@@ -172,9 +172,9 @@
                     <input type="text" id="input-title" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30" placeholder="Contoh: Cyberpunk Lion">
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-400 mb-1">Link Gambar / Video (Postimages, Imgur, dll)</label>
+                    <label class="block text-sm text-gray-400 mb-1 text-yellow-400 font-semibold"><i class="fas fa-exclamation-triangle mr-1"></i>Link WAJIB Tautan Langsung (Direct Link)</label>
                     <input type="url" id="input-media-url" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30" placeholder="https://i.postimg.cc/xxxx/gambar.jpg">
-                    <p class="text-[10px] text-gray-500 mt-1">Masukkan direct link yang berakhiran .jpg, .png, atau .mp4</p>
+                    <p class="text-[11px] text-gray-400 mt-1">Di Postimages, pastikan copy bagian <b>"Direct link"</b>. Link harus berakhiran <span class="text-white font-mono bg-white/10 px-1 rounded">.jpg</span>, <span class="text-white font-mono bg-white/10 px-1 rounded">.png</span>, atau <span class="text-white font-mono bg-white/10 px-1 rounded">.mp4</span></p>
                 </div>
                 <div>
                     <label class="block text-sm text-gray-400 mb-1">Teks Prompt</label>
@@ -282,11 +282,21 @@
                     snapshot.forEach((doc) => {
                         loadedData.push({ id: doc.id, ...doc.data() });
                     });
-                    promptData = loadedData.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                    
+                    // Gabungkan dengan data lokal (temp data yang belum dapat ID dari firebase)
+                    const finalData = loadedData.slice();
+                    promptData.forEach(localItem => {
+                        if(localItem.id.startsWith('temp-') && !finalData.find(f => f.createdAt === localItem.createdAt)) {
+                            finalData.push(localItem);
+                        }
+                    });
+
+                    promptData = finalData.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
                     window.renderPrompts();
                 }, (error) => {
                     console.error("Firestore Error:", error);
                     updateStatus(error.code === 'permission-denied' ? "RULES DENIED" : "DB ERROR");
+                    window.showCustomAlert("Peringatan: Akses Database Ditolak (Cek Rules Firestore!)");
                 });
             } else {
                 updateStatus("OFFLINE");
@@ -326,12 +336,10 @@
             
             container.innerHTML = promptData.map(item => {
                 const isLiked = likedList.includes(item.id);
-                // Mendukung legacy property "imageUrl" atau tipe data baru "mediaUrl"
                 const mediaUrl = item.mediaUrl || item.imageUrl; 
-                const mediaType = item.mediaType || 'image/jpeg'; // Default fallback
+                const mediaType = item.mediaType || 'image/jpeg';
                 const isVideo = mediaType.startsWith('video/') || (mediaUrl && mediaUrl.match(/\.(mp4|webm|ogg)$/i));
 
-                // Menyiapkan elemen media (gambar vs video)
                 let mediaElement = '';
                 if (isVideo) {
                     mediaElement = `<video src="${mediaUrl}" controls class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy"></video>`;
@@ -339,12 +347,19 @@
                     mediaElement = `<img src="${mediaUrl}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" onerror="this.src='https://via.placeholder.com/800x600/111/fff?text=Image+Not+Found';">`;
                 }
 
+                // Tambahkan efek transparan jika masih loading sync ke server
+                const isTemp = item.id.startsWith('temp-');
+                const cardClass = isTemp ? "glass-card rounded-2xl flex flex-col md:flex-row group w-full relative opacity-70 animate-pulse" : "glass-card rounded-2xl flex flex-col md:flex-row group w-full relative";
+
                 return `
-                    <div class="glass-card rounded-2xl flex flex-col md:flex-row group w-full relative">
-                        ${window.isAdmin ? `
+                    <div class="${cardClass}" id="card-${item.id}">
+                        ${window.isAdmin && !isTemp ? `
                         <button onclick="confirmDelete('${item.id}')" class="absolute top-4 right-4 bg-red-600/80 hover:bg-red-600 text-white w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition z-20 shadow-lg">
                             <i class="fas fa-trash-alt"></i>
                         </button>` : ''}
+                        
+                        ${isTemp ? `<div class="absolute top-4 right-4 bg-yellow-500/80 text-white text-[10px] px-2 py-1 rounded-full z-20"><i class="fas fa-cloud-upload-alt mr-1"></i> Menyinkronkan...</div>` : ''}
+
                         <div class="w-full md:w-5/12 h-64 md:h-auto shrink-0 relative overflow-hidden bg-neutral-900">
                             ${mediaElement}
                             ${!isVideo ? `<div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#1e1e1e]/80 to-transparent pointer-events-none"></div>` : ''}
@@ -360,11 +375,11 @@
                                 </div>
                             </div>
                             <div class="flex items-center justify-between">
-                                <button onclick="toggleLike('${item.id}', ${item.likes})" class="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 hover:bg-white/10 transition-colors group/btn">
+                                <button onclick="toggleLike('${item.id}', ${item.likes})" class="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 hover:bg-white/10 transition-colors group/btn" ${isTemp ? 'disabled' : ''}>
                                     <i class="${isLiked ? 'fas fa-heart text-white liked-anim' : 'far fa-heart text-gray-400'}"></i>
                                     <span class="text-sm font-medium ${isLiked ? 'text-white' : 'text-gray-400'}">${item.likes || 0}</span>
                                 </button>
-                                <button onclick="copyPrompt('${item.id}')" class="flex items-center gap-2 bg-white text-black px-6 py-2 rounded-full font-semibold hover:bg-gray-200 transition-all active:scale-95">
+                                <button onclick="copyPrompt('${item.id}')" class="flex items-center gap-2 bg-white text-black px-6 py-2 rounded-full font-semibold hover:bg-gray-200 transition-all active:scale-95" ${isTemp ? 'disabled' : ''}>
                                     <i class="fas fa-copy"></i><span class="text-sm">Salin Prompt</span>
                                 </button>
                             </div>
@@ -380,7 +395,7 @@
             if (isLiked) likedList.splice(likedList.indexOf(id), 1);
             else likedList.push(id);
             localStorage.setItem('likedPrompts', JSON.stringify(likedList));
-            if (currentUser) {
+            if (currentUser && !id.startsWith('temp-')) {
                 try {
                     const docRef = doc(db, 'artifacts', appId, 'public', 'data', collectionName, id);
                     await updateDoc(docRef, { likes: newLikes });
@@ -434,7 +449,7 @@
             document.getElementById('text-simpan').innerText = "Simpan ke Galeri";
         };
 
-        // Fungsi Utama untuk Simpan Link ke Firestore (Teknik Optimistic UI)
+        // True Optimistic UI: Muncul di layar 100% instan, sync di background
         window.addNewPrompt = async () => {
             const title = document.getElementById('input-title').value.trim();
             const mediaUrl = document.getElementById('input-media-url').value.trim();
@@ -444,33 +459,63 @@
                 return window.showCustomAlert("Lengkapi form (Judul, Link Gambar/Video, dan Prompt) terlebih dahulu!");
             }
 
-            // Mendeteksi apakah link tersebut video (.mp4/.webm) atau gambar biasa
+            // VALIDASI: Memastikan link adalah Direct Link (punya ekstensi file media)
+            const isValidMedia = mediaUrl.match(/\.(jpg|jpeg|png|gif|webp|mp4|webm|ogg)(\?.*)?$/i);
+            if (!isValidMedia) {
+                return window.showCustomAlert("❌ GAGAL: Gunakan 'Direct Link' yang berakhiran .jpg, .png, atau .mp4!");
+            }
+
             const isVideo = mediaUrl.match(/\.(mp4|webm|ogg)$/i);
             const mediaType = isVideo ? 'video/mp4' : 'image/jpeg';
 
+            // 1. BUAT DATA LOKAL SEMENTARA & TAMPILKAN LANGSUNG (0 Detik Lag)
+            const tempId = 'temp-' + Date.now();
+            const newPromptData = { 
+                id: tempId,
+                title: title, 
+                mediaUrl: mediaUrl,
+                mediaType: mediaType,
+                prompt: prompt, 
+                likes: 0, 
+                createdAt: Date.now()
+            };
+
+            promptData.unshift(newPromptData); // Masukkan ke data
+            window.renderPrompts();            // Render paksa ke layar
+            window.closeAdminModal();
+            window.showToast("Menyinkronkan ke Server...");
+            resetForm();
+
+            // 2. SIMPAN KE FIRESTORE DI BACKGROUND
             try {
                 const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
                 
-                // SIMPAN KE FIRESTORE (Di background, tanpa `await` agar UI langsung jalan)
-                addDoc(promptsRef, { 
-                    title: title, 
-                    mediaUrl: mediaUrl,
-                    mediaType: mediaType,
-                    prompt: prompt, 
+                const docRef = await addDoc(promptsRef, { 
+                    title: newPromptData.title, 
+                    mediaUrl: newPromptData.mediaUrl,
+                    mediaType: newPromptData.mediaType,
+                    prompt: newPromptData.prompt, 
                     likes: 0, 
-                    createdAt: Date.now()
-                }).catch(e => {
-                    console.error("Terjadi kesalahan background sync:", e);
-                    window.showCustomAlert("Gagal tersinkronisasi, cek jaringan kamu.");
+                    createdAt: newPromptData.createdAt
                 });
                 
-                // LANGSUNG eksekusi perintah menutup modal agar terasa instan (0 detik lag)
-                window.closeAdminModal();
-                window.showToast("Status: Selesai! Prompt Tersimpan ✅");
-                resetForm();
+                // Update ID lokal dengan ID asli dari server
+                const index = promptData.findIndex(p => p.id === tempId);
+                if (index !== -1) promptData[index].id = docRef.id;
+                
+                window.renderPrompts(); // Render ulang agar badge "menyinkronkan" hilang
+                window.showToast("Status: Tersimpan Permanen ✅");
+                
             } catch (e) { 
-                window.showCustomAlert("Terjadi kesalahan sistem."); 
-                console.error(e);
+                console.error("Terjadi kesalahan background sync:", e);
+                // Tampilkan pesan error jelas di tengah layar
+                window.showCustomAlert("❌ Gagal menyimpan ke Database! Pastikan Rules Firestore mengizinkan Write.");
+                
+                // Tarik kembali dari layar karena gagal masuk server
+                setTimeout(() => {
+                    promptData = promptData.filter(p => p.id !== tempId);
+                    window.renderPrompts();
+                }, 2000);
             }
         }
 
@@ -487,9 +532,7 @@
         window.executeDelete = async () => {
             if (!deleteDataId || !currentUser) return;
             try {
-                // Hapus Dokumen Firestore saja (karena file/gambar di hosting di luar)
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, deleteDataId));
-                
                 window.closeConfirmDelete();
                 window.showToast("Status: Prompt Terhapus 🗑️");
             } catch (e) { 
