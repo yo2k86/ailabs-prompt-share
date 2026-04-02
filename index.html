@@ -85,6 +85,7 @@
             </h1>
         </div>
         <div class="flex items-center gap-4">
+            <div id="connection-status" class="text-[10px] uppercase tracking-tighter px-2 py-1 rounded border border-gray-500/30 text-gray-400 font-mono">READY</div>
             <a href="#" class="text-gray-400 hover:text-white transition hidden md:block">
                 <i class="fab fa-facebook text-2xl"></i>
             </a>
@@ -121,9 +122,9 @@
     </div>
 
     <!-- Custom Alert -->
-    <div id="custom-alert" class="hidden fixed top-10 left-1/2 -translate-x-1/2 z-[110] glass-card px-6 py-3 rounded-full flex items-center gap-3 transition-all duration-300 transform -translate-y-10 opacity-0 pointer-events-none">
-        <i class="fas fa-info-circle text-white"></i>
-        <span id="alert-message" class="text-white text-sm font-medium"></span>
+    <div id="custom-alert" class="hidden fixed top-10 left-1/2 -translate-x-1/2 z-[110] glass-card px-6 py-4 rounded-xl flex items-center gap-3 transition-all duration-300 transform -translate-y-10 opacity-0 pointer-events-none max-w-md w-[90%] shadow-2xl border-red-500/30">
+        <i class="fas fa-exclamation-circle text-white text-xl"></i>
+        <span id="alert-message" class="text-white text-sm font-medium leading-tight"></span>
     </div>
 
     <!-- Modal Tambah Prompt -->
@@ -181,34 +182,27 @@
         <p>&copy; 2024 Ailabs Prompt Engineering. Dikembangkan oleh Bang pro.</p>
     </footer>
 
-    <!-- SCRIPT FIREBASE & LOGIKA APLIKASI -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <!-- SCRIPT GOOGLE SHEETS & LOGIKA APLIKASI -->
+    <script>
+        // --- KONFIGURASI GOOGLE SHEETS ---
+        // URL Web App dari Google Apps Script kamu
+        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycby8O5vvmo7woXB6P6c-z90TIniGoaEXrTZIWrC93oRoLSVkrWRhaieG1MPMqM9H7gatGw/exec";
 
-        // --- KONFIGURASI FIREBASE ---
-        const defaultFirebaseConfig = {
-            apiKey: "AIzaSyB2eTNTF1L5c9bMZLMyMb15ljdROyJ_5S8",
-            authDomain: "website-93ae4.firebaseapp.com",
-            projectId: "website-93ae4",
-            storageBucket: "website-93ae4.firebasestorage.app",
-            messagingSenderId: "176586837710",
-            appId: "1:176586837710:web:522dfa73f20ef9dcc30a9f",
-            measurementId: "G-ZNRJR9KB5D"
-        };
-
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : defaultFirebaseConfig;
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ailabs-prompt-app';
-        const collectionName = 'prompts';
-
-        let currentUser = null;
         let promptData = [];
         window.isAdmin = false;
+
+        const updateStatus = (text, type = 'error') => {
+            const statusIndicator = document.getElementById('connection-status');
+            if (!statusIndicator) return;
+            statusIndicator.innerText = text;
+            if (type === 'success') {
+                statusIndicator.className = "text-[10px] uppercase tracking-tighter px-2 py-1 rounded border border-green-500/30 text-green-400 font-mono";
+            } else if (type === 'warning') {
+                statusIndicator.className = "text-[10px] uppercase tracking-tighter px-2 py-1 rounded border border-yellow-500/30 text-yellow-400 font-mono";
+            } else {
+                statusIndicator.className = "text-[10px] uppercase tracking-tighter px-2 py-1 rounded border border-red-500/30 text-red-400 font-mono";
+            }
+        };
 
         window.showCustomAlert = (message) => {
             const alertBox = document.getElementById('custom-alert');
@@ -232,55 +226,47 @@
             }, 3000);
         }
 
-        // --- AUTHENTIKASI & SINKRONISASI REALTIME ---
-        const initAuth = async () => {
+        // --- FETCH DATA DARI GOOGLE SHEETS ---
+        const loadDataFromSheets = async () => {
+            // Validasi URL sebelum melakukan fetch
+            if (!GOOGLE_SHEET_URL || GOOGLE_SHEET_URL.includes("PASTE_URL")) {
+                console.warn("Google Sheet URL belum dikonfigurasi.");
+                updateStatus("CONFIG REQ", "warning");
+                const container = document.getElementById('prompts-container');
+                container.innerHTML = '<div class="text-center py-20 text-gray-600 italic">Database belum tersambung. Harap masukkan URL Web App Google Sheets Anda ke dalam kode (GOOGLE_SHEET_URL).</div>';
+                return;
+            }
+
+            updateStatus("SYNCING...", "warning");
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                const response = await fetch(GOOGLE_SHEET_URL);
+                const data = await response.json();
+                
+                // Urutkan data dari yang terbaru
+                promptData = data.sort((a, b) => b.createdAt - a.createdAt);
+                
+                updateStatus("ONLINE", "success");
+                window.renderPrompts();
             } catch (error) {
-                console.error("Auth failed:", error);
+                console.error("Gagal memuat data Google Sheets:", error);
+                updateStatus("OFFLINE");
+                window.showCustomAlert("Gagal terhubung ke Database Google Sheets. Pastikan URL benar dan aplikasi sudah di-deploy sebagai 'Anyone'.");
             }
         };
-
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user) {
-                const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
-                
-                // Mendengarkan perubahan data secara realtime (Setiap di-refresh akan ambil dari sini)
-                onSnapshot(promptsRef, (snapshot) => {
-                    const loadedData = [];
-                    snapshot.forEach((doc) => {
-                        loadedData.push({ id: doc.id, ...doc.data() });
-                    });
-                    
-                    promptData = loadedData.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-                    window.renderPrompts();
-                }, (error) => {
-                    console.error("Firestore Error:", error);
-                    window.showCustomAlert("Gagal memuat data dari database. Cek koneksi Anda.");
-                });
-            }
-        });
 
         window.renderPrompts = () => {
             const container = document.getElementById('prompts-container');
             
             if (promptData.length === 0) {
-                container.innerHTML = '<div class="text-center py-20 text-gray-600 italic">Galeri masih kosong. Tambah prompt melalui Admin.</div>';
+                container.innerHTML = '<div class="text-center py-20 text-gray-600 italic">Galeri kosong. Tambahkan prompt pertama Anda.</div>';
                 return;
             }
 
             const likedList = JSON.parse(localStorage.getItem('likedPrompts') || '[]');
             
             container.innerHTML = promptData.map(item => {
-                const isLiked = likedList.includes(item.id);
-                const mediaUrl = item.mediaUrl;
-                
-                const mediaElement = `<img src="${mediaUrl}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" onerror="this.src='https://placehold.co/800x600/111/fff?text=Link+Gambar+Rusak';">`;
+                const isLiked = likedList.includes(item.id.toString());
+                const mediaElement = `<img src="${item.mediaUrl}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" onerror="this.src='https://placehold.co/800x600/111/fff?text=Link+Gambar+Rusak';">`;
 
                 return `
                     <div class="glass-card rounded-2xl flex flex-col md:flex-row group w-full relative" id="card-${item.id}">
@@ -316,21 +302,31 @@
             }).join('');
         };
 
-        window.toggleLike = async (id, currentLikes) => {
+        window.toggleLike = (id, currentLikes) => {
+            const strId = id.toString();
             const likedList = JSON.parse(localStorage.getItem('likedPrompts') || '[]');
-            const isLiked = likedList.includes(id);
+            const isLiked = likedList.includes(strId);
             const newLikes = isLiked ? Math.max(0, currentLikes - 1) : (currentLikes || 0) + 1;
             
-            if (isLiked) likedList.splice(likedList.indexOf(id), 1);
-            else likedList.push(id);
+            if (isLiked) likedList.splice(likedList.indexOf(strId), 1);
+            else likedList.push(strId);
             
             localStorage.setItem('likedPrompts', JSON.stringify(likedList));
             
-            if (currentUser) {
-                try {
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', collectionName, id);
-                    await updateDoc(docRef, { likes: newLikes });
-                } catch(e) { console.error("Update error", e); }
+            // Update Array Lokal secara Optimistic UI
+            const index = promptData.findIndex(p => p.id.toString() === strId);
+            if(index !== -1) {
+                promptData[index].likes = newLikes;
+                window.renderPrompts();
+            }
+
+            // Update ke Google Sheets di latar belakang
+            if (!GOOGLE_SHEET_URL.includes("PASTE_URL")) {
+                fetch(`${GOOGLE_SHEET_URL}?action=like`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ id: id, likes: newLikes })
+                }).catch(e => console.error("Gagal kirim like ke Sheets", e));
             }
         }
 
@@ -363,11 +359,7 @@
         }
 
         window.closeAdminLogin = () => document.getElementById('admin-login-modal').classList.add('hidden');
-        
-        window.openAdminModal = () => {
-            document.getElementById('admin-modal').classList.remove('hidden');
-        }
-        
+        window.openAdminModal = () => document.getElementById('admin-modal').classList.remove('hidden');
         window.closeAdminModal = () => {
             document.getElementById('admin-modal').classList.add('hidden');
             resetForm();
@@ -379,45 +371,45 @@
             document.getElementById('input-prompt').value = '';
         };
 
-        // --- FUNGSI SIMPAN KE FIREBASE ---
-        window.addNewPrompt = async () => {
+        // --- TAMBAH DATA BARU ---
+        window.addNewPrompt = () => {
+            if(GOOGLE_SHEET_URL.includes("PASTE_URL")) {
+                return window.showCustomAlert("❌ ERROR: URL Google Sheets Web App belum dimasukkan ke dalam kode! Silakan ganti PASTE_URL_WEB_APP_KAMU_DISINI dengan link asli.");
+            }
+
             const title = document.getElementById('input-title').value.trim();
             const mediaUrl = document.getElementById('input-media-url').value.trim();
             const prompt = document.getElementById('input-prompt').value.trim();
             
-            if (!mediaUrl) {
-                return window.showCustomAlert("Link Postimages (Direct Link) wajib diisi!");
-            }
-            if (!currentUser) {
-                return window.showCustomAlert("Sistem sedang menghubungkan ke database, tunggu sebentar...");
-            }
+            if (!mediaUrl) return window.showCustomAlert("Link Postimages (Direct Link) wajib diisi!");
 
-            // Jika kosong, beri nilai default
-            const finalTitle = title || "Tanpa Judul";
-            const finalPrompt = prompt || "-";
+            const newItem = {
+                id: Date.now().toString(),
+                title: title || "Tanpa Judul",
+                mediaUrl: mediaUrl,
+                prompt: prompt || "-",
+                likes: 0,
+                createdAt: Date.now()
+            };
 
-            // Tutup modal segera agar terasa cepat (Optimistic approach)
+            // Tampilkan Instan (Optimistic UI)
+            promptData.unshift(newItem);
+            window.renderPrompts();
             window.closeAdminModal();
-            window.showToast("Menyimpan ke database... ⏳");
+            window.showToast("Mengirim ke Google Sheets... ⏳");
             resetForm();
 
-            try {
-                const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
-                
-                await addDoc(promptsRef, { 
-                    title: finalTitle, 
-                    mediaUrl: mediaUrl,
-                    prompt: finalPrompt, 
-                    likes: 0, 
-                    createdAt: Date.now()
-                });
-                
-                window.showToast("Tersimpan permanen & Publik! ✅");
-                
-            } catch (e) { 
-                console.error("Gagal simpan ke database:", e);
-                window.showCustomAlert("❌ Gagal menyimpan! Pastikan koneksi internet stabil.");
-            }
+            // Kirim diam-diam ke Google Sheets
+            fetch(`${GOOGLE_SHEET_URL}?action=insert`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(newItem)
+            }).then(() => {
+                window.showToast("Berhasil tersimpan! ✅");
+            }).catch(e => {
+                console.error("Gagal simpan ke Sheets:", e);
+                window.showCustomAlert("Gagal sinkronisasi ke server. Pastikan deployment Apps Script benar.");
+            });
         }
 
         let deleteDataId = null; 
@@ -430,20 +422,31 @@
             document.getElementById('confirm-delete-modal').classList.add('hidden');
         }
         
-        window.executeDelete = async () => {
-            if (!deleteDataId || !currentUser) return;
-            try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, deleteDataId));
-                window.closeConfirmDelete();
-                window.showToast("Dihapus dari Database 🗑️");
-            } catch (e) { 
-                window.showCustomAlert("Gagal menghapus."); 
-                console.error(e);
+        // --- HAPUS DATA ---
+        window.executeDelete = () => {
+            if (!deleteDataId) return;
+            if(GOOGLE_SHEET_URL.includes("PASTE_URL")) {
+                return window.showCustomAlert("❌ Konfigurasi URL belum benar.");
             }
+            
+            // Hapus dari tampilan instan
+            promptData = promptData.filter(item => item.id.toString() !== deleteDataId.toString());
+            window.renderPrompts();
+            window.closeConfirmDelete();
+            window.showToast("Sedang menghapus... 🗑️");
+
+            // Kirim perintah hapus ke Google Sheets
+            fetch(`${GOOGLE_SHEET_URL}?action=delete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ id: deleteDataId })
+            }).then(() => {
+                window.showToast("Terhapus permanen! ✅");
+            }).catch(e => console.error("Gagal hapus di Sheets", e));
         }
 
-        // Mulai sambungan Firebase
-        initAuth();
+        // Panggil saat web pertama kali dibuka
+        loadDataFromSheets();
 
     </script>
 </body>
