@@ -85,7 +85,6 @@
             </h1>
         </div>
         <div class="flex items-center gap-4">
-            <div id="connection-status" class="text-[10px] uppercase tracking-tighter px-2 py-1 rounded border border-blue-500/30 text-blue-400 font-mono">LOCAL MODE</div>
             <a href="#" class="text-gray-400 hover:text-white transition hidden md:block">
                 <i class="fab fa-facebook text-2xl"></i>
             </a>
@@ -94,12 +93,14 @@
 
     <main class="container mx-auto px-4 py-10 md:px-8 max-w-5xl">
         <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Galeri Prompt AI (Test Mode)</h2>
-            <p class="text-gray-400">Mode pengetesan tanpa database. Data akan hilang jika web di-refresh.</p>
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Galeri Prompt AI</h2>
+            <p class="text-gray-400">Temukan inspirasi dari kumpulan prompt terbaik kami. Salin dan gunakan untuk karya Anda.</p>
         </div>
 
         <div id="prompts-container" class="space-y-8">
-            <!-- Tempat prompt akan dirender -->
+            <!-- Skeleton Loading Awal -->
+            <div class="glass-card rounded-2xl flex flex-col md:flex-row group w-full animate-pulse h-64 md:h-80 opacity-20"></div>
+            <div class="glass-card rounded-2xl flex flex-col md:flex-row group w-full animate-pulse h-64 md:h-80 opacity-10"></div>
         </div>
     </main>
 
@@ -125,11 +126,11 @@
         <span id="alert-message" class="text-white text-sm font-medium"></span>
     </div>
 
-    <!-- Modal Tambah Prompt (KEMBALI KE LINK URL) -->
+    <!-- Modal Tambah Prompt -->
     <div id="admin-modal" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
         <div class="glass-card w-full max-w-lg p-6 rounded-2xl my-8">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-white">Tambah Prompt (Local Test)</h3>
+                <h3 class="text-xl font-bold text-white">Tambah Prompt Baru</h3>
                 <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
             </div>
             <div class="space-y-4">
@@ -149,7 +150,7 @@
                 <div class="flex gap-3 mt-4">
                     <button onclick="closeAdminModal()" class="w-1/3 px-4 py-3 rounded-lg text-gray-400 border border-white/10 font-medium hover:bg-white/5 transition">Batal</button>
                     <button id="btn-simpan" onclick="addNewPrompt()" class="w-2/3 bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center">
-                        <span id="text-simpan">Simpan ke Layar</span>
+                        <span id="text-simpan">Simpan & Publikasikan</span>
                     </button>
                 </div>
             </div>
@@ -177,11 +178,35 @@
     </div>
 
     <footer class="border-t border-white/10 mt-20 py-8 text-center text-gray-500 text-xs">
-        <p>&copy; 2024 Ailabs Prompt Engineering. Mode Uji Coba.</p>
+        <p>&copy; 2024 Ailabs Prompt Engineering. Dikembangkan oleh Bang pro.</p>
     </footer>
 
-    <!-- SCRIPT MURNI JAVASCRIPT LOKAL (TANPA FIREBASE/BACKEND) -->
-    <script>
+    <!-- SCRIPT FIREBASE & LOGIKA APLIKASI -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- KONFIGURASI FIREBASE ---
+        const defaultFirebaseConfig = {
+            apiKey: "AIzaSyB2eTNTF1L5c9bMZLMyMb15ljdROyJ_5S8",
+            authDomain: "website-93ae4.firebaseapp.com",
+            projectId: "website-93ae4",
+            storageBucket: "website-93ae4.firebasestorage.app",
+            messagingSenderId: "176586837710",
+            appId: "1:176586837710:web:522dfa73f20ef9dcc30a9f",
+            measurementId: "G-ZNRJR9KB5D"
+        };
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : defaultFirebaseConfig;
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ailabs-prompt-app';
+        const collectionName = 'prompts';
+
+        let currentUser = null;
         let promptData = [];
         window.isAdmin = false;
 
@@ -207,11 +232,45 @@
             }, 3000);
         }
 
+        // --- AUTHENTIKASI & SINKRONISASI REALTIME ---
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Auth failed:", error);
+            }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
+                
+                // Mendengarkan perubahan data secara realtime (Setiap di-refresh akan ambil dari sini)
+                onSnapshot(promptsRef, (snapshot) => {
+                    const loadedData = [];
+                    snapshot.forEach((doc) => {
+                        loadedData.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    promptData = loadedData.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                    window.renderPrompts();
+                }, (error) => {
+                    console.error("Firestore Error:", error);
+                    window.showCustomAlert("Gagal memuat data dari database. Cek koneksi Anda.");
+                });
+            }
+        });
+
         window.renderPrompts = () => {
             const container = document.getElementById('prompts-container');
             
             if (promptData.length === 0) {
-                container.innerHTML = '<div class="text-center py-20 text-gray-600 italic">Data kosong. Silakan tambah prompt dari Admin.</div>';
+                container.innerHTML = '<div class="text-center py-20 text-gray-600 italic">Galeri masih kosong. Tambah prompt melalui Admin.</div>';
                 return;
             }
 
@@ -221,7 +280,6 @@
                 const isLiked = likedList.includes(item.id);
                 const mediaUrl = item.mediaUrl;
                 
-                // Fallback untuk render gambar
                 const mediaElement = `<img src="${mediaUrl}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" onerror="this.src='https://placehold.co/800x600/111/fff?text=Link+Gambar+Rusak';">`;
 
                 return `
@@ -258,20 +316,21 @@
             }).join('');
         };
 
-        window.toggleLike = (id, currentLikes) => {
+        window.toggleLike = async (id, currentLikes) => {
             const likedList = JSON.parse(localStorage.getItem('likedPrompts') || '[]');
             const isLiked = likedList.includes(id);
+            const newLikes = isLiked ? Math.max(0, currentLikes - 1) : (currentLikes || 0) + 1;
             
             if (isLiked) likedList.splice(likedList.indexOf(id), 1);
             else likedList.push(id);
             
             localStorage.setItem('likedPrompts', JSON.stringify(likedList));
             
-            // Update UI lokal
-            const index = promptData.findIndex(p => p.id === id);
-            if(index !== -1) {
-                promptData[index].likes = isLiked ? Math.max(0, currentLikes - 1) : (currentLikes || 0) + 1;
-                window.renderPrompts();
+            if (currentUser) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', collectionName, id);
+                    await updateDoc(docRef, { likes: newLikes });
+                } catch(e) { console.error("Update error", e); }
             }
         }
 
@@ -320,32 +379,45 @@
             document.getElementById('input-prompt').value = '';
         };
 
-        // FUNGSI SIMPAN KE MEMORI LOKAL SAJA (Tanpa Database)
-        window.addNewPrompt = () => {
+        // --- FUNGSI SIMPAN KE FIREBASE ---
+        window.addNewPrompt = async () => {
             const title = document.getElementById('input-title').value.trim();
             const mediaUrl = document.getElementById('input-media-url').value.trim();
             const prompt = document.getElementById('input-prompt').value.trim();
             
-            // Validasi: Sekarang HANYA Link Gambar yang wajib diisi
             if (!mediaUrl) {
                 return window.showCustomAlert("Link Postimages (Direct Link) wajib diisi!");
             }
+            if (!currentUser) {
+                return window.showCustomAlert("Sistem sedang menghubungkan ke database, tunggu sebentar...");
+            }
 
-            // Data sementara disimpan ke dalam Array
-            const newItem = {
-                id: 'local-' + Date.now(),
-                title: title || "Tanpa Judul", // Jika kosong otomatis jadi "Tanpa Judul"
-                mediaUrl: mediaUrl,
-                prompt: prompt || "-", // Jika kosong otomatis diisi tanda strip (-)
-                likes: 0
-            };
+            // Jika kosong, beri nilai default
+            const finalTitle = title || "Tanpa Judul";
+            const finalPrompt = prompt || "-";
 
-            promptData.unshift(newItem); // Taruh di urutan paling atas
-            
-            window.renderPrompts();
+            // Tutup modal segera agar terasa cepat (Optimistic approach)
             window.closeAdminModal();
-            window.showToast("Tampil di layar! (Akan hilang jika di-refresh) ✅");
+            window.showToast("Menyimpan ke database... ⏳");
             resetForm();
+
+            try {
+                const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
+                
+                await addDoc(promptsRef, { 
+                    title: finalTitle, 
+                    mediaUrl: mediaUrl,
+                    prompt: finalPrompt, 
+                    likes: 0, 
+                    createdAt: Date.now()
+                });
+                
+                window.showToast("Tersimpan permanen & Publik! ✅");
+                
+            } catch (e) { 
+                console.error("Gagal simpan ke database:", e);
+                window.showCustomAlert("❌ Gagal menyimpan! Pastikan koneksi internet stabil.");
+            }
         }
 
         let deleteDataId = null; 
@@ -358,17 +430,20 @@
             document.getElementById('confirm-delete-modal').classList.add('hidden');
         }
         
-        window.executeDelete = () => {
-            if (!deleteDataId) return;
-            
-            promptData = promptData.filter(item => item.id !== deleteDataId);
-            window.renderPrompts();
-            window.closeConfirmDelete();
-            window.showToast("Dihapus dari layar 🗑️");
+        window.executeDelete = async () => {
+            if (!deleteDataId || !currentUser) return;
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, deleteDataId));
+                window.closeConfirmDelete();
+                window.showToast("Dihapus dari Database 🗑️");
+            } catch (e) { 
+                window.showCustomAlert("Gagal menghapus."); 
+                console.error(e);
+            }
         }
 
-        // Render awal saat web dibuka
-        window.renderPrompts();
+        // Mulai sambungan Firebase
+        initAuth();
 
     </script>
 </body>
