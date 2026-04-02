@@ -741,9 +741,7 @@
                 div.className = 'file-item';
                 div.innerHTML = `📄 ${file.name}`;
                 div.onclick = (e) => {
-                    // Remove active from all siblings
                     document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
-                    // Add active to current
                     e.currentTarget.classList.add('active');
                     
                     document.getElementById('active-filename').innerText = file.name;
@@ -754,11 +752,9 @@
             });
         }
 
-        // FUNGSI COPY PROMPT YANG SEBELUMNYA HILANG
         function copyCurrentPrompt() {
             if (!currentPromptContent) return;
             
-            // Clipboard API (Modern browsers)
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(currentPromptContent).then(showToast).catch(err => fallbackCopyTextToClipboard(currentPromptContent));
             } else {
@@ -790,6 +786,39 @@
             setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
         }
 
+        /* -------------------------------------------------------------
+           BAGIAN BARU: SCRIPT UNTUK MEMUTAR AUDIO SAAT ADA INTERAKSI
+        ------------------------------------------------------------- */
+        let hasInteracted = false;
+
+        function playAudioOnFirstInteraction() {
+            if (hasInteracted) return;
+            hasInteracted = true;
+            
+            bgAudio.play().then(() => {
+                initVisualizer();
+                // Jika audio context ada dan dalam state suspended, jalankan ulang
+                if(audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            }).catch((err) => {
+                console.log("Autoplay masih terblokir, pengguna butuh interaksi yang lebih jelas.", err);
+                hasInteracted = false; // reset agar dicoba lagi di klik berikutnya
+            });
+
+            // Hapus event listener agar tidak berjalan berulang-ulang
+            document.removeEventListener('click', playAudioOnFirstInteraction);
+            document.removeEventListener('keydown', playAudioOnFirstInteraction);
+            document.removeEventListener('touchstart', playAudioOnFirstInteraction);
+        }
+
+        // Pasang pendeteksi interaksi ke seluruh halaman
+        document.addEventListener('click', playAudioOnFirstInteraction);
+        document.addEventListener('keydown', playAudioOnFirstInteraction);
+        document.addEventListener('touchstart', playAudioOnFirstInteraction);
+        /* ------------------------------------------------------------- */
+
+
         document.getElementById('login-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const pass = document.getElementById('password').value.trim();
@@ -799,7 +828,11 @@
                 document.getElementById('portal-page').classList.remove('hidden');
                 document.getElementById('welcome-modal').classList.remove('hidden');
                 initExplorer();
-                bgAudio.play().then(() => initVisualizer()).catch(() => {});
+                // Audio sudah otomatis coba diputar dari trigger interaksi di atas
+                // Tapi kita buat cadangan disini jika belum berputar
+                if(bgAudio.paused) {
+                    bgAudio.play().then(() => initVisualizer()).catch(() => {});
+                }
             } else {
                 document.getElementById('error-message').textContent = 'TOKEN INVALID!';
             }
@@ -820,7 +853,6 @@
             document.getElementById('icon-sound-off').classList.toggle('hidden', !bgAudio.muted);
             if(!bgAudio.muted && audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
             
-            // Start audio if it wasn't playing due to browser autoplay policies
             if (!bgAudio.muted && bgAudio.paused) {
                 bgAudio.play().then(() => initVisualizer()).catch(() => {});
             }
@@ -835,8 +867,6 @@
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('portal-page').classList.remove('hidden');
                 initExplorer();
-                // Audio is not auto-played here due to browser interaction policies
-                // The user must click the sound toggle to start it if they bypassed login via session.
             }
         });
     </script>
