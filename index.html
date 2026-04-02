@@ -48,28 +48,6 @@
             transition: transform 0.3s ease, border-color 0.3s ease;
         }
 
-        .glass-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 50%;
-            height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.05), transparent);
-            transform: skewX(-25deg);
-            transition: left 0.5s ease;
-            pointer-events: none;
-        }
-
-        .glass-card:hover::before {
-            left: 150%;
-        }
-
-        .glass-card:hover {
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
         .glass-header {
             background: rgba(5, 5, 5, 0.7);
             backdrop-filter: blur(15px);
@@ -88,16 +66,6 @@
             100% { transform: scale(1); }
         }
         .liked-anim { animation: heartPulse 0.3s ease-in-out; }
-        
-        .shimmer {
-            background: linear-gradient(90deg, #111 25%, #222 50%, #111 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
     </style>
 </head>
 <body class="min-h-screen antialiased selection:bg-white selection:text-black">
@@ -117,7 +85,7 @@
             </h1>
         </div>
         <div class="flex items-center gap-4">
-            <div id="connection-status" class="text-[10px] uppercase tracking-tighter px-2 py-1 rounded border border-yellow-500/30 text-yellow-400">WAITING...</div>
+            <div id="connection-status" class="text-[10px] uppercase tracking-tighter px-2 py-1 rounded border border-blue-500/30 text-blue-400 font-mono">LOCAL MODE</div>
             <a href="#" class="text-gray-400 hover:text-white transition hidden md:block">
                 <i class="fab fa-facebook text-2xl"></i>
             </a>
@@ -126,14 +94,12 @@
 
     <main class="container mx-auto px-4 py-10 md:px-8 max-w-5xl">
         <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Galeri Prompt AI</h2>
-            <p class="text-gray-400">Temukan inspirasi dari kumpulan prompt terbaik kami. Salin dan gunakan untuk karya Anda.</p>
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Galeri Prompt AI (Test Mode)</h2>
+            <p class="text-gray-400">Mode pengetesan tanpa database. Data akan hilang jika web di-refresh.</p>
         </div>
 
         <div id="prompts-container" class="space-y-8">
-            <!-- Skeleton Loading -->
-            <div class="glass-card rounded-2xl flex flex-col md:flex-row group w-full shimmer h-64 md:h-80 opacity-20"></div>
-            <div class="glass-card rounded-2xl flex flex-col md:flex-row group w-full shimmer h-64 md:h-80 opacity-10"></div>
+            <!-- Tempat prompt akan dirender -->
         </div>
     </main>
 
@@ -159,11 +125,11 @@
         <span id="alert-message" class="text-white text-sm font-medium"></span>
     </div>
 
-    <!-- Modal Tambah Prompt (Fitur Auto-Upload & API Key Custom) -->
+    <!-- Modal Tambah Prompt (KEMBALI KE LINK URL) -->
     <div id="admin-modal" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
         <div class="glass-card w-full max-w-lg p-6 rounded-2xl my-8">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-white">Tambah Prompt Baru</h3>
+                <h3 class="text-xl font-bold text-white">Tambah Prompt (Local Test)</h3>
                 <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
             </div>
             <div class="space-y-4">
@@ -172,9 +138,9 @@
                     <input type="text" id="input-title" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30" placeholder="Contoh: Cyberpunk Lion">
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-400 mb-1">Pilih Gambar</label>
-                    <input type="file" id="input-media-file" accept="image/*" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white text-xs file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-white file:text-black hover:file:bg-gray-200 cursor-pointer">
-                    <p class="text-[11px] text-gray-400 mt-2"><i class="fas fa-cloud-upload-alt text-blue-400 mr-1"></i>Gambar akan dikompres & otomatis di-hosting.</p>
+                    <label class="block text-sm text-yellow-400 font-semibold mb-1">Link Postimages (Direct Link)</label>
+                    <input type="url" id="input-media-url" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30" placeholder="https://i.postimg.cc/xxxx/gambar.jpg">
+                    <p class="text-[11px] text-gray-400 mt-1">Harus berakhiran .jpg atau .png</p>
                 </div>
                 <div>
                     <label class="block text-sm text-gray-400 mb-1">Teks Prompt</label>
@@ -183,7 +149,7 @@
                 <div class="flex gap-3 mt-4">
                     <button onclick="closeAdminModal()" class="w-1/3 px-4 py-3 rounded-lg text-gray-400 border border-white/10 font-medium hover:bg-white/5 transition">Batal</button>
                     <button id="btn-simpan" onclick="addNewPrompt()" class="w-2/3 bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center">
-                        <span id="text-simpan">Upload & Simpan</span>
+                        <span id="text-simpan">Simpan ke Layar</span>
                     </button>
                 </div>
             </div>
@@ -211,94 +177,14 @@
     </div>
 
     <footer class="border-t border-white/10 mt-20 py-8 text-center text-gray-500 text-xs">
-        <p>&copy; 2024 Ailabs Prompt Engineering. Dikembangkan oleh Bang pro.</p>
+        <p>&copy; 2024 Ailabs Prompt Engineering. Mode Uji Coba.</p>
     </footer>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // --- CONFIGURATION ---
-        const defaultFirebaseConfig = {
-            apiKey: "AIzaSyB2eTNTF1L5c9bMZLMyMb15ljdROyJ_5S8",
-            authDomain: "website-93ae4.firebaseapp.com",
-            projectId: "website-93ae4",
-            storageBucket: "website-93ae4.firebasestorage.app",
-            messagingSenderId: "176586837710",
-            appId: "1:176586837710:web:522dfa73f20ef9dcc30a9f",
-            measurementId: "G-ZNRJR9KB5D"
-        };
-
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : defaultFirebaseConfig;
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ailabs-prompt-app';
-        const collectionName = 'prompts';
-
-        let currentUser = null;
+    <!-- SCRIPT MURNI JAVASCRIPT LOKAL (TANPA FIREBASE/BACKEND) -->
+    <script>
         let promptData = [];
-        let localPendingData = []; // Tambahan untuk efek loading secepat kilat
         window.isAdmin = false;
 
-        const updateStatus = (text, type = 'error') => {
-            const statusIndicator = document.getElementById('connection-status');
-            if (!statusIndicator) return;
-            statusIndicator.innerText = text;
-            if (type === 'success') {
-                statusIndicator.className = "text-[10px] uppercase tracking-tighter px-2 py-1 rounded border border-green-500/30 text-green-400";
-            } else if (type === 'warning') {
-                statusIndicator.className = "text-[10px] uppercase tracking-tighter px-2 py-1 rounded border border-yellow-500/30 text-yellow-400";
-            } else {
-                statusIndicator.className = "text-[10px] uppercase tracking-tighter px-2 py-1 rounded border border-red-500/30 text-red-400";
-            }
-        };
-
-        // --- AUTHENTICATION ---
-        const initAuth = async () => {
-            updateStatus("AUTH...", "warning");
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Auth failed:", error);
-                updateStatus("AUTH ERROR");
-            }
-        };
-
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user) {
-                updateStatus("SYNCING...", "warning");
-                
-                const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
-                
-                // Snapshot realtime Firebase
-                onSnapshot(promptsRef, (snapshot) => {
-                    updateStatus("ONLINE", "success");
-                    const loadedData = [];
-                    snapshot.forEach((doc) => {
-                        loadedData.push({ id: doc.id, ...doc.data() });
-                    });
-                    
-                    promptData = loadedData.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-                    window.renderPrompts();
-                }, (error) => {
-                    console.error("Firestore Error:", error);
-                    updateStatus(error.code === 'permission-denied' ? "RULES DENIED" : "DB ERROR");
-                    window.showCustomAlert("Peringatan: Akses Database Ditolak (Cek Rules Firestore!)");
-                });
-            } else {
-                updateStatus("OFFLINE");
-            }
-        });
-
-        // --- UI LOGIC ---
         window.showCustomAlert = (message) => {
             const alertBox = document.getElementById('custom-alert');
             document.getElementById('alert-message').innerText = message;
@@ -323,32 +209,27 @@
 
         window.renderPrompts = () => {
             const container = document.getElementById('prompts-container');
-            // Gabungkan data asli dari Firebase dengan data sementara (yang sedang proses upload)
-            const combinedData = [...localPendingData, ...promptData].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
-            if (combinedData.length === 0) {
-                container.innerHTML = '<div class="text-center py-20 text-gray-600 italic">Database kosong. Tambah prompt melalui Admin.</div>';
+            
+            if (promptData.length === 0) {
+                container.innerHTML = '<div class="text-center py-20 text-gray-600 italic">Data kosong. Silakan tambah prompt dari Admin.</div>';
                 return;
             }
+
             const likedList = JSON.parse(localStorage.getItem('likedPrompts') || '[]');
             
-            container.innerHTML = combinedData.map(item => {
+            container.innerHTML = promptData.map(item => {
                 const isLiked = likedList.includes(item.id);
-                const mediaUrl = item.mediaUrl || item.imageUrl; 
-                const mediaType = item.mediaType || 'image/jpeg';
-                const isTemp = item.isTemp; // Penanda kalau gambar masih proses background
+                const mediaUrl = item.mediaUrl;
                 
-                // Fallback untuk render gambar yang aman
-                const mediaElement = `<img src="${mediaUrl}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" onerror="this.src='https://placehold.co/800x600/111/fff?text=Image+Not+Found';">`;
+                // Fallback untuk render gambar
+                const mediaElement = `<img src="${mediaUrl}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" onerror="this.src='https://placehold.co/800x600/111/fff?text=Link+Gambar+Rusak';">`;
 
                 return `
-                    <div class="glass-card rounded-2xl flex flex-col md:flex-row group w-full relative ${isTemp ? 'opacity-70 animate-pulse pointer-events-none' : ''}" id="card-${item.id}">
-                        ${window.isAdmin && !isTemp ? `
+                    <div class="glass-card rounded-2xl flex flex-col md:flex-row group w-full relative" id="card-${item.id}">
+                        ${window.isAdmin ? `
                         <button onclick="confirmDelete('${item.id}')" class="absolute top-4 right-4 bg-red-600/80 hover:bg-red-600 text-white w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition z-20 shadow-lg">
                             <i class="fas fa-trash-alt"></i>
                         </button>` : ''}
-
-                        ${isTemp ? `<div class="absolute top-4 left-4 bg-blue-500/90 text-white text-[10px] px-3 py-1.5 rounded-full z-20 shadow-xl backdrop-blur-sm flex items-center"><i class="fas fa-cloud-upload-alt mr-1.5 animate-bounce"></i> Mengunggah...</div>` : ''}
 
                         <div class="w-full md:w-5/12 h-64 md:h-auto shrink-0 relative overflow-hidden bg-neutral-900">
                             ${mediaElement}
@@ -377,18 +258,20 @@
             }).join('');
         };
 
-        window.toggleLike = async (id, currentLikes) => {
+        window.toggleLike = (id, currentLikes) => {
             const likedList = JSON.parse(localStorage.getItem('likedPrompts') || '[]');
             const isLiked = likedList.includes(id);
-            const newLikes = isLiked ? Math.max(0, currentLikes - 1) : (currentLikes || 0) + 1;
+            
             if (isLiked) likedList.splice(likedList.indexOf(id), 1);
             else likedList.push(id);
+            
             localStorage.setItem('likedPrompts', JSON.stringify(likedList));
-            if (currentUser) {
-                try {
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', collectionName, id);
-                    await updateDoc(docRef, { likes: newLikes });
-                } catch(e) { console.error("Update error", e); }
+            
+            // Update UI lokal
+            const index = promptData.findIndex(p => p.id === id);
+            if(index !== -1) {
+                promptData[index].likes = isLiked ? Math.max(0, currentLikes - 1) : (currentLikes || 0) + 1;
+                window.renderPrompts();
             }
         }
 
@@ -433,133 +316,35 @@
 
         const resetForm = () => {
             document.getElementById('input-title').value = '';
-            document.getElementById('input-media-file').value = '';
+            document.getElementById('input-media-url').value = '';
             document.getElementById('input-prompt').value = '';
-            
-            const btn = document.getElementById('btn-simpan');
-            btn.disabled = false;
-            document.getElementById('text-simpan').innerText = "Upload & Simpan";
         };
 
-        // Kompresi Gambar Otomatis
-        const compressImage = (file) => {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const MAX_SIZE = 1200;
-                        let width = img.width;
-                        let height = img.height;
-
-                        if (width > height && width > MAX_SIZE) {
-                            height *= MAX_SIZE / width;
-                            width = MAX_SIZE;
-                        } else if (height > MAX_SIZE) {
-                            width *= MAX_SIZE / height;
-                            height = MAX_SIZE;
-                        }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                        resolve(dataUrl.split(',')[1]); 
-                    };
-                    img.onerror = (e) => reject(e);
-                };
-                reader.onerror = (e) => reject(e);
-            });
-        };
-
-        // UPLOAD KE IMGBB DENGAN INSTANT BACKGROUND UPLOAD (0-Detik Lag)
+        // FUNGSI SIMPAN KE MEMORI LOKAL SAJA (Tanpa Database)
         window.addNewPrompt = () => {
-            const IMGBB_API_KEY = "999554b8c6db097997b1aaea28416814"; // API Key milikmu
             const title = document.getElementById('input-title').value.trim();
-            const fileInput = document.getElementById('input-media-file');
-            const file = fileInput.files[0];
+            const mediaUrl = document.getElementById('input-media-url').value.trim();
             const prompt = document.getElementById('input-prompt').value.trim();
             
-            if (!title || !file || !prompt || !currentUser) {
-                return window.showCustomAlert("Lengkapi form (Judul, Pilih Gambar, dan Prompt)!");
+            if (!title || !mediaUrl || !prompt) {
+                return window.showCustomAlert("Lengkapi form (Judul, Link, dan Prompt)!");
             }
 
-            if (!file.type.startsWith('image/')) {
-                return window.showCustomAlert("File harus berupa gambar (JPG/PNG/WEBP).");
-            }
-
-            // 1. BUAT KARTU SEMENTARA & TAMPILKAN INSTAN (0ms Lag)
-            const tempId = 'temp-' + Date.now();
-            const localUrl = URL.createObjectURL(file); // Membaca gambar langsung dari memori HP
-            
-            const tempItem = {
-                id: tempId,
+            // Data sementara disimpan ke dalam Array
+            const newItem = {
+                id: 'local-' + Date.now(),
                 title: title,
-                mediaUrl: localUrl,
-                mediaType: file.type,
+                mediaUrl: mediaUrl,
                 prompt: prompt,
-                likes: 0,
-                createdAt: Date.now(),
-                isTemp: true
+                likes: 0
             };
 
-            localPendingData.unshift(tempItem);
-            window.renderPrompts(); // Langsung muncul di layar
-
-            // Tutup modal seketika agar admin tidak perlu nunggu muter-muter
+            promptData.unshift(newItem); // Taruh di urutan paling atas
+            
+            window.renderPrompts();
             window.closeAdminModal();
-            window.showToast("Mengunggah di latar belakang... ⏳");
+            window.showToast("Tampil di layar! (Akan hilang jika di-refresh) ✅");
             resetForm();
-
-            // 2. PROSES UPLOAD BACKGROUND (Tanpa membekukan UI)
-            (async () => {
-                try {
-                    const base64Image = await compressImage(file);
-                    
-                    const formData = new FormData();
-                    formData.append('image', base64Image);
-                    
-                    const imgbbResponse = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    const imgbbData = await imgbbResponse.json();
-
-                    if (!imgbbData.success) {
-                        throw new Error(imgbbData.error.message || "Gagal mengunggah gambar ke ImgBB");
-                    }
-
-                    const directImageUrl = imgbbData.data.url;
-                    
-                    const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
-                    await addDoc(promptsRef, { 
-                        title: tempItem.title, 
-                        mediaUrl: directImageUrl,
-                        mediaType: tempItem.mediaType,
-                        prompt: tempItem.prompt, 
-                        likes: 0, 
-                        createdAt: tempItem.createdAt
-                    });
-                    
-                    // Hapus data lokal karena data Firebase asli yang akan segera merender ulang
-                    localPendingData = localPendingData.filter(item => item.id !== tempId);
-                    window.renderPrompts();
-                    window.showToast("Status: Tersimpan Permanen ✅");
-                    
-                } catch (e) { 
-                    console.error("Gagal proses simpan:", e);
-                    // Hapus kartu sementara jika gagal agar tidak nyangkut
-                    localPendingData = localPendingData.filter(item => item.id !== tempId);
-                    window.renderPrompts();
-                    window.showCustomAlert(`❌ Gagal menyimpan: Cek jaringan internetmu.`);
-                }
-            })();
         }
 
         let deleteDataId = null; 
@@ -572,19 +357,18 @@
             document.getElementById('confirm-delete-modal').classList.add('hidden');
         }
         
-        window.executeDelete = async () => {
-            if (!deleteDataId || !currentUser) return;
-            try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, deleteDataId));
-                window.closeConfirmDelete();
-                window.showToast("Status: Prompt Terhapus 🗑️");
-            } catch (e) { 
-                window.showCustomAlert("Gagal menghapus."); 
-                console.error(e);
-            }
+        window.executeDelete = () => {
+            if (!deleteDataId) return;
+            
+            promptData = promptData.filter(item => item.id !== deleteDataId);
+            window.renderPrompts();
+            window.closeConfirmDelete();
+            window.showToast("Dihapus dari layar 🗑️");
         }
 
-        initAuth();
+        // Render awal saat web dibuka
+        window.renderPrompts();
+
     </script>
 </body>
 </html>
