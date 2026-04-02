@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ailabs Prompt Engineering</title>
+    <!-- Tailwind CSS untuk Styling Cepat -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        glass: 'rgba(255, 255, 255, 0.05)',
+                        glassBorder: 'rgba(255, 255, 255, 0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #030303;
+            color: #e5e5e5;
+            /* Latar belakang dengan efek pendaran cahaya redup */
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(255, 255, 255, 0.04), transparent 30%),
+                radial-gradient(circle at 85% 30%, rgba(255, 255, 255, 0.03), transparent 30%);
+            background-attachment: fixed;
+        }
+
+        /* Efek Kaca (Glassmorphism) */
+        .glass-card {
+            background: rgba(30, 30, 30, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* Kilauan saat di-hover */
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transform: skewX(-25deg);
+            transition: left 0.5s ease;
+            pointer-events: none;
+        }
+
+        .glass-card:hover::before {
+            left: 150%;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .glass-header {
+            background: rgba(5, 5, 5, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Scrollbar kustom hitam putih */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Animasi Tombol Like */
+        @keyframes heartPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        .liked-anim {
+            animation: heartPulse 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased selection:bg-white selection:text-black">
+
+    <!-- Efek Pendaran di Latar Belakang -->
+    <div class="fixed inset-0 z-[-1] pointer-events-none">
+        <div class="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-white/5 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] bg-white/5 rounded-full blur-[100px]"></div>
+    </div>
+
+    <!-- Header / Navbar -->
+    <nav class="glass-header sticky top-0 z-50 px-6 py-4 flex items-center justify-between shadow-xl">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="checkAdmin()" title="Ketuk untuk akses admin">
+            <div class="w-8 h-8 rounded bg-white flex items-center justify-center">
+                <i class="fas fa-brain text-black text-lg"></i>
+            </div>
+            <h1 class="text-xl md:text-2xl font-bold tracking-widest text-white uppercase">
+                Ailabs <span class="font-light text-gray-400">Prompt Engineering</span>
+            </h1>
+        </div>
+        <a href="#" class="text-gray-400 hover:text-white transition hidden md:block" title="Facebook Kami">
+            <i class="fab fa-facebook text-2xl"></i>
+        </a>
+    </nav>
+
+    <!-- Konten Utama -->
+    <main class="container mx-auto px-4 py-10 md:px-8 max-w-5xl">
+        
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Galeri Prompt AI</h2>
+            <p class="text-gray-400">Temukan inspirasi dari kumpulan prompt terbaik kami. Salin dan gunakan untuk karya Anda.</p>
+        </div>
+
+        <!-- Wadah Daftar Prompt -->
+        <div id="prompts-container" class="space-y-8">
+            <!-- Data akan dimuat dengan JavaScript -->
+        </div>
+
+    </main>
+
+    <!-- Tombol Tambah Prompt (Mode Admin) -->
+    <button id="add-prompt-btn" onclick="openAdminModal()" class="hidden fixed bottom-20 right-6 w-14 h-14 bg-white text-black rounded-full flex items-center justify-center text-2xl shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:scale-110 transition-transform z-40">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Modal Login Admin -->
+    <div id="admin-login-modal" class="hidden fixed inset-0 z-[105] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-sm p-6 rounded-2xl text-center">
+            <h3 class="text-xl font-bold text-white mb-4"><i class="fas fa-user-secret mr-2"></i>Akses Admin</h3>
+            <input type="password" id="admin-code-input" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30 text-center mb-4" placeholder="Masukkan kode rahasia">
+            <div class="flex gap-2 justify-center">
+                <button onclick="closeAdminLogin()" class="px-4 py-2 rounded-lg text-gray-400 hover:text-white transition border border-transparent hover:border-white/10">Batal</button>
+                <button onclick="verifyAdmin()" class="px-6 py-2 rounded-lg bg-white text-black font-bold hover:bg-gray-200 transition">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Alert / Message Box -->
+    <div id="custom-alert" class="hidden fixed top-10 left-1/2 -translate-x-1/2 z-[110] glass-card px-6 py-3 rounded-full flex items-center gap-3 transition-all duration-300 transform -translate-y-10 opacity-0 pointer-events-none">
+        <i class="fas fa-info-circle text-white"></i>
+        <span id="alert-message" class="text-white text-sm font-medium"></span>
+    </div>
+
+    <!-- Modal Admin Tambah Prompt -->
+    <div id="admin-modal" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-lg p-6 rounded-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-white">Tambah Prompt Baru</h3>
+                <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Judul Prompt</label>
+                    <input type="text" id="input-title" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30" placeholder="Contoh: Harimau Neon Cyberpunk">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Pilih Gambar (Langsung dari Galeri HP/Laptop)</label>
+                    <input type="file" id="input-image-file" accept="image/*" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white file:text-black hover:file:bg-gray-200">
+                    <input type="hidden" id="input-image-base64">
+                    <p id="upload-status" class="text-xs text-gray-400 mt-2 hidden">Memproses gambar...</p>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Teks Prompt</label>
+                    <textarea id="input-prompt" rows="4" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30" placeholder="Ketik prompt di sini..."></textarea>
+                </div>
+                <button onclick="addNewPrompt()" class="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-200 transition-colors mt-2">Simpan ke Galeri</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Hapus -->
+    <div id="confirm-delete-modal" class="hidden fixed inset-0 z-[115] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-sm p-6 rounded-2xl text-center">
+            <div class="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-trash-alt text-red-500 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Hapus Prompt?</h3>
+            <p class="text-gray-400 mb-6 text-sm">Tindakan ini tidak dapat dibatalkan. Prompt akan dihapus dari galeri selamanya.</p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeConfirmDelete()" class="px-5 py-2 rounded-lg text-gray-400 hover:text-white transition border border-transparent hover:border-white/10 flex-1">Batal</button>
+                <button onclick="executeDelete()" class="px-5 py-2 rounded-lg bg-red-600 text-white font-bold hover:bg-red-700 transition flex-1">Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifikasi Toast (Pesan Salin) -->
+    <div id="toast" class="fixed bottom-6 right-6 glass-card px-5 py-3 rounded-lg flex items-center gap-3 opacity-0 pointer-events-none transition-opacity duration-300 z-50">
+        <i class="fas fa-check-circle text-white"></i>
+        <span class="text-white text-sm font-medium">Prompt berhasil disalin!</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 mt-20 py-8 text-center text-gray-500 text-sm">
+        <p>&copy; 2024 Ailabs Prompt Engineering. Dikembangkan oleh Bang pro. Desain Hitam Putih Elegan.</p>
+    </footer>
+
+    <!-- Logika JavaScript -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- KONFIGURASI DATABASE (FIREBASE) ---
+        // Jika Anda men-deploy ke Vercel nanti, masukkan kode Firebase config asli Anda di dalam kurung kurawal di bawah.
+        let firebaseConfig = {
+            // apiKey: "...",
+            // authDomain: "...",
+            // projectId: "...",
+            // dll...
+        };
+
+        // Otomatis menggunakan database bawaan saat sedang berada di mode pratinjau (preview) ini
+        if (typeof __firebase_config !== 'undefined') {
+            firebaseConfig = JSON.parse(__firebase_config);
+        }
+
+        const app = Object.keys(firebaseConfig).length > 0 ? initializeApp(firebaseConfig) : null;
+        const auth = app ? getAuth(app) : null;
+        const db = app ? getFirestore(app) : null;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ailabs-prompt-app';
+        const collectionName = 'prompts';
+
+        let currentUser = null;
+        let promptData = [];
+        window.isAdmin = false;
+
+        // --- SISTEM ALERT & NOTIFIKASI ---
+        window.showCustomAlert = (message) => {
+            const alertBox = document.getElementById('custom-alert');
+            document.getElementById('alert-message').innerText = message;
+            
+            alertBox.classList.remove('hidden');
+            setTimeout(() => alertBox.classList.remove('-translate-y-10', 'opacity-0'), 10);
+            setTimeout(() => {
+                alertBox.classList.add('-translate-y-10', 'opacity-0');
+                setTimeout(() => alertBox.classList.add('hidden'), 300);
+            }, 3000);
+        }
+
+        let toastTimeout;
+        window.showToast = () => {
+            const toast = document.getElementById('toast');
+            clearTimeout(toastTimeout);
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+            
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 3000);
+        }
+
+        // --- FITUR LIKE LOKAL (Agar User Biasa Bisa Like) ---
+        function getLikedPrompts() {
+            return JSON.parse(localStorage.getItem('likedPrompts') || '[]');
+        }
+
+        window.toggleLike = async (id, currentLikes) => {
+            if (!db || !currentUser) {
+                window.showCustomAlert("Menunggu koneksi database...");
+                return;
+            }
+            
+            const likedList = getLikedPrompts();
+            const isLiked = likedList.includes(id);
+            const newLikes = isLiked ? Math.max(0, currentLikes - 1) : currentLikes + 1;
+            
+            if (isLiked) {
+                likedList.splice(likedList.indexOf(id), 1);
+            } else {
+                likedList.push(id);
+            }
+            localStorage.setItem('likedPrompts', JSON.stringify(likedList));
+            
+            // Pembaruan visual instan (optimistic UI)
+            const item = promptData.find(p => p.id === id);
+            if(item) { item.likes = newLikes; window.renderPrompts(); }
+
+            // Simpan ke database cloud
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', collectionName, id);
+                await updateDoc(docRef, { likes: newLikes });
+            } catch(e) { console.error(e); }
+        }
+
+        // --- LOGIKA COPY PROMPT ---
+        window.copyPrompt = (id) => {
+            const textToCopy = document.getElementById(`prompt-text-${id}`).innerText;
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = textToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            
+            try {
+                document.execCommand('copy');
+                window.showToast();
+            } catch (err) { console.error('Gagal menyalin text', err); }
+            
+            document.body.removeChild(tempTextArea);
+        }
+
+        // --- SISTEM ADMIN & FORM TAMBAH/HAPUS ---
+        window.checkAdmin = () => {
+            if (window.isAdmin) {
+                window.showCustomAlert("Mode admin sudah aktif!");
+                return;
+            }
+            document.getElementById('admin-login-modal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('admin-code-input').focus(), 100);
+        }
+
+        window.closeAdminLogin = () => {
+            document.getElementById('admin-login-modal').classList.add('hidden');
+            document.getElementById('admin-code-input').value = '';
+        }
+
+        window.verifyAdmin = () => {
+            const code = document.getElementById('admin-code-input').value;
+            if (code === "Kr333wol") {
+                window.isAdmin = true;
+                document.getElementById('add-prompt-btn').classList.remove('hidden');
+                window.closeAdminLogin();
+                window.showCustomAlert("Akses Diterima: Mode Admin Aktif!");
+                window.renderPrompts(); 
+            } else {
+                window.showCustomAlert("Akses Ditolak: Kode salah!");
+                document.getElementById('admin-code-input').value = '';
+                document.getElementById('admin-code-input').focus();
+            }
+        }
+
+        document.getElementById('admin-code-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') window.verifyAdmin();
+        });
+
+        window.openAdminModal = () => document.getElementById('admin-modal').classList.remove('hidden');
+        
+        window.closeAdminModal = () => {
+            document.getElementById('admin-modal').classList.add('hidden');
+            document.getElementById('input-title').value = '';
+            document.getElementById('input-image-file').value = '';
+            document.getElementById('input-image-base64').value = '';
+            document.getElementById('input-prompt').value = '';
+            document.getElementById('upload-status').classList.add('hidden');
+        }
+
+        // Fungsi mengompres gambar dari Galeri agar ringan disimpan di Database
+        document.getElementById('input-image-file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const statusText = document.getElementById('upload-status');
+            statusText.classList.remove('hidden');
+            statusText.innerText = "Memproses gambar...";
+            statusText.className = "text-xs text-yellow-400 mt-2";
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(event) {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800; // Ukuran maksimal supaya web tidak berat
+                    const MAX_HEIGHT = 800;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                    } else {
+                        if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Ubah jadi kode untuk disimpan
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7); 
+                    document.getElementById('input-image-base64').value = dataUrl;
+                    
+                    statusText.innerText = "Gambar siap disimpan! ✅";
+                    statusText.className = "text-xs text-green-400 mt-2";
+                }
+            }
+        });
+
+        window.addNewPrompt = async () => {
+            const title = document.getElementById('input-title').value.trim();
+            const imageUrl = document.getElementById('input-image-base64').value;
+            const promptText = document.getElementById('input-prompt').value.trim();
+
+            if (!title || !imageUrl || !promptText) {
+                window.showCustomAlert("Mohon isi Judul, Gambar, dan Teks Prompt!");
+                return;
+            }
+
+            if (!currentUser) {
+                window.showCustomAlert("Sedang menghubungi server cloud...");
+                return;
+            }
+
+            const newPrompt = {
+                imageUrl: imageUrl,
+                title: title,
+                prompt: promptText,
+                likes: 0,
+                createdAt: Date.now()
+            };
+
+            try {
+                const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
+                await addDoc(promptsRef, newPrompt);
+                
+                window.closeAdminModal();
+                
+                const toastSpan = document.querySelector('#toast span');
+                const originalText = toastSpan.innerText;
+                toastSpan.innerText = "Tersimpan online ke Database!";
+                window.showToast();
+                setTimeout(() => { toastSpan.innerText = originalText; }, 3000);
+            } catch(e) { console.error(e); window.showCustomAlert("Gagal menyimpan ke server."); }
+        }
+
+        let promptToDeleteId = null;
+        window.confirmDelete = (id) => {
+            promptToDeleteId = id;
+            document.getElementById('confirm-delete-modal').classList.remove('hidden');
+        }
+
+        window.closeConfirmDelete = () => {
+            document.getElementById('confirm-delete-modal').classList.add('hidden');
+            promptToDeleteId = null;
+        }
+
+        window.executeDelete = async () => {
+            if (promptToDeleteId !== null && currentUser) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', collectionName, promptToDeleteId);
+                    await deleteDoc(docRef);
+                    window.closeConfirmDelete();
+                    window.showCustomAlert("Terhapus dari Database!");
+                } catch(e) { console.error(e); window.showCustomAlert("Gagal menghapus."); }
+            }
+        }
+
+        // --- RENDER KE LAYAR UTAMA ---
+        window.renderPrompts = () => {
+            const container = document.getElementById('prompts-container');
+            container.innerHTML = ''; 
+            
+            const likedList = getLikedPrompts();
+            
+            if (promptData.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 my-10">Belum ada prompt. Menghubungi database...</p>';
+                return;
+            }
+
+            promptData.forEach((item) => {
+                const isLiked = likedList.includes(item.id);
+                const likeIconClass = isLiked ? 'fas fa-heart text-white liked-anim' : 'far fa-heart text-gray-400 group-hover:text-white';
+                const countClass = isLiked ? 'text-white' : 'text-gray-400 group-hover/btn:text-white';
+                
+                const cardHTML = `
+                    <div class="glass-card rounded-2xl flex flex-col md:flex-row group w-full relative">
+                        <button onclick="confirmDelete('${item.id}')" class="${window.isAdmin ? 'flex' : 'hidden'} absolute top-4 right-4 bg-red-600/80 hover:bg-red-600 text-white w-10 h-10 rounded-full items-center justify-center backdrop-blur-sm transition z-20 shadow-lg hover:scale-110">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                        <div class="w-full md:w-5/12 h-64 md:h-auto shrink-0 relative overflow-hidden">
+                            <img src="${item.imageUrl}" alt="${item.title}" 
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                onerror="this.src='https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop';">
+                            <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#1e1e1e]/80 to-transparent pointer-events-none"></div>
+                        </div>
+                        <div class="w-full md:w-7/12 p-6 md:p-8 flex flex-col justify-between relative">
+                            <div>
+                                <h3 class="text-xl font-bold text-white mb-2">${item.title}</h3>
+                                <div class="bg-black/40 border border-white/10 rounded-lg p-4 relative mb-6">
+                                    <p class="text-sm text-gray-300 font-mono leading-relaxed" id="prompt-text-${item.id}">
+                                        ${item.prompt}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mt-auto">
+                                <button onclick="toggleLike('${item.id}', ${item.likes})" class="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 hover:bg-white/10 transition-colors group/btn">
+                                    <i id="like-icon-${item.id}" class="${likeIconClass} transition-colors"></i>
+                                    <span id="like-count-${item.id}" class="text-sm font-medium ${countClass}">${item.likes}</span>
+                                </button>
+                                <button onclick="copyPrompt('${item.id}')" class="flex items-center gap-2 bg-white text-black px-6 py-2 rounded-full font-semibold hover:bg-gray-200 transition-colors active:scale-95 shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                                    <i class="fas fa-copy"></i><span>Salin Prompt</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', cardHTML);
+            });
+        }
+
+        window.renderPrompts(); // Render initial state (loading)
+
+        // --- INISIALISASI DATABASE & DATA AWAL ---
+        const initialMockData = [
+            {
+                imageUrl: "https://images.unsplash.com/photo-1620121478247-ec786b9be2fa?q=80&w=1000&auto=format&fit=crop",
+                title: "Arsitektur Futuristik Minimalis",
+                prompt: "A hyper-realistic black and white photography of a futuristic minimalist architectural structure. High contrast, cinematic lighting, glass reflections, extremely detailed, 8k resolution, shot on 35mm lens, moody atmosphere.",
+                likes: 342, createdAt: Date.now() - 4000
+            },
+            {
+                imageUrl: "https://images.unsplash.com/photo-1518331647614-7a1f04cd34cf?q=80&w=1000&auto=format&fit=crop",
+                title: "Potret Cyberpunk Monokrom",
+                prompt: "Close up portrait of a cyborg woman in a dark alley, neon lights reflecting on wet pavement in pure black and white. Cyberpunk aesthetics, hyper-detailed skin texture, sharp focus, ray tracing, unreal engine 5 render style.",
+                likes: 856, createdAt: Date.now() - 3000
+            },
+            {
+                imageUrl: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1000&auto=format&fit=crop",
+                title: "Abstrak Gelombang Kaca",
+                prompt: "Abstract fluid glass waves, monochromatic black and grey tones, deep shadows, bright white highlights, macro photography, glossy texture, sophisticated elegant background design, 4k.",
+                likes: 124, createdAt: Date.now() - 2000
+            }
+        ];
+
+        async function seedInitialDataIfNeeded() {
+            if(!db) return;
+            const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
+            const snap = await getDocs(promptsRef);
+            // Jika database kosong, isi dengan data mock otomatis
+            if (snap.empty) {
+                for(let item of initialMockData) { await addDoc(promptsRef, item); }
+            }
+        }
+
+        const initAuth = async () => {
+            if(!auth) return;
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) { console.error("Auth error:", error); }
+        };
+
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                currentUser = user;
+                if (user) {
+                    seedInitialDataIfNeeded().then(() => {
+                        const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
+                        // Listener Real-time
+                        onSnapshot(promptsRef, (snapshot) => {
+                            const loadedPrompts = [];
+                            snapshot.forEach((doc) => { loadedPrompts.push({ id: doc.id, ...doc.data() }); });
+                            // Urutkan dari yang terbaru
+                            loadedPrompts.sort((a, b) => b.createdAt - a.createdAt);
+                            promptData = loadedPrompts;
+                            window.renderPrompts();
+                        }, (error) => { console.error("Firestore error:", error); });
+                    });
+                }
+            });
+            initAuth();
+        }
+
+    </script>
+</body>
+</html>
