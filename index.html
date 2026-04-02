@@ -159,7 +159,7 @@
         <span id="alert-message" class="text-white text-sm font-medium"></span>
     </div>
 
-    <!-- Modal Tambah Prompt (Diperbarui untuk Input URL/Link Gambar) -->
+    <!-- Modal Tambah Prompt -->
     <div id="admin-modal" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="glass-card w-full max-w-lg p-6 rounded-2xl">
             <div class="flex justify-between items-center mb-6">
@@ -276,6 +276,8 @@
                 updateStatus("SYNCING...", "warning");
                 
                 const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
+                
+                // Snapshot murni dari Firebase (Otomatis handle realtime & latency compensation)
                 onSnapshot(promptsRef, (snapshot) => {
                     updateStatus("ONLINE", "success");
                     const loadedData = [];
@@ -283,15 +285,7 @@
                         loadedData.push({ id: doc.id, ...doc.data() });
                     });
                     
-                    // Gabungkan dengan data lokal (temp data yang belum dapat ID dari firebase)
-                    const finalData = loadedData.slice();
-                    promptData.forEach(localItem => {
-                        if(localItem.id.startsWith('temp-') && !finalData.find(f => f.createdAt === localItem.createdAt)) {
-                            finalData.push(localItem);
-                        }
-                    });
-
-                    promptData = finalData.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                    promptData = loadedData.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
                     window.renderPrompts();
                 }, (error) => {
                     console.error("Firestore Error:", error);
@@ -344,21 +338,16 @@
                 if (isVideo) {
                     mediaElement = `<video src="${mediaUrl}" controls class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy"></video>`;
                 } else {
-                    mediaElement = `<img src="${mediaUrl}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" onerror="this.src='https://via.placeholder.com/800x600/111/fff?text=Image+Not+Found';">`;
+                    // Fallback gambar menggunakan placehold.co yang lebih stabil
+                    mediaElement = `<img src="${mediaUrl}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" onerror="this.src='https://placehold.co/800x600/111/fff?text=Image+Not+Found';">`;
                 }
 
-                // Tambahkan efek transparan jika masih loading sync ke server
-                const isTemp = item.id.startsWith('temp-');
-                const cardClass = isTemp ? "glass-card rounded-2xl flex flex-col md:flex-row group w-full relative opacity-70 animate-pulse" : "glass-card rounded-2xl flex flex-col md:flex-row group w-full relative";
-
                 return `
-                    <div class="${cardClass}" id="card-${item.id}">
-                        ${window.isAdmin && !isTemp ? `
+                    <div class="glass-card rounded-2xl flex flex-col md:flex-row group w-full relative" id="card-${item.id}">
+                        ${window.isAdmin ? `
                         <button onclick="confirmDelete('${item.id}')" class="absolute top-4 right-4 bg-red-600/80 hover:bg-red-600 text-white w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition z-20 shadow-lg">
                             <i class="fas fa-trash-alt"></i>
                         </button>` : ''}
-                        
-                        ${isTemp ? `<div class="absolute top-4 right-4 bg-yellow-500/80 text-white text-[10px] px-2 py-1 rounded-full z-20"><i class="fas fa-cloud-upload-alt mr-1"></i> Menyinkronkan...</div>` : ''}
 
                         <div class="w-full md:w-5/12 h-64 md:h-auto shrink-0 relative overflow-hidden bg-neutral-900">
                             ${mediaElement}
@@ -375,11 +364,11 @@
                                 </div>
                             </div>
                             <div class="flex items-center justify-between">
-                                <button onclick="toggleLike('${item.id}', ${item.likes})" class="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 hover:bg-white/10 transition-colors group/btn" ${isTemp ? 'disabled' : ''}>
+                                <button onclick="toggleLike('${item.id}', ${item.likes})" class="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 hover:bg-white/10 transition-colors group/btn">
                                     <i class="${isLiked ? 'fas fa-heart text-white liked-anim' : 'far fa-heart text-gray-400'}"></i>
                                     <span class="text-sm font-medium ${isLiked ? 'text-white' : 'text-gray-400'}">${item.likes || 0}</span>
                                 </button>
-                                <button onclick="copyPrompt('${item.id}')" class="flex items-center gap-2 bg-white text-black px-6 py-2 rounded-full font-semibold hover:bg-gray-200 transition-all active:scale-95" ${isTemp ? 'disabled' : ''}>
+                                <button onclick="copyPrompt('${item.id}')" class="flex items-center gap-2 bg-white text-black px-6 py-2 rounded-full font-semibold hover:bg-gray-200 transition-all active:scale-95">
                                     <i class="fas fa-copy"></i><span class="text-sm">Salin Prompt</span>
                                 </button>
                             </div>
@@ -395,7 +384,7 @@
             if (isLiked) likedList.splice(likedList.indexOf(id), 1);
             else likedList.push(id);
             localStorage.setItem('likedPrompts', JSON.stringify(likedList));
-            if (currentUser && !id.startsWith('temp-')) {
+            if (currentUser) {
                 try {
                     const docRef = doc(db, 'artifacts', appId, 'public', 'data', collectionName, id);
                     await updateDoc(docRef, { likes: newLikes });
@@ -436,7 +425,7 @@
         
         window.closeAdminModal = () => {
             document.getElementById('admin-modal').classList.add('hidden');
-            resetForm(); // Reset form jika modal ditutup
+            resetForm();
         }
 
         const resetForm = () => {
@@ -449,17 +438,18 @@
             document.getElementById('text-simpan').innerText = "Simpan ke Galeri";
         };
 
-        // True Optimistic UI: Muncul di layar 100% instan, sync di background
+        // Fungsi Simpan yang Bersih & Profesional (Memanfaatkan Firebase Native Speed)
         window.addNewPrompt = async () => {
             const title = document.getElementById('input-title').value.trim();
             const mediaUrl = document.getElementById('input-media-url').value.trim();
             const prompt = document.getElementById('input-prompt').value.trim();
+            const btn = document.getElementById('btn-simpan');
             
             if (!title || !mediaUrl || !prompt || !currentUser) {
                 return window.showCustomAlert("Lengkapi form (Judul, Link Gambar/Video, dan Prompt) terlebih dahulu!");
             }
 
-            // VALIDASI: Memastikan link adalah Direct Link (punya ekstensi file media)
+            // Validasi format link
             const isValidMedia = mediaUrl.match(/\.(jpg|jpeg|png|gif|webp|mp4|webm|ogg)(\?.*)?$/i);
             if (!isValidMedia) {
                 return window.showCustomAlert("❌ GAGAL: Gunakan 'Direct Link' yang berakhiran .jpg, .png, atau .mp4!");
@@ -468,54 +458,33 @@
             const isVideo = mediaUrl.match(/\.(mp4|webm|ogg)$/i);
             const mediaType = isVideo ? 'video/mp4' : 'image/jpeg';
 
-            // 1. BUAT DATA LOKAL SEMENTARA & TAMPILKAN LANGSUNG (0 Detik Lag)
-            const tempId = 'temp-' + Date.now();
-            const newPromptData = { 
-                id: tempId,
-                title: title, 
-                mediaUrl: mediaUrl,
-                mediaType: mediaType,
-                prompt: prompt, 
-                likes: 0, 
-                createdAt: Date.now()
-            };
+            // Ubah tombol jadi status Loading
+            btn.disabled = true;
+            document.getElementById('text-simpan').innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i>Menyimpan...';
 
-            promptData.unshift(newPromptData); // Masukkan ke data
-            window.renderPrompts();            // Render paksa ke layar
-            window.closeAdminModal();
-            window.showToast("Menyinkronkan ke Server...");
-            resetForm();
-
-            // 2. SIMPAN KE FIRESTORE DI BACKGROUND
             try {
                 const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
                 
-                const docRef = await addDoc(promptsRef, { 
-                    title: newPromptData.title, 
-                    mediaUrl: newPromptData.mediaUrl,
-                    mediaType: newPromptData.mediaType,
-                    prompt: newPromptData.prompt, 
+                // Tunggu konfirmasi berhasil dari Firebase
+                await addDoc(promptsRef, { 
+                    title: title, 
+                    mediaUrl: mediaUrl,
+                    mediaType: mediaType,
+                    prompt: prompt, 
                     likes: 0, 
-                    createdAt: newPromptData.createdAt
+                    createdAt: Date.now()
                 });
                 
-                // Update ID lokal dengan ID asli dari server
-                const index = promptData.findIndex(p => p.id === tempId);
-                if (index !== -1) promptData[index].id = docRef.id;
-                
-                window.renderPrompts(); // Render ulang agar badge "menyinkronkan" hilang
+                // Jika sukses, tutup modal dan kembalikan tombol
+                window.closeAdminModal();
                 window.showToast("Status: Tersimpan Permanen ✅");
+                resetForm();
                 
             } catch (e) { 
-                console.error("Terjadi kesalahan background sync:", e);
-                // Tampilkan pesan error jelas di tengah layar
-                window.showCustomAlert("❌ Gagal menyimpan ke Database! Pastikan Rules Firestore mengizinkan Write.");
-                
-                // Tarik kembali dari layar karena gagal masuk server
-                setTimeout(() => {
-                    promptData = promptData.filter(p => p.id !== tempId);
-                    window.renderPrompts();
-                }, 2000);
+                console.error("Gagal simpan ke database:", e);
+                window.showCustomAlert("❌ Gagal menyimpan! Pastikan Rules Firestore mengizinkan Write.");
+                btn.disabled = false;
+                document.getElementById('text-simpan').innerText = "Coba Lagi";
             }
         }
 
