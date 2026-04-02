@@ -99,9 +99,9 @@
         </div>
 
         <div id="prompts-container" class="space-y-12">
-            <!-- Skeleton Loading Awal (Kembali ke Kiri-Kanan) -->
+            <!-- Skeleton Loading -->
             <div class="glass-card rounded-2xl flex flex-col md:flex-row group w-full animate-pulse opacity-20">
-                <div class="w-full md:w-5/12 h-64 md:h-80 bg-neutral-800"></div>
+                <div class="w-full md:w-5/12 min-h-[250px] md:min-h-[320px] shrink-0 bg-neutral-800"></div>
                 <div class="w-full md:w-7/12 p-5 md:p-6 space-y-3 flex flex-col justify-center">
                     <div class="h-5 bg-neutral-700 rounded w-1/3"></div>
                     <div class="h-20 bg-neutral-700 rounded w-full"></div>
@@ -272,8 +272,8 @@
             container.innerHTML = promptData.map(item => {
                 const isLiked = likedList.includes(item.id.toString());
                 
-                // Gambar menggunakan object-contain agar tidak terpotong sama sekali
-                const mediaElement = `<img src="${item.mediaUrl}" alt="${item.title}" class="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105" loading="lazy" onerror="this.src='https://placehold.co/800x600/111/fff?text=Link+Gambar+Rusak';">`;
+                // Gambar dibikin absolute dan object-cover agar mengisi penuh kolom sebelah kiri sesuai tinggi kolom kanannya
+                const mediaElement = `<img src="${item.mediaUrl}" alt="${item.title}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" onerror="this.src='https://placehold.co/800x600/111/fff?text=Link+Gambar+Rusak';">`;
 
                 return `
                     <div class="glass-card rounded-2xl flex flex-col md:flex-row group w-full relative" id="card-${item.id}">
@@ -282,8 +282,8 @@
                             <i class="fas fa-trash-alt text-sm"></i>
                         </button>` : ''}
 
-                        <!-- Area Foto: Kiri (Desktop) / Atas (Mobile) -->
-                        <div class="w-full md:w-5/12 h-64 md:min-h-[300px] shrink-0 relative overflow-hidden bg-[#050505] flex justify-center items-center">
+                        <!-- Area Foto: Flex Stretch dengan min-height agar tidak terlalu pipih jika prompt pendek -->
+                        <div class="w-full md:w-5/12 min-h-[250px] md:min-h-[320px] shrink-0 relative overflow-hidden bg-[#050505] flex justify-center items-center">
                             ${mediaElement}
                             <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[rgba(30,30,30,0.6)] via-transparent to-transparent pointer-events-none"></div>
                         </div>
