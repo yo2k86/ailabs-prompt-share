@@ -423,22 +423,42 @@
             const title = document.getElementById('input-title').value.trim();
             const imageUrl = document.getElementById('input-image-base64').value;
             const prompt = document.getElementById('input-prompt').value.trim();
-            if (!title || !imageUrl || !prompt || !currentUser) return window.showCustomAlert("Lengkapi form!");
+            
+            if (!title || !imageUrl || !prompt || !currentUser) {
+                return window.showCustomAlert("Lengkapi form terlebih dahulu!");
+            }
+
             const btn = document.getElementById('btn-simpan');
             btn.disabled = true;
-            btn.innerText = "Menyimpan...";
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Hosting...';
+            
             try {
                 const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
-                await addDoc(promptsRef, { title, imageUrl, prompt, likes: 0, createdAt: Date.now() });
+                await addDoc(promptsRef, { 
+                    title, 
+                    imageUrl, 
+                    prompt, 
+                    likes: 0, 
+                    createdAt: Date.now() 
+                });
+                
                 window.closeAdminModal();
-                window.showToast("Berhasil!");
+                // Notifikasi status selesai dan ter-hosting
+                window.showToast("Status: Selesai! Prompt Ter-hosting ✅");
+                
+                // Reset Form
                 document.getElementById('input-title').value = '';
                 document.getElementById('input-image-file').value = '';
                 document.getElementById('input-prompt').value = '';
                 document.getElementById('input-image-base64').value = '';
                 document.getElementById('upload-status').classList.add('hidden');
-            } catch (e) { window.showCustomAlert("Gagal menyimpan."); }
-            finally { btn.disabled = false; btn.innerText = "Simpan ke Galeri"; }
+            } catch (e) { 
+                window.showCustomAlert("Gagal hosting ke database."); 
+                console.error(e);
+            } finally { 
+                btn.disabled = false; 
+                btn.innerText = "Simpan ke Galeri"; 
+            }
         }
 
         let deleteId = null;
@@ -449,7 +469,7 @@
             try {
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, deleteId));
                 window.closeConfirmDelete();
-                window.showToast("Dihapus!");
+                window.showToast("Status: Terhapus dari Hosting 🗑️");
             } catch (e) { window.showCustomAlert("Gagal menghapus."); }
         }
 
