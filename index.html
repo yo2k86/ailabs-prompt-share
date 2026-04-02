@@ -113,7 +113,7 @@
                 <i class="fas fa-brain text-black text-lg"></i>
             </div>
             <h1 class="text-xl md:text-2xl font-bold tracking-widest text-white uppercase">
-                Ailabs <span class="font-light text-gray-400">Prompt Engineering</span>
+                Ailabs <span class="font-light text-gray-400">Prompt</span>
             </h1>
         </div>
         <div class="flex items-center gap-4">
@@ -141,6 +141,7 @@
         <i class="fas fa-plus"></i>
     </button>
 
+    <!-- Modal Login Admin -->
     <div id="admin-login-modal" class="hidden fixed inset-0 z-[105] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="glass-card w-full max-w-sm p-6 rounded-2xl text-center">
             <h3 class="text-xl font-bold text-white mb-4"><i class="fas fa-user-secret mr-2"></i>Akses Admin</h3>
@@ -152,11 +153,13 @@
         </div>
     </div>
 
+    <!-- Custom Alert -->
     <div id="custom-alert" class="hidden fixed top-10 left-1/2 -translate-x-1/2 z-[110] glass-card px-6 py-3 rounded-full flex items-center gap-3 transition-all duration-300 transform -translate-y-10 opacity-0 pointer-events-none">
         <i class="fas fa-info-circle text-white"></i>
         <span id="alert-message" class="text-white text-sm font-medium"></span>
     </div>
 
+    <!-- Modal Tambah Prompt (Diperbarui untuk File/Video ke Storage) -->
     <div id="admin-modal" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="glass-card w-full max-w-lg p-6 rounded-2xl">
             <div class="flex justify-between items-center mb-6">
@@ -169,25 +172,34 @@
                     <input type="text" id="input-title" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30" placeholder="Contoh: Cyberpunk Lion">
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-400 mb-1">Pilih Gambar (Ukuran akan dikompres otomatis)</label>
-                    <input type="file" id="input-image-file" accept="image/*" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white text-xs file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:bg-white file:text-black hover:file:bg-gray-200">
-                    <input type="hidden" id="input-image-base64">
+                    <label class="block text-sm text-gray-400 mb-1">Pilih File (Gambar / Video)</label>
+                    <!-- Menerima gambar dan video -->
+                    <input type="file" id="input-media-file" accept="image/*,video/*" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white text-xs file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:bg-white file:text-black hover:file:bg-gray-200">
                     <p id="upload-status" class="text-[10px] mt-2 hidden"></p>
+                    
+                    <!-- Progress Bar Upload -->
+                    <div id="progress-container" class="hidden mt-3">
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div id="progress-bar" class="bg-white h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <p id="progress-text" class="text-[10px] text-gray-400 text-right mt-1">0%</p>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-sm text-gray-400 mb-1">Teks Prompt</label>
                     <textarea id="input-prompt" rows="4" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30 text-sm" placeholder="Ketik prompt di sini..."></textarea>
                 </div>
                 <div class="flex gap-3 mt-4">
-                    <button onclick="closeAdminModal()" class="w-1/3 px-4 py-3 rounded-lg text-gray-400 border border-white/10 font-medium">Batal</button>
+                    <button onclick="closeAdminModal()" class="w-1/3 px-4 py-3 rounded-lg text-gray-400 border border-white/10 font-medium hover:bg-white/5 transition">Batal</button>
                     <button id="btn-simpan" onclick="addNewPrompt()" class="w-2/3 bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center">
-                        <span id="text-simpan">Simpan ke Galeri</span>
+                        <span id="text-simpan">Upload & Simpan</span>
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Modal Konfirmasi Hapus -->
     <div id="confirm-delete-modal" class="hidden fixed inset-0 z-[115] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="glass-card w-full max-w-sm p-6 rounded-2xl text-center">
             <div class="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4">
@@ -195,12 +207,13 @@
             </div>
             <h3 class="text-xl font-bold text-white mb-2">Hapus Prompt?</h3>
             <div class="flex gap-3 justify-center mt-6">
-                <button onclick="closeConfirmDelete()" class="px-5 py-2 rounded-lg text-gray-400 flex-1">Batal</button>
-                <button onclick="executeDelete()" class="px-5 py-2 rounded-lg bg-red-600 text-white font-bold flex-1">Hapus</button>
+                <button onclick="closeConfirmDelete()" class="px-5 py-2 rounded-lg text-gray-400 flex-1 hover:bg-white/5 border border-white/10">Batal</button>
+                <button onclick="executeDelete()" class="px-5 py-2 rounded-lg bg-red-600 text-white font-bold flex-1 hover:bg-red-700 transition">Hapus</button>
             </div>
         </div>
     </div>
 
+    <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-6 right-6 glass-card px-5 py-3 rounded-lg flex items-center gap-3 opacity-0 pointer-events-none transition-opacity duration-300 z-50">
         <i class="fas fa-check-circle text-white"></i>
         <span class="text-white text-sm font-medium">Berhasil!</span>
@@ -214,13 +227,15 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // IMPORT FIREBASE STORAGE
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         // --- CONFIGURATION ---
         const defaultFirebaseConfig = {
             apiKey: "AIzaSyB2eTNTF1L5c9bMZLMyMb15ljdROyJ_5S8",
             authDomain: "website-93ae4.firebaseapp.com",
             projectId: "website-93ae4",
-            storageBucket: "website-93ae4.firebasestorage.app",
+            storageBucket: "website-93ae4.firebasestorage.app", // Wajib ada untuk Storage
             messagingSenderId: "176586837710",
             appId: "1:176586837710:web:522dfa73f20ef9dcc30a9f",
             measurementId: "G-ZNRJR9KB5D"
@@ -230,12 +245,17 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const storage = getStorage(app); // INISIALISASI STORAGE
+        
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'ailabs-prompt-app';
         const collectionName = 'prompts';
 
         let currentUser = null;
         let promptData = [];
         window.isAdmin = false;
+        
+        // Variable untuk menampung file asli yang dipilih user
+        let selectedMediaFile = null;
 
         const updateStatus = (text, type = 'error') => {
             const statusIndicator = document.getElementById('connection-status');
@@ -318,24 +338,38 @@
                 return;
             }
             const likedList = JSON.parse(localStorage.getItem('likedPrompts') || '[]');
+            
             container.innerHTML = promptData.map(item => {
                 const isLiked = likedList.includes(item.id);
+                // Mendukung legacy property "imageUrl" atau tipe data baru "mediaUrl"
+                const mediaUrl = item.mediaUrl || item.imageUrl; 
+                const mediaType = item.mediaType || 'image/jpeg'; // Default fallback
+                const isVideo = mediaType.startsWith('video/');
+
+                // Menyiapkan elemen media (gambar vs video)
+                let mediaElement = '';
+                if (isVideo) {
+                    mediaElement = `<video src="${mediaUrl}" controls class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy"></video>`;
+                } else {
+                    mediaElement = `<img src="${mediaUrl}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" onerror="this.src='https://via.placeholder.com/800x600/111/fff?text=Image+Not+Found';">`;
+                }
+
                 return `
                     <div class="glass-card rounded-2xl flex flex-col md:flex-row group w-full relative">
                         ${window.isAdmin ? `
-                        <button onclick="confirmDelete('${item.id}')" class="absolute top-4 right-4 bg-red-600/80 hover:bg-red-600 text-white w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition z-20 shadow-lg">
+                        <button onclick="confirmDelete('${item.id}', '${mediaUrl}')" class="absolute top-4 right-4 bg-red-600/80 hover:bg-red-600 text-white w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition z-20 shadow-lg">
                             <i class="fas fa-trash-alt"></i>
                         </button>` : ''}
                         <div class="w-full md:w-5/12 h-64 md:h-auto shrink-0 relative overflow-hidden bg-neutral-900">
-                            <img src="${item.imageUrl}" alt="${item.title}" 
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-                                loading="lazy"
-                                onerror="this.src='https://via.placeholder.com/800x600/111/fff?text=No+Image';">
-                            <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#1e1e1e]/80 to-transparent pointer-events-none"></div>
+                            ${mediaElement}
+                            ${!isVideo ? `<div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#1e1e1e]/80 to-transparent pointer-events-none"></div>` : ''}
                         </div>
                         <div class="w-full md:w-7/12 p-6 md:p-8 flex flex-col justify-between">
                             <div>
-                                <h3 class="text-xl font-bold text-white mb-2">${item.title}</h3>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <h3 class="text-xl font-bold text-white">${item.title}</h3>
+                                    ${isVideo ? '<span class="text-[10px] bg-blue-600/30 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30"><i class="fas fa-video mr-1"></i>Video</span>' : ''}
+                                </div>
                                 <div class="bg-black/40 border border-white/10 rounded-lg p-4 mb-6">
                                     <p class="text-sm text-gray-300 font-mono leading-relaxed" id="prompt-text-${item.id}">${item.prompt}</p>
                                 </div>
@@ -399,92 +433,155 @@
 
         window.closeAdminLogin = () => document.getElementById('admin-login-modal').classList.add('hidden');
         window.openAdminModal = () => document.getElementById('admin-modal').classList.remove('hidden');
-        window.closeAdminModal = () => document.getElementById('admin-modal').classList.add('hidden');
+        
+        window.closeAdminModal = () => {
+            document.getElementById('admin-modal').classList.add('hidden');
+            resetForm(); // Reset form jika modal ditutup
+        }
 
-        document.getElementById('input-image-file').addEventListener('change', function(e) {
+        // Handle Pemilihan File (Hanya menyimpan file ke memori, bukan convert base64)
+        document.getElementById('input-media-file').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
+
+            // Limit ukuran file (Misal maksimal 50MB)
+            if (file.size > 50 * 1024 * 1024) {
+                window.showCustomAlert("File terlalu besar! Maksimal ukuran adalah 50MB.");
+                this.value = '';
+                selectedMediaFile = null;
+                return;
+            }
+
+            selectedMediaFile = file;
             const status = document.getElementById('upload-status');
-            status.innerText = "Mengompres Gambar...";
-            status.className = "text-[10px] mt-2 text-yellow-500 block";
+            const fileType = file.type.startsWith('video/') ? 'Video' : 'Gambar';
             
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    // Optimasi resolusi ke 700px untuk kecepatan
-                    const MAX = 700;
-                    let w = img.width, h = img.height;
-                    if (w > h && w > MAX) { h *= MAX/w; w = MAX; }
-                    else if (h > MAX) { w *= MAX/h; h = MAX; }
-                    canvas.width = w; canvas.height = h;
-                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                    // Kompres kualitas ke 0.6 untuk mengurangi ukuran data Base64
-                    document.getElementById('input-image-base64').value = canvas.toDataURL('image/jpeg', 0.6);
-                    status.innerText = "Gambar dioptimasi! Siap hosting.";
-                    status.className = "text-[10px] mt-2 text-green-500 block";
-                };
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
+            status.innerText = `File dipilih: ${file.name} (${fileType}, ${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+            status.className = "text-[10px] mt-2 text-green-500 block";
         });
 
+        const resetForm = () => {
+            document.getElementById('input-title').value = '';
+            document.getElementById('input-media-file').value = '';
+            document.getElementById('input-prompt').value = '';
+            document.getElementById('upload-status').classList.add('hidden');
+            document.getElementById('progress-container').classList.add('hidden');
+            document.getElementById('progress-bar').style.width = '0%';
+            document.getElementById('progress-text').innerText = '0%';
+            selectedMediaFile = null;
+            
+            const btn = document.getElementById('btn-simpan');
+            btn.disabled = false;
+            document.getElementById('text-simpan').innerText = "Upload & Simpan";
+        };
+
+        // Fungsi Utama untuk Upload ke Storage dan Save ke Firestore
         window.addNewPrompt = async () => {
             const title = document.getElementById('input-title').value.trim();
-            const imageUrl = document.getElementById('input-image-base64').value;
             const prompt = document.getElementById('input-prompt').value.trim();
             const btn = document.getElementById('btn-simpan');
             
-            if (!title || !imageUrl || !prompt || !currentUser) {
-                return window.showCustomAlert("Lengkapi form terlebih dahulu!");
+            if (!title || !selectedMediaFile || !prompt || !currentUser) {
+                return window.showCustomAlert("Lengkapi form (Judul, File, dan Prompt) terlebih dahulu!");
             }
 
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i>Mengunggah...';
+            document.getElementById('text-simpan').innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i>Menyiapkan Upload...';
             
+            // Tampilkan Progress Bar
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            progressContainer.classList.remove('hidden');
+
             try {
-                const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
-                
-                // Langkah-langkah update teks tombol agar user tidak merasa stuck
-                setTimeout(() => { if(btn.disabled) btn.innerHTML = '<i class="fas fa-cloud-upload-alt mr-2 animate-bounce"></i>Sinkronisasi...'; }, 2000);
-                
-                await addDoc(promptsRef, { 
-                    title, 
-                    imageUrl, 
-                    prompt, 
-                    likes: 0, 
-                    createdAt: Date.now() 
-                });
-                
-                window.closeAdminModal();
-                window.showToast("Status: Selesai! Prompt Ter-hosting ✅");
-                
-                // Reset Form
-                document.getElementById('input-title').value = '';
-                document.getElementById('input-image-file').value = '';
-                document.getElementById('input-prompt').value = '';
-                document.getElementById('input-image-base64').value = '';
-                document.getElementById('upload-status').classList.add('hidden');
+                // 1. UPLOAD KE FIREBASE STORAGE
+                // Membuat struktur folder unik di storage: artifacts/{appId}/media/{timestamp}_{filename}
+                const fileName = `${Date.now()}_${selectedMediaFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+                const storagePath = `artifacts/${appId}/media/${fileName}`;
+                const storageReference = ref(storage, storagePath);
+
+                const uploadTask = uploadBytesResumable(storageReference, selectedMediaFile);
+
+                // Pantau progress upload
+                uploadTask.on('state_changed', 
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        progressBar.style.width = progress + '%';
+                        progressText.innerText = Math.round(progress) + '% (' + (snapshot.bytesTransferred / 1024 / 1024).toFixed(1) + 'MB / ' + (snapshot.totalBytes / 1024 / 1024).toFixed(1) + 'MB)';
+                        document.getElementById('text-simpan').innerText = `Mengunggah... ${Math.round(progress)}%`;
+                    }, 
+                    (error) => {
+                        console.error("Upload error:", error);
+                        window.showCustomAlert("Gagal mengunggah file ke Storage.");
+                        btn.disabled = false;
+                        document.getElementById('text-simpan').innerText = "Coba Lagi";
+                    }, 
+                    async () => {
+                        // Upload Berhasil! Ambil URL Download-nya
+                        document.getElementById('text-simpan').innerHTML = '<i class="fas fa-database mr-2"></i>Menyimpan ke Database...';
+                        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+                        // 2. SIMPAN KE FIRESTORE
+                        const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
+                        
+                        await addDoc(promptsRef, { 
+                            title: title, 
+                            mediaUrl: downloadURL, // Menyimpan URL Asli dari Storage
+                            mediaType: selectedMediaFile.type, // image/jpeg, video/mp4, dll
+                            prompt: prompt, 
+                            likes: 0, 
+                            createdAt: Date.now(),
+                            storagePath: storagePath // Simpan path untuk kemudahan hapus file nanti
+                        });
+                        
+                        window.closeAdminModal();
+                        window.showToast("Status: Selesai! Prompt & Media Tersimpan ✅");
+                        resetForm();
+                    }
+                );
+
             } catch (e) { 
-                window.showCustomAlert("Gagal hosting ke database."); 
+                window.showCustomAlert("Terjadi kesalahan sistem."); 
                 console.error(e);
-            } finally { 
                 btn.disabled = false; 
-                btn.innerText = "Simpan ke Galeri"; 
+                document.getElementById('text-simpan').innerText = "Simpan ke Galeri"; 
             }
         }
 
-        let deleteId = null;
-        window.confirmDelete = (id) => { deleteId = id; document.getElementById('confirm-delete-modal').classList.remove('hidden'); }
-        window.closeConfirmDelete = () => document.getElementById('confirm-delete-modal').classList.add('hidden');
+        let deleteData = null; // Menyimpan id dan mediaUrl
+        window.confirmDelete = (id, mediaUrl) => { 
+            deleteData = { id, mediaUrl }; 
+            document.getElementById('confirm-delete-modal').classList.remove('hidden'); 
+        }
+        window.closeConfirmDelete = () => {
+            deleteData = null;
+            document.getElementById('confirm-delete-modal').classList.add('hidden');
+        }
+        
         window.executeDelete = async () => {
-            if (!deleteId || !currentUser) return;
+            if (!deleteData || !currentUser) return;
             try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, deleteId));
+                // 1. Hapus Dokumen Firestore
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, deleteData.id));
+                
+                // 2. (Opsional/Best Practice) Hapus File dari Storage menggunakan referensi URL
+                // Meskipun kita tidak menyimpan storagePath secara explisit sebelumnya, 
+                // kita bisa mencoba mereferensikan via HTTPS URL
+                try {
+                    const mediaRef = ref(storage, deleteData.mediaUrl);
+                    await deleteObject(mediaRef);
+                    console.log("File di Storage terhapus");
+                } catch (storageErr) {
+                    console.warn("Gagal hapus file storage, mungkin URL format lama:", storageErr);
+                }
+
                 window.closeConfirmDelete();
                 window.showToast("Status: Terhapus dari Hosting 🗑️");
-            } catch (e) { window.showCustomAlert("Gagal menghapus."); }
+            } catch (e) { 
+                window.showCustomAlert("Gagal menghapus."); 
+                console.error(e);
+            }
         }
 
         initAuth();
