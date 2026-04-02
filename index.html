@@ -159,7 +159,7 @@
         <span id="alert-message" class="text-white text-sm font-medium"></span>
     </div>
 
-    <!-- Modal Tambah Prompt (Diperbarui untuk File/Video ke Storage) -->
+    <!-- Modal Tambah Prompt (Diperbarui untuk Input URL/Link Gambar) -->
     <div id="admin-modal" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="glass-card w-full max-w-lg p-6 rounded-2xl">
             <div class="flex justify-between items-center mb-6">
@@ -172,18 +172,9 @@
                     <input type="text" id="input-title" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30" placeholder="Contoh: Cyberpunk Lion">
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-400 mb-1">Pilih File (Gambar / Video)</label>
-                    <!-- Menerima gambar dan video -->
-                    <input type="file" id="input-media-file" accept="image/*,video/*" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white text-xs file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:bg-white file:text-black hover:file:bg-gray-200">
-                    <p id="upload-status" class="text-[10px] mt-2 hidden"></p>
-                    
-                    <!-- Progress Bar Upload -->
-                    <div id="progress-container" class="hidden mt-3">
-                        <div class="w-full bg-gray-700 rounded-full h-2">
-                            <div id="progress-bar" class="bg-white h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-                        </div>
-                        <p id="progress-text" class="text-[10px] text-gray-400 text-right mt-1">0%</p>
-                    </div>
+                    <label class="block text-sm text-gray-400 mb-1">Link Gambar / Video (Postimages, Imgur, dll)</label>
+                    <input type="url" id="input-media-url" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30" placeholder="https://i.postimg.cc/xxxx/gambar.jpg">
+                    <p class="text-[10px] text-gray-500 mt-1">Masukkan direct link yang berakhiran .jpg, .png, atau .mp4</p>
                 </div>
                 <div>
                     <label class="block text-sm text-gray-400 mb-1">Teks Prompt</label>
@@ -192,7 +183,7 @@
                 <div class="flex gap-3 mt-4">
                     <button onclick="closeAdminModal()" class="w-1/3 px-4 py-3 rounded-lg text-gray-400 border border-white/10 font-medium hover:bg-white/5 transition">Batal</button>
                     <button id="btn-simpan" onclick="addNewPrompt()" class="w-2/3 bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center">
-                        <span id="text-simpan">Upload & Simpan</span>
+                        <span id="text-simpan">Simpan ke Galeri</span>
                     </button>
                 </div>
             </div>
@@ -227,15 +218,13 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        // IMPORT FIREBASE STORAGE
-        import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         // --- CONFIGURATION ---
         const defaultFirebaseConfig = {
             apiKey: "AIzaSyB2eTNTF1L5c9bMZLMyMb15ljdROyJ_5S8",
             authDomain: "website-93ae4.firebaseapp.com",
             projectId: "website-93ae4",
-            storageBucket: "website-93ae4.firebasestorage.app", // Wajib ada untuk Storage
+            storageBucket: "website-93ae4.firebasestorage.app",
             messagingSenderId: "176586837710",
             appId: "1:176586837710:web:522dfa73f20ef9dcc30a9f",
             measurementId: "G-ZNRJR9KB5D"
@@ -245,7 +234,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const storage = getStorage(app); // INISIALISASI STORAGE
         
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'ailabs-prompt-app';
         const collectionName = 'prompts';
@@ -253,9 +241,6 @@
         let currentUser = null;
         let promptData = [];
         window.isAdmin = false;
-        
-        // Variable untuk menampung file asli yang dipilih user
-        let selectedMediaFile = null;
 
         const updateStatus = (text, type = 'error') => {
             const statusIndicator = document.getElementById('connection-status');
@@ -344,7 +329,7 @@
                 // Mendukung legacy property "imageUrl" atau tipe data baru "mediaUrl"
                 const mediaUrl = item.mediaUrl || item.imageUrl; 
                 const mediaType = item.mediaType || 'image/jpeg'; // Default fallback
-                const isVideo = mediaType.startsWith('video/');
+                const isVideo = mediaType.startsWith('video/') || (mediaUrl && mediaUrl.match(/\.(mp4|webm|ogg)$/i));
 
                 // Menyiapkan elemen media (gambar vs video)
                 let mediaElement = '';
@@ -357,7 +342,7 @@
                 return `
                     <div class="glass-card rounded-2xl flex flex-col md:flex-row group w-full relative">
                         ${window.isAdmin ? `
-                        <button onclick="confirmDelete('${item.id}', '${mediaUrl}')" class="absolute top-4 right-4 bg-red-600/80 hover:bg-red-600 text-white w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition z-20 shadow-lg">
+                        <button onclick="confirmDelete('${item.id}')" class="absolute top-4 right-4 bg-red-600/80 hover:bg-red-600 text-white w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition z-20 shadow-lg">
                             <i class="fas fa-trash-alt"></i>
                         </button>` : ''}
                         <div class="w-full md:w-5/12 h-64 md:h-auto shrink-0 relative overflow-hidden bg-neutral-900">
@@ -439,145 +424,77 @@
             resetForm(); // Reset form jika modal ditutup
         }
 
-        // Handle Pemilihan File (Hanya menyimpan file ke memori, bukan convert base64)
-        document.getElementById('input-media-file').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            // Limit ukuran file (Misal maksimal 50MB)
-            if (file.size > 50 * 1024 * 1024) {
-                window.showCustomAlert("File terlalu besar! Maksimal ukuran adalah 50MB.");
-                this.value = '';
-                selectedMediaFile = null;
-                return;
-            }
-
-            selectedMediaFile = file;
-            const status = document.getElementById('upload-status');
-            const fileType = file.type.startsWith('video/') ? 'Video' : 'Gambar';
-            
-            status.innerText = `File dipilih: ${file.name} (${fileType}, ${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-            status.className = "text-[10px] mt-2 text-green-500 block";
-        });
-
         const resetForm = () => {
             document.getElementById('input-title').value = '';
-            document.getElementById('input-media-file').value = '';
+            document.getElementById('input-media-url').value = '';
             document.getElementById('input-prompt').value = '';
-            document.getElementById('upload-status').classList.add('hidden');
-            document.getElementById('progress-container').classList.add('hidden');
-            document.getElementById('progress-bar').style.width = '0%';
-            document.getElementById('progress-text').innerText = '0%';
-            selectedMediaFile = null;
             
             const btn = document.getElementById('btn-simpan');
             btn.disabled = false;
-            document.getElementById('text-simpan').innerText = "Upload & Simpan";
+            document.getElementById('text-simpan').innerText = "Simpan ke Galeri";
         };
 
-        // Fungsi Utama untuk Upload ke Storage dan Save ke Firestore
+        // Fungsi Utama untuk Simpan Link ke Firestore
         window.addNewPrompt = async () => {
             const title = document.getElementById('input-title').value.trim();
+            const mediaUrl = document.getElementById('input-media-url').value.trim();
             const prompt = document.getElementById('input-prompt').value.trim();
             const btn = document.getElementById('btn-simpan');
             
-            if (!title || !selectedMediaFile || !prompt || !currentUser) {
-                return window.showCustomAlert("Lengkapi form (Judul, File, dan Prompt) terlebih dahulu!");
+            if (!title || !mediaUrl || !prompt || !currentUser) {
+                return window.showCustomAlert("Lengkapi form (Judul, Link Gambar/Video, dan Prompt) terlebih dahulu!");
             }
 
+            // Mendeteksi apakah link tersebut video (.mp4/.webm) atau gambar biasa
+            const isVideo = mediaUrl.match(/\.(mp4|webm|ogg)$/i);
+            const mediaType = isVideo ? 'video/mp4' : 'image/jpeg';
+
             btn.disabled = true;
-            document.getElementById('text-simpan').innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i>Menyiapkan Upload...';
-            
-            // Tampilkan Progress Bar
-            const progressContainer = document.getElementById('progress-container');
-            const progressBar = document.getElementById('progress-bar');
-            const progressText = document.getElementById('progress-text');
-            progressContainer.classList.remove('hidden');
+            document.getElementById('text-simpan').innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i>Menyimpan...';
 
             try {
-                // 1. UPLOAD KE FIREBASE STORAGE
-                // Membuat struktur folder unik di storage: artifacts/{appId}/media/{timestamp}_{filename}
-                const fileName = `${Date.now()}_${selectedMediaFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-                const storagePath = `artifacts/${appId}/media/${fileName}`;
-                const storageReference = ref(storage, storagePath);
-
-                const uploadTask = uploadBytesResumable(storageReference, selectedMediaFile);
-
-                // Pantau progress upload
-                uploadTask.on('state_changed', 
-                    (snapshot) => {
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        progressBar.style.width = progress + '%';
-                        progressText.innerText = Math.round(progress) + '% (' + (snapshot.bytesTransferred / 1024 / 1024).toFixed(1) + 'MB / ' + (snapshot.totalBytes / 1024 / 1024).toFixed(1) + 'MB)';
-                        document.getElementById('text-simpan').innerText = `Mengunggah... ${Math.round(progress)}%`;
-                    }, 
-                    (error) => {
-                        console.error("Upload error:", error);
-                        window.showCustomAlert("Gagal mengunggah file ke Storage.");
-                        btn.disabled = false;
-                        document.getElementById('text-simpan').innerText = "Coba Lagi";
-                    }, 
-                    async () => {
-                        // Upload Berhasil! Ambil URL Download-nya
-                        document.getElementById('text-simpan').innerHTML = '<i class="fas fa-database mr-2"></i>Menyimpan ke Database...';
-                        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-
-                        // 2. SIMPAN KE FIRESTORE
-                        const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
-                        
-                        await addDoc(promptsRef, { 
-                            title: title, 
-                            mediaUrl: downloadURL, // Menyimpan URL Asli dari Storage
-                            mediaType: selectedMediaFile.type, // image/jpeg, video/mp4, dll
-                            prompt: prompt, 
-                            likes: 0, 
-                            createdAt: Date.now(),
-                            storagePath: storagePath // Simpan path untuk kemudahan hapus file nanti
-                        });
-                        
-                        window.closeAdminModal();
-                        window.showToast("Status: Selesai! Prompt & Media Tersimpan ✅");
-                        resetForm();
-                    }
-                );
-
+                // SIMPAN KE FIRESTORE
+                const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
+                
+                await addDoc(promptsRef, { 
+                    title: title, 
+                    mediaUrl: mediaUrl,
+                    mediaType: mediaType,
+                    prompt: prompt, 
+                    likes: 0, 
+                    createdAt: Date.now()
+                });
+                
+                window.closeAdminModal();
+                window.showToast("Status: Selesai! Prompt Tersimpan ✅");
+                resetForm();
             } catch (e) { 
-                window.showCustomAlert("Terjadi kesalahan sistem."); 
+                window.showCustomAlert("Terjadi kesalahan sistem saat menyimpan ke database."); 
                 console.error(e);
+            } finally {
                 btn.disabled = false; 
                 document.getElementById('text-simpan').innerText = "Simpan ke Galeri"; 
             }
         }
 
-        let deleteData = null; // Menyimpan id dan mediaUrl
-        window.confirmDelete = (id, mediaUrl) => { 
-            deleteData = { id, mediaUrl }; 
+        let deleteDataId = null; 
+        window.confirmDelete = (id) => { 
+            deleteDataId = id; 
             document.getElementById('confirm-delete-modal').classList.remove('hidden'); 
         }
         window.closeConfirmDelete = () => {
-            deleteData = null;
+            deleteDataId = null;
             document.getElementById('confirm-delete-modal').classList.add('hidden');
         }
         
         window.executeDelete = async () => {
-            if (!deleteData || !currentUser) return;
+            if (!deleteDataId || !currentUser) return;
             try {
-                // 1. Hapus Dokumen Firestore
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, deleteData.id));
+                // Hapus Dokumen Firestore saja (karena file/gambar di hosting di luar)
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, deleteDataId));
                 
-                // 2. (Opsional/Best Practice) Hapus File dari Storage menggunakan referensi URL
-                // Meskipun kita tidak menyimpan storagePath secara explisit sebelumnya, 
-                // kita bisa mencoba mereferensikan via HTTPS URL
-                try {
-                    const mediaRef = ref(storage, deleteData.mediaUrl);
-                    await deleteObject(mediaRef);
-                    console.log("File di Storage terhapus");
-                } catch (storageErr) {
-                    console.warn("Gagal hapus file storage, mungkin URL format lama:", storageErr);
-                }
-
                 window.closeConfirmDelete();
-                window.showToast("Status: Terhapus dari Hosting 🗑️");
+                window.showToast("Status: Prompt Terhapus 🗑️");
             } catch (e) { 
                 window.showCustomAlert("Gagal menghapus."); 
                 console.error(e);
