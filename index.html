@@ -169,7 +169,7 @@
                     <input type="text" id="input-title" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30" placeholder="Contoh: Cyberpunk Lion">
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-400 mb-1">Pilih Gambar</label>
+                    <label class="block text-sm text-gray-400 mb-1">Pilih Gambar (Ukuran akan dikompres otomatis)</label>
                     <input type="file" id="input-image-file" accept="image/*" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white text-xs file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:bg-white file:text-black hover:file:bg-gray-200">
                     <input type="hidden" id="input-image-base64">
                     <p id="upload-status" class="text-[10px] mt-2 hidden"></p>
@@ -405,21 +405,24 @@
             const file = e.target.files[0];
             if (!file) return;
             const status = document.getElementById('upload-status');
-            status.innerText = "Memproses...";
+            status.innerText = "Mengompres Gambar...";
             status.className = "text-[10px] mt-2 text-yellow-500 block";
+            
             const reader = new FileReader();
             reader.onload = (event) => {
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX = 800;
+                    // Optimasi resolusi ke 700px untuk kecepatan
+                    const MAX = 700;
                     let w = img.width, h = img.height;
                     if (w > h && w > MAX) { h *= MAX/w; w = MAX; }
                     else if (h > MAX) { w *= MAX/h; h = MAX; }
                     canvas.width = w; canvas.height = h;
                     canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                    document.getElementById('input-image-base64').value = canvas.toDataURL('image/jpeg', 0.7);
-                    status.innerText = "Siap!";
+                    // Kompres kualitas ke 0.6 untuk mengurangi ukuran data Base64
+                    document.getElementById('input-image-base64').value = canvas.toDataURL('image/jpeg', 0.6);
+                    status.innerText = "Gambar dioptimasi! Siap hosting.";
                     status.className = "text-[10px] mt-2 text-green-500 block";
                 };
                 img.src = event.target.result;
@@ -431,17 +434,21 @@
             const title = document.getElementById('input-title').value.trim();
             const imageUrl = document.getElementById('input-image-base64').value;
             const prompt = document.getElementById('input-prompt').value.trim();
+            const btn = document.getElementById('btn-simpan');
             
             if (!title || !imageUrl || !prompt || !currentUser) {
                 return window.showCustomAlert("Lengkapi form terlebih dahulu!");
             }
 
-            const btn = document.getElementById('btn-simpan');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Hosting...';
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i>Mengunggah...';
             
             try {
                 const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
+                
+                // Langkah-langkah update teks tombol agar user tidak merasa stuck
+                setTimeout(() => { if(btn.disabled) btn.innerHTML = '<i class="fas fa-cloud-upload-alt mr-2 animate-bounce"></i>Sinkronisasi...'; }, 2000);
+                
                 await addDoc(promptsRef, { 
                     title, 
                     imageUrl, 
@@ -453,6 +460,7 @@
                 window.closeAdminModal();
                 window.showToast("Status: Selesai! Prompt Ter-hosting ✅");
                 
+                // Reset Form
                 document.getElementById('input-title').value = '';
                 document.getElementById('input-image-file').value = '';
                 document.getElementById('input-prompt').value = '';
