@@ -66,6 +66,15 @@
             100% { transform: scale(1); }
         }
         .liked-anim { animation: heartPulse 0.3s ease-in-out; }
+
+        /* Animasi Kelap-Kelip untuk Tombol Quantum */
+        @keyframes quantumBlink {
+            0%, 100% { box-shadow: 0 0 5px rgba(168,85,247,0.2); border-color: rgba(168,85,247,0.3); opacity: 0.85; }
+            50% { box-shadow: 0 0 20px rgba(168,85,247,0.9); border-color: rgba(168,85,247,1); opacity: 1; }
+        }
+        .kelap-kelip {
+            animation: quantumBlink 1.5s ease-in-out infinite;
+        }
     </style>
 </head>
 <body class="min-h-screen antialiased selection:bg-white selection:text-black">
@@ -84,10 +93,16 @@
                 Ailabs <span class="font-light text-gray-400">Prompt</span>
             </h1>
         </div>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3 md:gap-4">
+            <!-- Tombol Ailabs Quantum Akses -->
+            <a href="https://ailabsquantum.vercel.app/" target="_blank" class="kelap-kelip flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold text-purple-200 hover:text-white transition bg-purple-900/40 hover:bg-purple-800/60 px-3 py-1.5 rounded-full border border-purple-500/30">
+                <i class="fas fa-atom text-purple-400 animate-pulse"></i> <span class="hidden sm:inline">Quantum Akses</span>
+            </a>
+            
             <div id="connection-status" class="text-[10px] uppercase tracking-tighter px-2 py-1 rounded border border-gray-500/30 text-gray-400 font-mono">READY</div>
+            
             <a href="#" class="text-gray-400 hover:text-white transition hidden md:block">
-                <i class="fab fa-facebook text-2xl"></i>
+                <i class="fab fa-facebook text-xl"></i>
             </a>
         </div>
     </nav>
