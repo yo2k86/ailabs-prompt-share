@@ -67,10 +67,10 @@
         }
         .liked-anim { animation: heartPulse 0.3s ease-in-out; }
 
-        /* Animasi Kelap-Kelip untuk Tombol Quantum */
+        /* Animasi Kelap-Kelip untuk Tombol Quantum (Hijau Elegan) */
         @keyframes quantumBlink {
-            0%, 100% { box-shadow: 0 0 5px rgba(168,85,247,0.2); border-color: rgba(168,85,247,0.3); opacity: 0.85; }
-            50% { box-shadow: 0 0 20px rgba(168,85,247,0.9); border-color: rgba(168,85,247,1); opacity: 1; }
+            0%, 100% { box-shadow: 0 0 5px rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.3); opacity: 0.85; }
+            50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.9); border-color: rgba(16, 185, 129, 1); opacity: 1; }
         }
         .kelap-kelip {
             animation: quantumBlink 1.5s ease-in-out infinite;
@@ -94,9 +94,11 @@
             </h1>
         </div>
         <div class="flex items-center gap-3 md:gap-4">
-            <!-- Tombol Ailabs Quantum Akses -->
-            <a href="https://ailabsquantum.vercel.app/" target="_blank" class="kelap-kelip flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold text-purple-200 hover:text-white transition bg-purple-900/40 hover:bg-purple-800/60 px-3 py-1.5 rounded-full border border-purple-500/30">
-                <i class="fas fa-atom text-purple-400 animate-pulse"></i> <span class="hidden sm:inline">Quantum Akses</span>
+            <!-- Tombol Ailabs Quantum Akses VIP -->
+            <a href="https://ailabsquantum.vercel.app/" target="_blank" class="kelap-kelip flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold text-emerald-200 hover:text-white transition bg-emerald-900/40 hover:bg-emerald-800/60 px-3 py-1.5 rounded-full border border-emerald-500/30">
+                <i class="fas fa-atom text-emerald-400"></i> 
+                <span class="hidden sm:inline">Quantum Akses VIP</span>
+                <i class="fas fa-arrow-right text-emerald-400 animate-pulse ml-0.5"></i>
             </a>
             
             <div id="connection-status" class="text-[10px] uppercase tracking-tighter px-2 py-1 rounded border border-gray-500/30 text-gray-400 font-mono">READY</div>
@@ -147,7 +149,7 @@
         <span id="alert-message" class="text-white text-sm font-medium leading-tight"></span>
     </div>
 
-    <!-- Modal Tambah Prompt -->
+    <!-- Modal Tambah Prompt (Diperbarui untuk ImgBB) -->
     <div id="admin-modal" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
         <div class="glass-card w-full max-w-lg p-6 rounded-2xl my-8">
             <div class="flex justify-between items-center mb-6">
@@ -161,13 +163,13 @@
                 </div>
                 <div>
                     <div class="flex justify-between items-end mb-1">
-                        <label class="block text-sm text-yellow-400 font-semibold">Link Postimages (Wajib Direct Link)</label>
-                        <a href="https://postimages.org/" target="_blank" class="text-[11px] bg-white/10 hover:bg-white/20 text-white px-2.5 py-1 rounded flex items-center gap-1.5 transition-colors" title="Buka Postimages di tab baru">
-                            <i class="fas fa-external-link-alt"></i> Buka Postimages
+                        <label class="block text-sm text-yellow-400 font-semibold">Link Gambar (Wajib Direct Link)</label>
+                        <a href="https://imgbb.com/" target="_blank" class="text-[11px] bg-white/10 hover:bg-white/20 text-white px-2.5 py-1 rounded flex items-center gap-1.5 transition-colors" title="Buka ImgBB di tab baru">
+                            <i class="fas fa-external-link-alt"></i> Buka ImgBB
                         </a>
                     </div>
-                    <input type="url" id="input-media-url" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30" placeholder="https://i.postimg.cc/xxxx/gambar.jpg">
-                    <p class="text-[11px] text-gray-400 mt-1">Harus berakhiran .jpg atau .png</p>
+                    <input type="url" id="input-media-url" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30" placeholder="https://i.ibb.co/xxxx/gambar.jpg">
+                    <p class="text-[11px] text-gray-400 mt-1">Gunakan ImgBB.com agar bebas blokir. Akhiran wajib .jpg/.png</p>
                 </div>
                 <div>
                     <label class="block text-sm text-gray-400 mb-1">Teks Prompt (Opsional)</label>
@@ -409,7 +411,15 @@
             const mediaUrl = document.getElementById('input-media-url').value.trim();
             const prompt = document.getElementById('input-prompt').value.trim();
             
-            if (!mediaUrl) return window.showCustomAlert("Link Postimages (Direct Link) wajib diisi!");
+            if (!mediaUrl) return window.showCustomAlert("Link Gambar (Direct Link) wajib diisi!");
+
+            // Validasi: Memaksa harus Direct Link (berakhiran gambar)
+            const validImageExtensions = /\.(jpg|jpeg|png|gif|webp)$/i;
+            const cleanUrl = mediaUrl.split('?')[0]; 
+
+            if (!validImageExtensions.test(cleanUrl)) {
+                return window.showCustomAlert("❌ SALAH LINK! Harus pakai 'Direct Link' (Tautan Langsung) dari ImgBB yang berakhiran .jpg atau .png");
+            }
 
             const newItem = {
                 id: Date.now().toString(),
