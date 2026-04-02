@@ -107,7 +107,7 @@
             </h1>
         </div>
         <div class="flex items-center gap-4">
-            <div id="connection-status" class="text-[10px] uppercase tracking-tighter px-2 py-1 rounded border border-red-500/30 text-red-400">OFFLINE</div>
+            <div id="connection-status" class="text-[10px] uppercase tracking-tighter px-2 py-1 rounded border border-yellow-500/30 text-yellow-400">CONNECTING...</div>
             <a href="#" class="text-gray-400 hover:text-white transition hidden md:block">
                 <i class="fab fa-facebook text-2xl"></i>
             </a>
@@ -203,10 +203,20 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- INITIALIZATION ---
-        const firebaseConfig = JSON.parse(__firebase_config);
+        // --- CONFIGURATION ---
+        const defaultFirebaseConfig = {
+            apiKey: "AIzaSyB2eTNTF1L5c9bMZLMyMb15ljdROyJ_5S8",
+            authDomain: "website-93ae4.firebaseapp.com",
+            projectId: "website-93ae4",
+            storageBucket: "website-93ae4.firebasestorage.app",
+            messagingSenderId: "176586837710",
+            appId: "1:176586837710:web:522dfa73f20ef9dcc30a9f",
+            measurementId: "G-ZNRJR9KB5D"
+        };
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : defaultFirebaseConfig;
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -217,7 +227,63 @@
         let promptData = [];
         window.isAdmin = false;
 
-        // --- UI HELPERS ---
+        const updateStatus = (text, type = 'error') => {
+            const statusIndicator = document.getElementById('connection-status');
+            statusIndicator.innerText = text;
+            if (type === 'success') {
+                statusIndicator.className = "text-[10px] uppercase tracking-tighter px-2 py-1 rounded border border-green-500/30 text-green-400";
+            } else if (type === 'warning') {
+                statusIndicator.className = "text-[10px] uppercase tracking-tighter px-2 py-1 rounded border border-yellow-500/30 text-yellow-400";
+            } else {
+                statusIndicator.className = "text-[10px] uppercase tracking-tighter px-2 py-1 rounded border border-red-500/30 text-red-400";
+            }
+        };
+
+        // --- AUTHENTICATION ---
+        const initAuth = async () => {
+            updateStatus("AUTH...", "warning");
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Auth failed:", error);
+                updateStatus("AUTH ERROR");
+                window.showCustomAlert("Gagal login anonim. Pastikan 'Anonymous' aktif di Firebase Console.");
+            }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                updateStatus("SYNCING...", "warning");
+                
+                const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
+                onSnapshot(promptsRef, (snapshot) => {
+                    updateStatus("ONLINE", "success");
+                    const loadedData = [];
+                    snapshot.forEach((doc) => {
+                        loadedData.push({ id: doc.id, ...doc.data() });
+                    });
+                    promptData = loadedData.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                    window.renderPrompts();
+                }, (error) => {
+                    console.error("Firestore Error:", error);
+                    if (error.code === 'permission-denied') {
+                        updateStatus("RULES DENIED");
+                        window.showCustomAlert("Izin ditolak. Cek tab 'Rules' di Firestore.");
+                    } else {
+                        updateStatus("DB ERROR");
+                    }
+                });
+            } else {
+                updateStatus("OFFLINE");
+            }
+        });
+
+        // --- UI LOGIC ---
         window.showCustomAlert = (message) => {
             const alertBox = document.getElementById('custom-alert');
             document.getElementById('alert-message').innerText = message;
@@ -226,10 +292,10 @@
             setTimeout(() => {
                 alertBox.classList.add('-translate-y-10', 'opacity-0');
                 setTimeout(() => alertBox.classList.add('hidden'), 300);
-            }, 3000);
+            }, 5000);
         }
 
-        window.showToast = (msg = "Berhasil disalin!") => {
+        window.showToast = (msg = "Berhasil!") => {
             const toast = document.getElementById('toast');
             toast.querySelector('span').innerText = msg;
             toast.classList.remove('opacity-0');
@@ -240,53 +306,13 @@
             }, 3000);
         }
 
-        // --- AUTHENTICATION (RULE 3) ---
-        const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Auth failed:", error);
-                window.showCustomAlert("Gagal terhubung ke database.");
-            }
-        };
-
-        // --- FIRESTORE OPERATIONS ---
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user) {
-                document.getElementById('connection-status').innerText = "ONLINE";
-                document.getElementById('connection-status').className = "text-[10px] uppercase tracking-tighter px-2 py-1 rounded border border-green-500/30 text-green-400";
-                
-                // Real-time Listener (RULE 1)
-                const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
-                onSnapshot(promptsRef, (snapshot) => {
-                    const loadedData = [];
-                    snapshot.forEach((doc) => {
-                        loadedData.push({ id: doc.id, ...doc.data() });
-                    });
-                    // Simple Sort in JS (RULE 2)
-                    promptData = loadedData.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-                    window.renderPrompts();
-                }, (error) => {
-                    console.error("Firestore Listen Error:", error);
-                });
-            }
-        });
-
-        // --- RENDERING ---
         window.renderPrompts = () => {
             const container = document.getElementById('prompts-container');
             if (promptData.length === 0) {
-                container.innerHTML = '<div class="text-center py-20 text-gray-600">Belum ada prompt tersedia.</div>';
+                container.innerHTML = '<div class="text-center py-20 text-gray-600">Database kosong. Gunakan Admin untuk menambah data.</div>';
                 return;
             }
-
             const likedList = JSON.parse(localStorage.getItem('likedPrompts') || '[]');
-
             container.innerHTML = promptData.map(item => {
                 const isLiked = likedList.includes(item.id);
                 return `
@@ -295,14 +321,10 @@
                         <button onclick="confirmDelete('${item.id}')" class="absolute top-4 right-4 bg-red-600/80 hover:bg-red-600 text-white w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition z-20 shadow-lg">
                             <i class="fas fa-trash-alt"></i>
                         </button>` : ''}
-                        
                         <div class="w-full md:w-5/12 h-64 md:h-auto shrink-0 relative overflow-hidden bg-neutral-900">
-                            <img src="${item.imageUrl}" alt="${item.title}" 
-                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                onerror="this.src='https://via.placeholder.com/800x600/111/fff?text=Image+Error';">
+                            <img src="${item.imageUrl}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" onerror="this.src='https://via.placeholder.com/800x600/111/fff?text=No+Image';">
                             <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#1e1e1e]/80 to-transparent pointer-events-none"></div>
                         </div>
-
                         <div class="w-full md:w-7/12 p-6 md:p-8 flex flex-col justify-between">
                             <div>
                                 <h3 class="text-xl font-bold text-white mb-2">${item.title}</h3>
@@ -320,25 +342,22 @@
                                 </button>
                             </div>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             }).join('');
         };
 
-        // --- ACTIONS ---
         window.toggleLike = async (id, currentLikes) => {
             const likedList = JSON.parse(localStorage.getItem('likedPrompts') || '[]');
             const isLiked = likedList.includes(id);
             const newLikes = isLiked ? Math.max(0, currentLikes - 1) : (currentLikes || 0) + 1;
-            
             if (isLiked) likedList.splice(likedList.indexOf(id), 1);
             else likedList.push(id);
-            
             localStorage.setItem('likedPrompts', JSON.stringify(likedList));
-            
             if (currentUser) {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', collectionName, id);
-                await updateDoc(docRef, { likes: newLikes });
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', collectionName, id);
+                    await updateDoc(docRef, { likes: newLikes });
+                } catch(e) { console.error("Update error", e); }
             }
         }
 
@@ -350,22 +369,20 @@
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
-            window.showToast();
+            window.showToast("Prompt disalin!");
         }
 
-        // --- ADMIN LOGIC ---
         window.checkAdmin = () => {
-            if (window.isAdmin) return window.showCustomAlert("Mode admin sudah aktif!");
+            if (window.isAdmin) return window.showCustomAlert("Admin sudah aktif.");
             document.getElementById('admin-login-modal').classList.remove('hidden');
         }
 
         window.verifyAdmin = () => {
-            const code = document.getElementById('admin-code-input').value;
-            if (code === "Kr333wol") {
+            if (document.getElementById('admin-code-input').value === "Kr333wol") {
                 window.isAdmin = true;
                 document.getElementById('add-prompt-btn').classList.remove('hidden');
                 document.getElementById('admin-login-modal').classList.add('hidden');
-                window.showCustomAlert("Akses Admin Terverifikasi!");
+                window.showCustomAlert("Akses Admin Aktif!");
                 window.renderPrompts();
             } else {
                 window.showCustomAlert("Kode Salah!");
@@ -376,14 +393,12 @@
         window.openAdminModal = () => document.getElementById('admin-modal').classList.remove('hidden');
         window.closeAdminModal = () => document.getElementById('admin-modal').classList.add('hidden');
 
-        // Image Compression
         document.getElementById('input-image-file').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
             const status = document.getElementById('upload-status');
             status.innerText = "Memproses...";
             status.className = "text-[10px] mt-2 text-yellow-500 block";
-
             const reader = new FileReader();
             reader.onload = (event) => {
                 const img = new Image();
@@ -396,7 +411,7 @@
                     canvas.width = w; canvas.height = h;
                     canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                     document.getElementById('input-image-base64').value = canvas.toDataURL('image/jpeg', 0.7);
-                    status.innerText = "Gambar siap!";
+                    status.innerText = "Siap!";
                     status.className = "text-[10px] mt-2 text-green-500 block";
                 };
                 img.src = event.target.result;
@@ -408,37 +423,26 @@
             const title = document.getElementById('input-title').value.trim();
             const imageUrl = document.getElementById('input-image-base64').value;
             const prompt = document.getElementById('input-prompt').value.trim();
+            if (!title || !imageUrl || !prompt || !currentUser) return window.showCustomAlert("Lengkapi form!");
             const btn = document.getElementById('btn-simpan');
-
-            if (!title || !imageUrl || !prompt || !currentUser) return window.showCustomAlert("Lengkapi semua data!");
-
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...';
-
+            btn.innerText = "Menyimpan...";
             try {
                 const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
-                await addDoc(promptsRef, {
-                    title, imageUrl, prompt, likes: 0, createdAt: Date.now()
-                });
+                await addDoc(promptsRef, { title, imageUrl, prompt, likes: 0, createdAt: Date.now() });
                 window.closeAdminModal();
-                window.showToast("Berhasil ditambahkan!");
-                // Reset Form
+                window.showToast("Berhasil!");
                 document.getElementById('input-title').value = '';
                 document.getElementById('input-image-file').value = '';
                 document.getElementById('input-prompt').value = '';
-            } catch (e) {
-                window.showCustomAlert("Error menyimpan data.");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = 'Simpan ke Galeri';
-            }
+                document.getElementById('input-image-base64').value = '';
+                document.getElementById('upload-status').classList.add('hidden');
+            } catch (e) { window.showCustomAlert("Gagal menyimpan."); }
+            finally { btn.disabled = false; btn.innerText = "Simpan ke Galeri"; }
         }
 
         let deleteId = null;
-        window.confirmDelete = (id) => {
-            deleteId = id;
-            document.getElementById('confirm-delete-modal').classList.remove('hidden');
-        }
+        window.confirmDelete = (id) => { deleteId = id; document.getElementById('confirm-delete-modal').classList.remove('hidden'); }
         window.closeConfirmDelete = () => document.getElementById('confirm-delete-modal').classList.add('hidden');
         window.executeDelete = async () => {
             if (!deleteId || !currentUser) return;
@@ -449,9 +453,7 @@
             } catch (e) { window.showCustomAlert("Gagal menghapus."); }
         }
 
-        // Start
         initAuth();
-
     </script>
 </body>
 </html>
