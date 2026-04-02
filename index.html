@@ -92,16 +92,21 @@
         </div>
     </nav>
 
-    <main class="container mx-auto px-4 py-10 md:px-8 max-w-5xl">
+    <main class="container mx-auto px-4 py-10 md:px-8 max-w-4xl">
         <div class="text-center mb-12">
             <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Galeri Prompt AI</h2>
             <p class="text-gray-400">Temukan inspirasi dari kumpulan prompt terbaik kami. Salin dan gunakan untuk karya Anda.</p>
         </div>
 
-        <div id="prompts-container" class="space-y-8">
-            <!-- Skeleton Loading Awal -->
-            <div class="glass-card rounded-2xl flex flex-col md:flex-row group w-full animate-pulse h-64 md:h-80 opacity-20"></div>
-            <div class="glass-card rounded-2xl flex flex-col md:flex-row group w-full animate-pulse h-64 md:h-80 opacity-10"></div>
+        <div id="prompts-container" class="space-y-12">
+            <!-- Skeleton Loading Awal (Kembali ke Kiri-Kanan) -->
+            <div class="glass-card rounded-2xl flex flex-col md:flex-row group w-full animate-pulse opacity-20">
+                <div class="w-full md:w-5/12 h-64 md:h-80 bg-neutral-800"></div>
+                <div class="w-full md:w-7/12 p-5 md:p-6 space-y-3 flex flex-col justify-center">
+                    <div class="h-5 bg-neutral-700 rounded w-1/3"></div>
+                    <div class="h-20 bg-neutral-700 rounded w-full"></div>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -266,35 +271,38 @@
             
             container.innerHTML = promptData.map(item => {
                 const isLiked = likedList.includes(item.id.toString());
-                const mediaElement = `<img src="${item.mediaUrl}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" onerror="this.src='https://placehold.co/800x600/111/fff?text=Link+Gambar+Rusak';">`;
+                
+                // Gambar menggunakan object-contain agar tidak terpotong sama sekali
+                const mediaElement = `<img src="${item.mediaUrl}" alt="${item.title}" class="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105" loading="lazy" onerror="this.src='https://placehold.co/800x600/111/fff?text=Link+Gambar+Rusak';">`;
 
                 return `
                     <div class="glass-card rounded-2xl flex flex-col md:flex-row group w-full relative" id="card-${item.id}">
                         ${window.isAdmin ? `
-                        <button onclick="confirmDelete('${item.id}')" class="absolute top-4 right-4 bg-red-600/80 hover:bg-red-600 text-white w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition z-20 shadow-lg">
-                            <i class="fas fa-trash-alt"></i>
+                        <button onclick="confirmDelete('${item.id}')" class="absolute top-4 right-4 bg-red-600/80 hover:bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm transition z-20 shadow-lg">
+                            <i class="fas fa-trash-alt text-sm"></i>
                         </button>` : ''}
 
-                        <div class="w-full md:w-5/12 h-64 md:h-auto shrink-0 relative overflow-hidden bg-neutral-900">
+                        <!-- Area Foto: Kiri (Desktop) / Atas (Mobile) -->
+                        <div class="w-full md:w-5/12 h-64 md:min-h-[300px] shrink-0 relative overflow-hidden bg-[#050505] flex justify-center items-center">
                             ${mediaElement}
-                            <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#1e1e1e]/80 to-transparent pointer-events-none"></div>
+                            <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[rgba(30,30,30,0.6)] via-transparent to-transparent pointer-events-none"></div>
                         </div>
-                        <div class="w-full md:w-7/12 p-6 md:p-8 flex flex-col justify-between">
+                        
+                        <!-- Area Prompt: Kanan (Desktop) / Bawah (Mobile) -->
+                        <div class="w-full md:w-7/12 p-5 md:p-6 flex flex-col justify-center gap-3">
                             <div>
-                                <div class="flex items-center gap-2 mb-2">
-                                    <h3 class="text-xl font-bold text-white">${item.title}</h3>
-                                </div>
-                                <div class="bg-black/40 border border-white/10 rounded-lg p-4 mb-6">
-                                    <p class="text-sm text-gray-300 font-mono leading-relaxed" id="prompt-text-${item.id}">${item.prompt}</p>
+                                <h3 class="text-lg md:text-xl font-bold text-white mb-2">${item.title}</h3>
+                                <div class="bg-black/40 border border-white/10 rounded-lg p-3 md:p-4">
+                                    <p class="text-xs md:text-sm text-gray-300 font-mono leading-relaxed" id="prompt-text-${item.id}">${item.prompt}</p>
                                 </div>
                             </div>
-                            <div class="flex items-center justify-between">
-                                <button onclick="toggleLike('${item.id}', ${item.likes})" class="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 hover:bg-white/10 transition-colors group/btn">
-                                    <i class="${isLiked ? 'fas fa-heart text-white liked-anim' : 'far fa-heart text-gray-400'}"></i>
-                                    <span class="text-sm font-medium ${isLiked ? 'text-white' : 'text-gray-400'}">${item.likes || 0}</span>
+                            <div class="flex items-center justify-between mt-2">
+                                <button onclick="toggleLike('${item.id}', ${item.likes})" class="flex items-center gap-1.5 px-4 py-2 rounded-full border border-white/10 hover:bg-white/10 transition-colors group/btn">
+                                    <i class="${isLiked ? 'fas fa-heart text-white liked-anim' : 'far fa-heart text-gray-400'} text-sm"></i>
+                                    <span class="text-xs font-medium ${isLiked ? 'text-white' : 'text-gray-400'}">${item.likes || 0}</span>
                                 </button>
-                                <button onclick="copyPrompt('${item.id}')" class="flex items-center gap-2 bg-white text-black px-6 py-2 rounded-full font-semibold hover:bg-gray-200 transition-all active:scale-95">
-                                    <i class="fas fa-copy"></i><span class="text-sm">Salin Prompt</span>
+                                <button onclick="copyPrompt('${item.id}')" class="flex items-center gap-1.5 bg-white text-black px-5 py-2 rounded-full font-semibold hover:bg-gray-200 transition-all active:scale-95 shadow-lg">
+                                    <i class="fas fa-copy text-sm"></i><span class="text-xs">Salin Prompt</span>
                                 </button>
                             </div>
                         </div>
