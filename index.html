@@ -159,9 +159,9 @@
         <span id="alert-message" class="text-white text-sm font-medium"></span>
     </div>
 
-    <!-- Modal Tambah Prompt (Fitur Auto-Upload ala Postimages) -->
-    <div id="admin-modal" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="glass-card w-full max-w-lg p-6 rounded-2xl">
+    <!-- Modal Tambah Prompt (Fitur Auto-Upload & API Key Custom) -->
+    <div id="admin-modal" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-card w-full max-w-lg p-6 rounded-2xl my-8">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-bold text-white">Tambah Prompt Baru</h3>
                 <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
@@ -172,10 +172,9 @@
                     <input type="text" id="input-title" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30" placeholder="Contoh: Cyberpunk Lion">
                 </div>
                 <div>
-                    <!-- INPUT FILE KEMBALI HADIR: Tinggal pilih gambar, sisanya web yang urus -->
                     <label class="block text-sm text-gray-400 mb-1">Pilih Gambar</label>
                     <input type="file" id="input-media-file" accept="image/*" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white text-xs file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-white file:text-black hover:file:bg-gray-200 cursor-pointer">
-                    <p class="text-[11px] text-gray-400 mt-2"><i class="fas fa-cloud-upload-alt text-blue-400 mr-1"></i>Gambar akan otomatis di-hosting ke cloud secara gratis.</p>
+                    <p class="text-[11px] text-gray-400 mt-2"><i class="fas fa-cloud-upload-alt text-blue-400 mr-1"></i>Gambar akan dikompres & otomatis di-hosting.</p>
                 </div>
                 <div>
                     <label class="block text-sm text-gray-400 mb-1">Teks Prompt</label>
@@ -334,7 +333,7 @@
                 const mediaUrl = item.mediaUrl || item.imageUrl; 
                 const mediaType = item.mediaType || 'image/jpeg';
                 
-                // Fallback untuk render gambar yang aman (dihosting pihak ketiga)
+                // Fallback untuk render gambar yang aman
                 const mediaElement = `<img src="${mediaUrl}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" onerror="this.src='https://placehold.co/800x600/111/fff?text=Image+Not+Found';">`;
 
                 return `
@@ -415,7 +414,10 @@
         }
 
         window.closeAdminLogin = () => document.getElementById('admin-login-modal').classList.add('hidden');
-        window.openAdminModal = () => document.getElementById('admin-modal').classList.remove('hidden');
+        
+        window.openAdminModal = () => {
+            document.getElementById('admin-modal').classList.remove('hidden');
+        }
         
         window.closeAdminModal = () => {
             document.getElementById('admin-modal').classList.add('hidden');
@@ -432,7 +434,7 @@
             document.getElementById('text-simpan').innerText = "Upload & Simpan";
         };
 
-        // Fungsi Kompresi Gambar Otomatis agar Upload Cepat & Tidak Gagal
+        // Kompresi Gambar Otomatis
         const compressImage = (file) => {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -442,7 +444,7 @@
                     img.src = event.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const MAX_SIZE = 1200; // Maksimal resolusi 1200px
+                        const MAX_SIZE = 1200;
                         let width = img.width;
                         let height = img.height;
 
@@ -459,7 +461,6 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
                         
-                        // Ambil Base64 (Hanya datanya saja untuk ImgBB)
                         const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
                         resolve(dataUrl.split(',')[1]); 
                     };
@@ -469,8 +470,9 @@
             });
         };
 
-        // FUNGSI AUTO-UPLOAD GAMBAR KE IMGBB LALU SIMPAN KE FIRESTORE
+        // UPLOAD KE IMGBB MENGGUNAKAN API KEY DARI INPUT
         window.addNewPrompt = async () => {
+            const IMGBB_API_KEY = "999554b8c6db097997b1aaea28416814"; // API Key milikmu
             const title = document.getElementById('input-title').value.trim();
             const fileInput = document.getElementById('input-media-file');
             const file = fileInput.files[0];
@@ -478,24 +480,19 @@
             const btn = document.getElementById('btn-simpan');
             
             if (!title || !file || !prompt || !currentUser) {
-                return window.showCustomAlert("Lengkapi form (Judul, Pilih Gambar, dan Prompt) terlebih dahulu!");
+                return window.showCustomAlert("Lengkapi form (Judul, Pilih Gambar, dan Prompt)!");
             }
 
-            // Ubah tombol jadi status Loading
             btn.disabled = true;
             document.getElementById('text-simpan').innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mengompres & Mengunggah...';
 
             try {
-                // TAHAP 1: KOMPRES GAMBAR & UPLOAD KE CLOUD (API ImgBB)
-                // Fitur kompresi akan mencegah error ukuran file dari ImgBB
                 const base64Image = await compressImage(file);
                 
                 const formData = new FormData();
                 formData.append('image', base64Image);
                 
-                // Gunakan API Key ImgBB (Jika error terus, daftar gratis di api.imgbb.com)
-                const IMGBB_API_KEY = "3277028148b5286eaeb25ebfb6233481"; 
-                
+                // Gunakan API Key yang sudah di-hardcode
                 const imgbbResponse = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
                     method: 'POST',
                     body: formData
@@ -505,27 +502,23 @@
 
                 if (!imgbbData.success) {
                     console.error("ImgBB Error Detail:", imgbbData);
-                    throw new Error(imgbbData.error.message || "Gagal mengunggah gambar ke server cloud.");
+                    throw new Error(imgbbData.error.message || "Gagal mengunggah gambar. Pastikan API Key valid!");
                 }
 
-                // Mendapatkan Direct Link secara otomatis!
                 const directImageUrl = imgbbData.data.url;
 
-                // TAHAP 2: SIMPAN TEKS & LINK KE FIRESTORE
                 document.getElementById('text-simpan').innerHTML = '<i class="fas fa-database mr-2"></i>Menyimpan Data...';
                 
                 const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
-                
                 await addDoc(promptsRef, { 
                     title: title, 
-                    mediaUrl: directImageUrl, // URL otomatis dari ImgBB
+                    mediaUrl: directImageUrl,
                     mediaType: 'image/jpeg',
                     prompt: prompt, 
                     likes: 0, 
                     createdAt: Date.now()
                 });
                 
-                // Jika sukses, tutup modal dan kembalikan tombol
                 window.closeAdminModal();
                 window.showToast("Status: Tersimpan Permanen ✅");
                 resetForm();
