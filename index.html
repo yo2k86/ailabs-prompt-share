@@ -189,7 +189,12 @@
                     <label class="block text-sm text-gray-400 mb-1">Teks Prompt</label>
                     <textarea id="input-prompt" rows="4" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30" placeholder="Ketik prompt di sini..."></textarea>
                 </div>
-                <button onclick="addNewPrompt()" class="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-200 transition-colors mt-2">Simpan ke Galeri</button>
+                <div class="flex gap-3 mt-4">
+                    <button onclick="closeAdminModal()" class="w-1/3 px-4 py-3 rounded-lg text-gray-400 hover:text-white transition border border-white/10 hover:border-white/30 font-medium">Kembali</button>
+                    <button id="btn-simpan" onclick="addNewPrompt()" class="w-2/3 bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center">
+                        <span id="text-simpan">Simpan ke Galeri</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -417,6 +422,8 @@
             const title = document.getElementById('input-title').value.trim();
             const imageUrl = document.getElementById('input-image-base64').value;
             const promptText = document.getElementById('input-prompt').value.trim();
+            const btnSimpan = document.getElementById('btn-simpan');
+            const textSimpan = document.getElementById('text-simpan');
 
             if (!title || !imageUrl || !promptText) {
                 window.showCustomAlert("Mohon isi Judul, Gambar, dan Teks Prompt!");
@@ -427,6 +434,11 @@
                 window.showCustomAlert("Sedang menghubungi server cloud...");
                 return;
             }
+
+            // Ubah tombol menjadi status Loading
+            btnSimpan.disabled = true;
+            btnSimpan.classList.add('opacity-70', 'cursor-not-allowed');
+            textSimpan.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Menyimpan...';
 
             const newPrompt = {
                 imageUrl: imageUrl,
@@ -440,6 +452,11 @@
                 const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
                 await addDoc(promptsRef, newPrompt);
                 
+                // Kembalikan status tombol
+                btnSimpan.disabled = false;
+                btnSimpan.classList.remove('opacity-70', 'cursor-not-allowed');
+                textSimpan.innerHTML = 'Simpan ke Galeri';
+                
                 window.closeAdminModal();
                 
                 const toastSpan = document.querySelector('#toast span');
@@ -447,7 +464,14 @@
                 toastSpan.innerText = "Tersimpan online ke Database!";
                 window.showToast();
                 setTimeout(() => { toastSpan.innerText = originalText; }, 3000);
-            } catch(e) { console.error(e); window.showCustomAlert("Gagal menyimpan ke server."); }
+            } catch(e) { 
+                console.error(e); 
+                window.showCustomAlert("Gagal menyimpan ke server."); 
+                // Kembalikan status tombol jika gagal
+                btnSimpan.disabled = false;
+                btnSimpan.classList.remove('opacity-70', 'cursor-not-allowed');
+                textSimpan.innerHTML = 'Simpan ke Galeri';
+            }
         }
 
         let promptToDeleteId = null;
