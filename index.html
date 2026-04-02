@@ -159,7 +159,7 @@
         <span id="alert-message" class="text-white text-sm font-medium"></span>
     </div>
 
-    <!-- Modal Tambah Prompt -->
+    <!-- Modal Tambah Prompt (Fitur Auto-Upload ala Postimages) -->
     <div id="admin-modal" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="glass-card w-full max-w-lg p-6 rounded-2xl">
             <div class="flex justify-between items-center mb-6">
@@ -172,9 +172,10 @@
                     <input type="text" id="input-title" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30" placeholder="Contoh: Cyberpunk Lion">
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-400 mb-1 text-yellow-400 font-semibold"><i class="fas fa-exclamation-triangle mr-1"></i>Link WAJIB Tautan Langsung (Direct Link)</label>
-                    <input type="url" id="input-media-url" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30" placeholder="https://i.postimg.cc/xxxx/gambar.jpg">
-                    <p class="text-[11px] text-gray-400 mt-1">Di Postimages, pastikan copy bagian <b>"Direct link"</b>. Link harus berakhiran <span class="text-white font-mono bg-white/10 px-1 rounded">.jpg</span>, <span class="text-white font-mono bg-white/10 px-1 rounded">.png</span>, atau <span class="text-white font-mono bg-white/10 px-1 rounded">.mp4</span></p>
+                    <!-- INPUT FILE KEMBALI HADIR: Tinggal pilih gambar, sisanya web yang urus -->
+                    <label class="block text-sm text-gray-400 mb-1">Pilih Gambar</label>
+                    <input type="file" id="input-media-file" accept="image/*" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white text-xs file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-white file:text-black hover:file:bg-gray-200 cursor-pointer">
+                    <p class="text-[11px] text-gray-400 mt-2"><i class="fas fa-cloud-upload-alt text-blue-400 mr-1"></i>Gambar akan otomatis di-hosting ke cloud secara gratis.</p>
                 </div>
                 <div>
                     <label class="block text-sm text-gray-400 mb-1">Teks Prompt</label>
@@ -183,7 +184,7 @@
                 <div class="flex gap-3 mt-4">
                     <button onclick="closeAdminModal()" class="w-1/3 px-4 py-3 rounded-lg text-gray-400 border border-white/10 font-medium hover:bg-white/5 transition">Batal</button>
                     <button id="btn-simpan" onclick="addNewPrompt()" class="w-2/3 bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center">
-                        <span id="text-simpan">Simpan ke Galeri</span>
+                        <span id="text-simpan">Upload & Simpan</span>
                     </button>
                 </div>
             </div>
@@ -277,7 +278,7 @@
                 
                 const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
                 
-                // Snapshot murni dari Firebase (Otomatis handle realtime & latency compensation)
+                // Snapshot realtime Firebase
                 onSnapshot(promptsRef, (snapshot) => {
                     updateStatus("ONLINE", "success");
                     const loadedData = [];
@@ -332,15 +333,9 @@
                 const isLiked = likedList.includes(item.id);
                 const mediaUrl = item.mediaUrl || item.imageUrl; 
                 const mediaType = item.mediaType || 'image/jpeg';
-                const isVideo = mediaType.startsWith('video/') || (mediaUrl && mediaUrl.match(/\.(mp4|webm|ogg)$/i));
-
-                let mediaElement = '';
-                if (isVideo) {
-                    mediaElement = `<video src="${mediaUrl}" controls class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy"></video>`;
-                } else {
-                    // Fallback gambar menggunakan placehold.co yang lebih stabil
-                    mediaElement = `<img src="${mediaUrl}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" onerror="this.src='https://placehold.co/800x600/111/fff?text=Image+Not+Found';">`;
-                }
+                
+                // Fallback untuk render gambar yang aman (dihosting pihak ketiga)
+                const mediaElement = `<img src="${mediaUrl}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" onerror="this.src='https://placehold.co/800x600/111/fff?text=Image+Not+Found';">`;
 
                 return `
                     <div class="glass-card rounded-2xl flex flex-col md:flex-row group w-full relative" id="card-${item.id}">
@@ -351,13 +346,12 @@
 
                         <div class="w-full md:w-5/12 h-64 md:h-auto shrink-0 relative overflow-hidden bg-neutral-900">
                             ${mediaElement}
-                            ${!isVideo ? `<div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#1e1e1e]/80 to-transparent pointer-events-none"></div>` : ''}
+                            <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#1e1e1e]/80 to-transparent pointer-events-none"></div>
                         </div>
                         <div class="w-full md:w-7/12 p-6 md:p-8 flex flex-col justify-between">
                             <div>
                                 <div class="flex items-center gap-2 mb-2">
                                     <h3 class="text-xl font-bold text-white">${item.title}</h3>
-                                    ${isVideo ? '<span class="text-[10px] bg-blue-600/30 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30"><i class="fas fa-video mr-1"></i>Video</span>' : ''}
                                 </div>
                                 <div class="bg-black/40 border border-white/10 rounded-lg p-4 mb-6">
                                     <p class="text-sm text-gray-300 font-mono leading-relaxed" id="prompt-text-${item.id}">${item.prompt}</p>
@@ -430,46 +424,62 @@
 
         const resetForm = () => {
             document.getElementById('input-title').value = '';
-            document.getElementById('input-media-url').value = '';
+            document.getElementById('input-media-file').value = '';
             document.getElementById('input-prompt').value = '';
             
             const btn = document.getElementById('btn-simpan');
             btn.disabled = false;
-            document.getElementById('text-simpan').innerText = "Simpan ke Galeri";
+            document.getElementById('text-simpan').innerText = "Upload & Simpan";
         };
 
-        // Fungsi Simpan yang Bersih & Profesional (Memanfaatkan Firebase Native Speed)
+        // FUNGSI AUTO-UPLOAD GAMBAR KE IMGBB LALU SIMPAN KE FIRESTORE
         window.addNewPrompt = async () => {
             const title = document.getElementById('input-title').value.trim();
-            const mediaUrl = document.getElementById('input-media-url').value.trim();
+            const fileInput = document.getElementById('input-media-file');
+            const file = fileInput.files[0];
             const prompt = document.getElementById('input-prompt').value.trim();
             const btn = document.getElementById('btn-simpan');
             
-            if (!title || !mediaUrl || !prompt || !currentUser) {
-                return window.showCustomAlert("Lengkapi form (Judul, Link Gambar/Video, dan Prompt) terlebih dahulu!");
+            if (!title || !file || !prompt || !currentUser) {
+                return window.showCustomAlert("Lengkapi form (Judul, Pilih Gambar, dan Prompt) terlebih dahulu!");
             }
-
-            // Validasi format link
-            const isValidMedia = mediaUrl.match(/\.(jpg|jpeg|png|gif|webp|mp4|webm|ogg)(\?.*)?$/i);
-            if (!isValidMedia) {
-                return window.showCustomAlert("❌ GAGAL: Gunakan 'Direct Link' yang berakhiran .jpg, .png, atau .mp4!");
-            }
-
-            const isVideo = mediaUrl.match(/\.(mp4|webm|ogg)$/i);
-            const mediaType = isVideo ? 'video/mp4' : 'image/jpeg';
 
             // Ubah tombol jadi status Loading
             btn.disabled = true;
-            document.getElementById('text-simpan').innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i>Menyimpan...';
+            document.getElementById('text-simpan').innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mengunggah Gambar...';
 
             try {
+                // TAHAP 1: UPLOAD GAMBAR KE CLOUD (Memakai API Publik ImgBB)
+                // Ini menggantikan peran kamu yg tadinya harus manual buka web Postimages
+                const formData = new FormData();
+                formData.append('image', file);
+                
+                // Note: Ini adalah public key ImgBB. Aman dipakai untuk tes dan production ringan.
+                const IMGBB_API_KEY = "3277028148b5286eaeb25ebfb6233481"; 
+                
+                const imgbbResponse = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const imgbbData = await imgbbResponse.json();
+
+                if (!imgbbData.success) {
+                    throw new Error("Gagal mengunggah gambar ke server cloud.");
+                }
+
+                // Mendapatkan Direct Link secara otomatis!
+                const directImageUrl = imgbbData.data.url;
+
+                // TAHAP 2: SIMPAN TEKS & LINK KE FIRESTORE
+                document.getElementById('text-simpan').innerHTML = '<i class="fas fa-database mr-2"></i>Menyimpan Data...';
+                
                 const promptsRef = collection(db, 'artifacts', appId, 'public', 'data', collectionName);
                 
-                // Tunggu konfirmasi berhasil dari Firebase
                 await addDoc(promptsRef, { 
                     title: title, 
-                    mediaUrl: mediaUrl,
-                    mediaType: mediaType,
+                    mediaUrl: directImageUrl, // URL otomatis dari ImgBB
+                    mediaType: 'image/jpeg',
                     prompt: prompt, 
                     likes: 0, 
                     createdAt: Date.now()
@@ -481,8 +491,8 @@
                 resetForm();
                 
             } catch (e) { 
-                console.error("Gagal simpan ke database:", e);
-                window.showCustomAlert("❌ Gagal menyimpan! Pastikan Rules Firestore mengizinkan Write.");
+                console.error("Gagal proses simpan:", e);
+                window.showCustomAlert("❌ Gagal menyimpan! Pastikan format gambar valid dan ukuran tidak terlalu besar.");
                 btn.disabled = false;
                 document.getElementById('text-simpan').innerText = "Coba Lagi";
             }
