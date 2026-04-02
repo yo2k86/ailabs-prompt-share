@@ -134,17 +134,17 @@
             </div>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm text-gray-400 mb-1">Judul Prompt</label>
-                    <input type="text" id="input-title" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30" placeholder="Contoh: Cyberpunk Lion">
+                    <label class="block text-sm text-gray-400 mb-1">Judul Prompt (Opsional)</label>
+                    <input type="text" id="input-title" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30" placeholder="Boleh dikosongkan">
                 </div>
                 <div>
-                    <label class="block text-sm text-yellow-400 font-semibold mb-1">Link Postimages (Direct Link)</label>
+                    <label class="block text-sm text-yellow-400 font-semibold mb-1">Link Postimages (Wajib Direct Link)</label>
                     <input type="url" id="input-media-url" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30" placeholder="https://i.postimg.cc/xxxx/gambar.jpg">
                     <p class="text-[11px] text-gray-400 mt-1">Harus berakhiran .jpg atau .png</p>
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-400 mb-1">Teks Prompt</label>
-                    <textarea id="input-prompt" rows="4" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30 text-sm" placeholder="Ketik prompt di sini..."></textarea>
+                    <label class="block text-sm text-gray-400 mb-1">Teks Prompt (Opsional)</label>
+                    <textarea id="input-prompt" rows="4" class="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30 text-sm" placeholder="Boleh dikosongkan..."></textarea>
                 </div>
                 <div class="flex gap-3 mt-4">
                     <button onclick="closeAdminModal()" class="w-1/3 px-4 py-3 rounded-lg text-gray-400 border border-white/10 font-medium hover:bg-white/5 transition">Batal</button>
@@ -326,16 +326,17 @@
             const mediaUrl = document.getElementById('input-media-url').value.trim();
             const prompt = document.getElementById('input-prompt').value.trim();
             
-            if (!title || !mediaUrl || !prompt) {
-                return window.showCustomAlert("Lengkapi form (Judul, Link, dan Prompt)!");
+            // Validasi: Sekarang HANYA Link Gambar yang wajib diisi
+            if (!mediaUrl) {
+                return window.showCustomAlert("Link Postimages (Direct Link) wajib diisi!");
             }
 
             // Data sementara disimpan ke dalam Array
             const newItem = {
                 id: 'local-' + Date.now(),
-                title: title,
+                title: title || "Tanpa Judul", // Jika kosong otomatis jadi "Tanpa Judul"
                 mediaUrl: mediaUrl,
-                prompt: prompt,
+                prompt: prompt || "-", // Jika kosong otomatis diisi tanda strip (-)
                 likes: 0
             };
 
