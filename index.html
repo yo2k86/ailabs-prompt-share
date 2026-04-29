@@ -187,6 +187,59 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(0, 255, 213, 0.5); }
+
+        /* --- MOBILE UI RESPONSIVE FIXES --- */
+        @media (max-width: 768px) {
+            .glass-panel { padding: 1.5rem !important; }
+            
+            /* Tab Menu Scrollable Fix */
+            .tab-container {
+                flex-wrap: nowrap !important;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 12px !important;
+                gap: 8px !important;
+                scroll-snap-type: x mandatory;
+            }
+            .tab-container::-webkit-scrollbar { display: none; }
+            .tab-container { -ms-overflow-style: none; scrollbar-width: none; }
+            .tab-btn {
+                min-width: max-content;
+                flex: 0 0 auto;
+                scroll-snap-align: start;
+                padding: 10px 14px;
+                font-size: 0.75rem;
+            }
+
+            /* Explorer UI Fix (Prompt Framework) */
+            .explorer-container {
+                flex-direction: column;
+                height: 75vh;
+                min-height: 500px;
+            }
+            .explorer-sidebar {
+                width: 100%;
+                height: 40%;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .explorer-main { height: 60%; }
+            .txt-content { padding: 16px; font-size: 0.85rem; }
+            #toast { width: 90%; font-size: 0.85rem; }
+
+            /* Text Readability Fix */
+            .app-card p, .tutorial-card p, .framework-card p {
+                font-size: 0.85rem !important;
+                line-height: 1.5;
+            }
+            .app-card h3, .tutorial-card h3, .framework-card h3 {
+                font-size: 1.25rem !important;
+            }
+
+            /* Header Stack Fix */
+            .mobile-stack { flex-direction: column; align-items: center; text-align: center; gap: 1rem; }
+            .mobile-wrap-center { justify-content: center; width: 100%; }
+        }
     </style>
 </head>
 <body class="text-gray-100 min-h-screen flex items-center justify-center p-4 selection:bg-neonOrange selection:text-black">
@@ -200,9 +253,9 @@
     <div id="toast">Prompt Berhasil Disalin!</div>
 
     <!-- 1. LOGIN PAGE -->
-    <div id="login-page" class="w-full max-w-md relative z-10">
-        <form id="login-form" class="glass-panel rounded-2xl p-10 relative overflow-hidden">
-            <div class="text-center mb-12">
+    <div id="login-page" class="w-full max-w-md relative z-10 px-2">
+        <form id="login-form" class="glass-panel rounded-2xl p-6 md:p-10 relative overflow-hidden">
+            <div class="text-center mb-8 md:mb-12">
                 <h1 class="text-4xl md:text-5xl font-tech font-bold text-white mb-3 tracking-wider leading-tight">
                     <span class="text-neonOrange">AI</span>LABS<br>
                     <span class="text-2xl md:text-3xl tracking-[0.2em] text-white">WORKSPACE</span>
@@ -222,32 +275,32 @@
             <div class="mb-10 text-center">
                 <label class="block text-xs text-neonOrange uppercase tracking-widest mb-4 font-bold">Security Token</label>
                 <input type="password" id="password" name="password" placeholder="ENTER CODE" required
-                       class="w-full p-4 border border-white/20 bg-black/50 rounded-lg text-center text-xl font-tech tracking-widest text-neonBlue focus:border-neonOrange outline-none">
+                       class="w-full p-3 md:p-4 border border-white/20 bg-black/50 rounded-lg text-center text-lg md:text-xl font-tech tracking-widest text-neonBlue focus:border-neonOrange outline-none">
             </div>
             
-            <button type="submit" class="w-full bg-transparent border-2 border-neonBlue text-neonBlue py-4 rounded-lg font-bold text-lg tracking-wider hover:bg-neonBlue hover:text-black transition-all">INITIALIZE</button>
+            <button type="submit" class="w-full bg-transparent border-2 border-neonBlue text-neonBlue py-3 md:py-4 rounded-lg font-bold text-base md:text-lg tracking-wider hover:bg-neonBlue hover:text-black transition-all">INITIALIZE</button>
             <p id="error-message" class="text-red-400 text-center mt-6 text-xs font-mono min-h-[20px]"></p>
         </form>
     </div>
 
     <!-- 2. PORTAL DASHBOARD -->
-    <div id="portal-page" class="w-full max-w-7xl p-4 hidden relative z-10">
-        <div class="glass-panel rounded-3xl p-6 md:p-10">
+    <div id="portal-page" class="w-full max-w-7xl md:p-4 hidden relative z-10">
+        <div class="glass-panel rounded-3xl p-4 md:p-10">
             
             <!-- HEADER -->
-            <div class="mb-8 border-b border-white/10 pb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-                <div>
-                    <h1 class="text-xl md:text-3xl font-bold text-white tracking-tight font-tech mb-2 leading-tight">
+            <div class="mb-6 md:mb-8 border-b border-white/10 pb-6 flex flex-col md:flex-row justify-between items-center md:items-end gap-6 mobile-stack">
+                <div class="w-full text-center md:text-left">
+                    <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight font-tech mb-2 leading-tight">
                         <span class="text-neonOrange block mb-1">
                             <a href="https://gemini.google.com/share/c8dbf606a9df" target="_blank" class="hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,153,0,0.8)] transition-all cursor-pointer">⚡</a> 
                             AILABS WORKSPACE
                         </span>
-                        <span class="text-neonBlue text-lg md:text-2xl tracking-widest">AILABS INFINITY CORE</span>
+                        <span class="text-neonBlue text-base md:text-2xl tracking-widest block mt-2">AILABS INFINITY CORE</span>
                     </h1>
                 </div>
                 
-                <div class="flex flex-col items-end gap-3 w-full md:w-auto">
-                    <div class="flex items-center justify-end gap-4 w-full flex-wrap">
+                <div class="flex flex-col items-center md:items-end gap-4 w-full md:w-auto">
+                    <div class="flex items-center justify-center md:justify-end gap-4 w-full flex-wrap mobile-wrap-center">
                         
                         <!-- FACEBOOK LINK WITH TEXT -->
                         <div class="flex items-center mr-2">
@@ -274,13 +327,13 @@
                             </div>
                         </div>
 
-                        <div class="text-right">
+                        <div class="text-center md:text-right">
                             <span class="text-[9px] text-gray-300 uppercase tracking-widest block mb-0.5 font-bold">Status</span>
-                            <span class="text-neonBlue font-tech text-xs font-bold">ACTIVE PRIME</span>
+                            <span class="text-neonBlue font-tech text-[10px] md:text-xs font-bold">ACTIVE PRIME</span>
                         </div>
-                        <button id="logout-button" class="text-[10px] text-red-400 border border-red-500/40 px-4 py-1.5 rounded font-bold hover:bg-red-500 hover:text-white transition-all">LOGOUT</button>
+                        <button id="logout-button" class="text-[10px] md:text-xs text-red-400 border border-red-500/40 px-3 md:px-4 py-1.5 rounded font-bold hover:bg-red-500 hover:text-white transition-all">LOGOUT</button>
                     </div>
-                    <div class="bg-black/60 border border-white/10 rounded-lg px-3 py-2 flex items-center gap-3">
+                    <div class="bg-black/60 border border-white/10 rounded-lg px-3 py-2 flex items-center justify-center gap-3 w-full md:w-auto">
                         <span class="relative flex h-2 w-2">
                           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
                           <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
@@ -296,7 +349,7 @@
             </div>
 
             <!-- TAB NAVIGATION -->
-            <div class="flex flex-wrap gap-4 mb-10 border-b border-white/5 pb-4">
+            <div class="flex flex-wrap tab-container gap-4 mb-8 md:mb-10 border-b border-white/5 pb-4">
                 <button onclick="switchTab('apps')" id="tab-apps" class="tab-btn active">APPLICATIONS</button>
                 <button onclick="switchTab('apps2')" id="tab-apps2" class="tab-btn">APPLICATIONS 2</button>
                 <button onclick="switchTab('vibeai')" id="tab-vibeai" class="tab-btn">VIBEAI LABS</button>
