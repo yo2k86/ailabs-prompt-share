@@ -93,16 +93,17 @@
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
         }
 
+        /* --- UI DESKTOP-STYLE FORCE TABS --- */
         .tab-btn {
             position: relative;
-            padding: 10px 15px;
+            padding: 8px 10px;
             font-family: 'Orbitron', sans-serif;
             font-weight: 900;
-            font-size: 0.7rem;
-            letter-spacing: 2px;
+            font-size: 0.6rem;
+            letter-spacing: 1px;
             transition: all 0.3s ease;
             color: rgba(255, 255, 255, 0.5);
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(0, 0, 0, 0.6);
             border-radius: 4px;
             display: flex;
@@ -110,13 +111,22 @@
             justify-content: center;
             text-align: center;
             flex: 1;
-            min-width: 140px;
+            min-width: 110px;
             max-width: 200px;
+        }
+        @media (min-width: 768px) {
+            .tab-btn {
+                padding: 10px 15px;
+                font-size: 0.7rem;
+                letter-spacing: 2px;
+                border-width: 2px;
+                min-width: 140px;
+            }
         }
 
         .tab-btn.active {
             color: #00ffd5;
-            border: 2px solid #00ffd5;
+            border-color: #00ffd5;
             background: rgba(0, 255, 213, 0.1);
             box-shadow: 0 0 15px rgba(0, 255, 213, 0.4), inset 0 0 10px rgba(0, 255, 213, 0.2);
             animation: flicker 4s linear infinite;
@@ -159,23 +169,31 @@
             transition: height 0.08s ease;
         }
 
-        /* Explorer Style */
+        /* Explorer Style - FORCED SIDE-BY-SIDE DESKTOP LOOK */
         .explorer-container {
             background: rgba(15, 15, 25, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             overflow: hidden;
             display: flex;
-            height: 600px;
+            flex-direction: row !important; /* Mencegah turun ke bawah */
+            height: 60vh;
+            min-height: 450px;
+            max-height: 600px;
             backdrop-filter: blur(10px);
         }
-        .explorer-sidebar { width: 280px; border-right: 1px solid rgba(255, 255, 255, 0.1); background: rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; }
-        .explorer-main { flex: 1; display: flex; flex-direction: column; background: #ffffff; }
-        .file-item { padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.7); font-size: 0.8rem; }
+        .explorer-sidebar { width: 35%; border-right: 1px solid rgba(255, 255, 255, 0.1); background: rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; }
+        .explorer-main { flex: 1; width: 65%; display: flex; flex-direction: column; background: #ffffff; }
+        .file-item { padding: 10px 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.7); font-size: 0.7rem; }
+        @media (min-width: 768px) { .file-item { font-size: 0.8rem; padding: 12px 16px; gap: 12px; } }
         .file-item:hover { background: rgba(0, 255, 213, 0.1); color: #00ffd5; }
         .file-item.active { background: rgba(0, 255, 213, 0.15); color: #00ffd5; border-left: 4px solid #00ffd5; }
-        .txt-header { background: #f1f5f9; padding: 10px 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; color: #475569; font-size: 0.75rem; font-weight: 700; }
-        .txt-content { flex: 1; padding: 24px 32px; color: #0f172a; font-family: 'Fira Code', monospace; font-size: 0.95rem; line-height: 1.8; overflow-y: auto; white-space: pre-wrap; background-image: linear-gradient(#f8fafc 1.3rem, #e2e8f0 1.4rem); background-size: 100% 1.4rem; background-attachment: local; text-shadow: none; }
+        .txt-header { background: #f1f5f9; padding: 8px 15px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; color: #475569; font-size: 0.7rem; font-weight: 700; }
+        .txt-content { flex: 1; padding: 16px 20px; color: #0f172a; font-family: 'Fira Code', monospace; font-size: 0.8rem; line-height: 1.6; overflow-y: auto; white-space: pre-wrap; background-image: linear-gradient(#f8fafc 1.3rem, #e2e8f0 1.4rem); background-size: 100% 1.4rem; background-attachment: local; text-shadow: none; }
+        @media (min-width: 768px) {
+            .txt-header { padding: 10px 20px; font-size: 0.75rem; }
+            .txt-content { padding: 24px 32px; font-size: 0.95rem; line-height: 1.8; }
+        }
 
         #toast { visibility: hidden; min-width: 250px; background-color: #00ffd5; color: black; text-align: center; border-radius: 8px; padding: 16px; position: fixed; z-index: 200; left: 50%; bottom: 30px; transform: translateX(-50%); font-family: 'Orbitron', sans-serif; font-weight: bold; box-shadow: 0 0 20px rgba(0, 255, 213, 0.5); text-shadow: none; }
         #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
@@ -187,62 +205,9 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(0, 255, 213, 0.5); }
-
-        /* --- MOBILE UI RESPONSIVE FIXES --- */
-        @media (max-width: 768px) {
-            .glass-panel { padding: 1.5rem !important; }
-            
-            /* Tab Menu Scrollable Fix */
-            .tab-container {
-                flex-wrap: nowrap !important;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                padding-bottom: 12px !important;
-                gap: 8px !important;
-                scroll-snap-type: x mandatory;
-            }
-            .tab-container::-webkit-scrollbar { display: none; }
-            .tab-container { -ms-overflow-style: none; scrollbar-width: none; }
-            .tab-btn {
-                min-width: max-content;
-                flex: 0 0 auto;
-                scroll-snap-align: start;
-                padding: 10px 14px;
-                font-size: 0.75rem;
-            }
-
-            /* Explorer UI Fix (Prompt Framework) */
-            .explorer-container {
-                flex-direction: column;
-                height: 75vh;
-                min-height: 500px;
-            }
-            .explorer-sidebar {
-                width: 100%;
-                height: 40%;
-                border-right: none;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            }
-            .explorer-main { height: 60%; }
-            .txt-content { padding: 16px; font-size: 0.85rem; }
-            #toast { width: 90%; font-size: 0.85rem; }
-
-            /* Text Readability Fix */
-            .app-card p, .tutorial-card p, .framework-card p {
-                font-size: 0.85rem !important;
-                line-height: 1.5;
-            }
-            .app-card h3, .tutorial-card h3, .framework-card h3 {
-                font-size: 1.25rem !important;
-            }
-
-            /* Header Stack Fix */
-            .mobile-stack { flex-direction: column; align-items: center; text-align: center; gap: 1rem; }
-            .mobile-wrap-center { justify-content: center; width: 100%; }
-        }
     </style>
 </head>
-<body class="text-gray-100 min-h-screen flex items-center justify-center p-4 selection:bg-neonOrange selection:text-black">
+<body class="text-gray-100 min-h-screen flex items-center justify-center p-2 md:p-4 selection:bg-neonOrange selection:text-black">
 
     <!-- AUDIO PLAYER -->
     <audio id="bg-audio" loop crossorigin="anonymous">
@@ -285,61 +250,61 @@
 
     <!-- 2. PORTAL DASHBOARD -->
     <div id="portal-page" class="w-full max-w-7xl md:p-4 hidden relative z-10">
-        <div class="glass-panel rounded-3xl p-4 md:p-10">
+        <div class="glass-panel rounded-2xl md:rounded-3xl p-4 md:p-10">
             
-            <!-- HEADER -->
-            <div class="mb-6 md:mb-8 border-b border-white/10 pb-6 flex flex-col md:flex-row justify-between items-center md:items-end gap-6 mobile-stack">
-                <div class="w-full text-center md:text-left">
-                    <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight font-tech mb-2 leading-tight">
-                        <span class="text-neonOrange block mb-1">
+            <!-- HEADER (Forced Horizontal Desktop Mode) -->
+            <div class="mb-6 md:mb-8 border-b border-white/10 pb-4 md:pb-6 flex flex-row justify-between items-end gap-2 md:gap-6 w-full">
+                <div class="flex-shrink-0">
+                    <h1 class="text-[14px] sm:text-xl md:text-3xl font-bold text-white tracking-tight font-tech mb-0 md:mb-2 leading-tight whitespace-nowrap">
+                        <span class="text-neonOrange block mb-0 md:mb-1">
                             <a href="https://gemini.google.com/share/c8dbf606a9df" target="_blank" class="hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,153,0,0.8)] transition-all cursor-pointer">⚡</a> 
                             AILABS WORKSPACE
                         </span>
-                        <span class="text-neonBlue text-base md:text-2xl tracking-widest block mt-2">AILABS INFINITY CORE</span>
+                        <span class="text-neonBlue text-[8px] sm:text-xs md:text-2xl tracking-widest block mt-1">AILABS INFINITY CORE</span>
                     </h1>
                 </div>
                 
-                <div class="flex flex-col items-center md:items-end gap-4 w-full md:w-auto">
-                    <div class="flex items-center justify-center md:justify-end gap-4 w-full flex-wrap mobile-wrap-center">
+                <div class="flex flex-col items-end gap-2 md:gap-3 w-auto">
+                    <div class="flex items-center justify-end gap-2 md:gap-4 flex-wrap">
                         
-                        <!-- FACEBOOK LINK WITH TEXT -->
-                        <div class="flex items-center mr-2">
-                            <span class="text-[10px] text-neonBlue font-bold mr-2 animate-pulse hidden sm:block">Follow dong</span>
+                        <!-- FACEBOOK LINK -->
+                        <div class="flex items-center mr-1 md:mr-2">
+                            <span class="text-[7px] md:text-[10px] text-neonBlue font-bold mr-1 md:mr-2 animate-pulse hidden md:block">Follow dong</span>
                             <a href="https://www.facebook.com/share/1DxuKkDdFm/" target="_blank" class="text-blue-500 hover:text-white hover:scale-110 transition-all duration-300" title="Follow Bang Pro">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                                <svg class="w-[14px] h-[14px] md:w-[22px] md:h-[22px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
                                 </svg>
                             </a>
                         </div>
 
                         <!-- Sound Control + Visualizer -->
-                        <div class="flex flex-col items-center gap-2 mr-2">
-                            <div class="flex items-center gap-2 bg-black/60 border border-white/10 px-3 py-1 rounded-lg">
+                        <div class="flex flex-col items-center gap-1 md:gap-2 mr-1 md:mr-2">
+                            <div class="flex items-center gap-1 md:gap-2 bg-black/60 border border-white/10 px-2 py-1 md:px-3 rounded-lg">
                                 <button id="sound-toggle" class="text-neonBlue hover:text-white transition-colors">
-                                    <svg id="icon-sound-on" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-                                    <svg id="icon-sound-off" class="hidden" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+                                    <svg id="icon-sound-on" class="w-[12px] h-[12px] md:w-[16px] md:h-[16px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                                    <svg id="icon-sound-off" class="hidden w-[12px] h-[12px] md:w-[16px] md:h-[16px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
                                 </button>
-                                <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.5" class="w-16 accent-neonBlue">
+                                <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.5" class="w-10 md:w-16 h-1 md:h-auto accent-neonBlue">
                             </div>
                             <!-- Visualizer Bars -->
-                            <div id="visualizer" class="flex items-end justify-center gap-[2px] h-3 w-full opacity-60">
-                                <div class="v-bar h-1"></div><div class="v-bar h-1"></div><div class="v-bar h-1"></div><div class="v-bar h-1"></div><div class="v-bar h-1"></div><div class="v-bar h-1"></div><div class="v-bar h-1"></div><div class="v-bar h-1"></div>
+                            <div id="visualizer" class="flex items-end justify-center gap-[1px] md:gap-[2px] h-2 md:h-3 w-full opacity-60">
+                                <div class="v-bar w-[2px] md:w-[4px] h-[2px]"></div><div class="v-bar w-[2px] md:w-[4px] h-[2px]"></div><div class="v-bar w-[2px] md:w-[4px] h-[2px]"></div><div class="v-bar w-[2px] md:w-[4px] h-[2px]"></div><div class="v-bar w-[2px] md:w-[4px] h-[2px]"></div><div class="v-bar w-[2px] md:w-[4px] h-[2px]"></div><div class="v-bar w-[2px] md:w-[4px] h-[2px]"></div><div class="v-bar w-[2px] md:w-[4px] h-[2px]"></div>
                             </div>
                         </div>
 
-                        <div class="text-center md:text-right">
-                            <span class="text-[9px] text-gray-300 uppercase tracking-widest block mb-0.5 font-bold">Status</span>
-                            <span class="text-neonBlue font-tech text-[10px] md:text-xs font-bold">ACTIVE PRIME</span>
+                        <div class="text-right">
+                            <span class="text-[7px] md:text-[9px] text-gray-300 uppercase tracking-widest block mb-0 md:mb-0.5 font-bold">Status</span>
+                            <span class="text-neonBlue font-tech text-[8px] md:text-xs font-bold">ACTIVE PRIME</span>
                         </div>
-                        <button id="logout-button" class="text-[10px] md:text-xs text-red-400 border border-red-500/40 px-3 md:px-4 py-1.5 rounded font-bold hover:bg-red-500 hover:text-white transition-all">LOGOUT</button>
+                        <button id="logout-button" class="text-[8px] md:text-[10px] text-red-400 border border-red-500/40 px-2 py-1 md:px-4 md:py-1.5 rounded font-bold hover:bg-red-500 hover:text-white transition-all">LOGOUT</button>
                     </div>
-                    <div class="bg-black/60 border border-white/10 rounded-lg px-3 py-2 flex items-center justify-center gap-3 w-full md:w-auto">
-                        <span class="relative flex h-2 w-2">
+                    <div class="bg-black/60 border border-white/10 rounded-lg px-2 py-1 md:px-3 md:py-2 flex items-center gap-2 md:gap-3">
+                        <span class="relative flex h-1.5 w-1.5 md:h-2 md:w-2">
                           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
-                          <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                          <span class="relative inline-flex rounded-full h-1.5 w-1.5 md:h-2 md:w-2 bg-green-500"></span>
                         </span>
-                        <span class="text-[10px] text-white font-bold uppercase tracking-wide">Online</span>
-                        <div class="flex gap-3 text-[10px] font-mono font-bold text-gray-300">
+                        <span class="text-[8px] md:text-[10px] text-white font-bold uppercase tracking-wide">Online</span>
+                        <div class="flex gap-2 md:gap-3 text-[8px] md:text-[10px] font-mono font-bold text-gray-300">
                             <span>🇮🇩 <span id="srv1-count">0</span></span>
                             <span>🇺🇸 <span id="srv2-count">0</span></span>
                             <span>🇸🇬 <span id="srv3-count">0</span></span>
@@ -349,103 +314,90 @@
             </div>
 
             <!-- TAB NAVIGATION -->
-            <div class="flex flex-wrap tab-container gap-4 mb-8 md:mb-10 border-b border-white/5 pb-4">
+            <div class="flex flex-wrap gap-2 md:gap-4 mb-6 md:mb-10 border-b border-white/5 pb-4">
                 <button onclick="switchTab('apps')" id="tab-apps" class="tab-btn active">APPLICATIONS</button>
                 <button onclick="switchTab('apps2')" id="tab-apps2" class="tab-btn">APPLICATIONS 2</button>
                 <button onclick="switchTab('vibeai')" id="tab-vibeai" class="tab-btn">VIBEAI LABS</button>
                 <button onclick="switchTab('toolkit')" id="tab-toolkit" class="tab-btn">
                     TOOLKIT
-                    <span class="absolute -top-3 -right-2 bg-red-600 text-white text-[9px] font-bold px-2 py-0.5 rounded animate-pulse shadow-[0_0_8px_red]">NEW</span>
+                    <span class="absolute -top-2 -right-1 md:-top-3 md:-right-2 bg-red-600 text-white text-[7px] md:text-[9px] font-bold px-1.5 py-0.5 rounded animate-pulse shadow-[0_0_8px_red]">NEW</span>
                 </button>
                 <button onclick="switchTab('tutorial')" id="tab-tutorial" class="tab-btn">TUTORIALS</button>
                 <button onclick="switchTab('framework')" id="tab-framework" class="tab-btn">PROMPT FRAMEWORK</button>
                 <button onclick="switchTab('camera')" id="tab-camera" class="tab-btn text-neonBlue border-neonBlue/30 hover:border-neonBlue">42 CAMERA MOVEMENTS</button>
             </div>
 
-            <!-- TAB CONTENT: APPLICATIONS -->
+            <!-- TAB CONTENT: APPLICATIONS (Forced 2 Columns Minimum) -->
             <div id="content-apps">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+                <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 mb-12">
                     
-                    <!-- 1. Ailabs Scene Pro -->
-                    <a href="https://gemini.google.com/share/933135103f8b" target="_blank" class="block app-card p-6 rounded-2xl group">
-                       <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">Ailabs Scene Pro</h3>
-                       <p class="text-xs text-gray-200 font-medium">Visual scene generator.</p>
+                    <a href="https://gemini.google.com/share/933135103f8b" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group">
+                       <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Ailabs Scene Pro</h3>
+                       <p class="text-[9px] md:text-xs text-gray-200 font-medium">Visual scene generator.</p>
                     </a>
 
-                    <!-- 2. AIlabs Voice Over V2 -->
-                    <a href="https://gemini.google.com/share/bf5db708874f" target="_blank" class="block app-card p-6 rounded-2xl group border-l-4 border-l-neonBlue/50">
-                        <h3 class="text-2xl font-bold text-white group-hover:text-neonBlue transition-colors">AIlabs Voice Over V2</h3>
-                        <p class="text-sm text-gray-200 leading-relaxed font-medium">Advanced Audio Synthesis.</p>
+                    <a href="https://gemini.google.com/share/bf5db708874f" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group border-l-2 md:border-l-4 border-l-neonBlue/50">
+                        <h3 class="text-[13px] md:text-2xl font-bold text-white group-hover:text-neonBlue transition-colors mb-1 md:mb-2">AIlabs Voice Over V2</h3>
+                        <p class="text-[9px] md:text-sm text-gray-200 leading-relaxed font-medium">Advanced Audio Synthesis.</p>
                     </a>
 
-                    <!-- 3. Ailabs UMKM -->
-                    <a href="https://gemini.google.com/share/044954c793b3" target="_blank" class="block app-card p-6 rounded-2xl group">
-                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">Ailabs UMKM</h3>
-                        <p class="text-xs text-gray-200 font-medium">Solusi cerdas bisnis.</p>
+                    <a href="https://gemini.google.com/share/044954c793b3" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group">
+                        <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Ailabs UMKM</h3>
+                        <p class="text-[9px] md:text-xs text-gray-200 font-medium">Solusi cerdas bisnis.</p>
                     </a>
 
-                    <!-- 4. Ailabs Affiliate -->
-                    <a href="https://gemini.google.com/share/d9800cca2fa0" target="_blank" class="block app-card p-6 rounded-2xl group">
-                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">Ailabs Affiliate</h3>
-                        <p class="text-xs text-gray-200 font-medium">Program mitra eksklusif.</p>
+                    <a href="https://gemini.google.com/share/d9800cca2fa0" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group">
+                        <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Ailabs Affiliate</h3>
+                        <p class="text-[9px] md:text-xs text-gray-200 font-medium">Program mitra eksklusif.</p>
                     </a>
 
-                    <!-- 5. Ailabs Cartoon -->
-                    <a href="https://gemini.google.com/share/226091114d5e" target="_blank" class="block app-card p-6 rounded-2xl group">
-                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">Ailabs Cartoon</h3>
-                        <p class="text-xs text-gray-200 font-medium">Style kartun instan.</p>
+                    <a href="https://gemini.google.com/share/226091114d5e" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group">
+                        <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Ailabs Cartoon</h3>
+                        <p class="text-[9px] md:text-xs text-gray-200 font-medium">Style kartun instan.</p>
                     </a>
 
-                    <!-- 6. Restore Image -->
-                    <a href="https://gemini.google.com/share/7082a8de4d9b" target="_blank" class="block app-card p-6 rounded-2xl group">
-                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">Restore Image</h3>
-                        <p class="text-xs text-gray-200 font-medium">Perbaiki foto lama.</p>
+                    <a href="https://gemini.google.com/share/7082a8de4d9b" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group">
+                        <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Restore Image</h3>
+                        <p class="text-[9px] md:text-xs text-gray-200 font-medium">Perbaiki foto lama.</p>
                     </a>
 
-                    <!-- 7. Auto Caption -->
-                    <a href="https://gemini.google.com/share/432a65b1df34" target="_blank" class="block app-card p-6 rounded-2xl group">
-                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">Auto Caption</h3>
-                        <p class="text-xs text-gray-200 font-medium">Subtitle otomatis.</p>
+                    <a href="https://gemini.google.com/share/432a65b1df34" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group">
+                        <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Auto Caption</h3>
+                        <p class="text-[9px] md:text-xs text-gray-200 font-medium">Subtitle otomatis.</p>
                     </a>
 
-                    <!-- 8. Elite Prompt Lab -->
-                    <a href="https://gemini.google.com/share/663b42f003d0" target="_blank" class="block app-card p-6 rounded-2xl group">
-                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">Elite Prompt Lab</h3>
-                        <p class="text-xs text-gray-200 font-medium">Optimasi teks AI.</p>
+                    <a href="https://gemini.google.com/share/663b42f003d0" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group">
+                        <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Elite Prompt Lab</h3>
+                        <p class="text-[9px] md:text-xs text-gray-200 font-medium">Optimasi teks AI.</p>
                     </a>
 
-                    <!-- 11. Ailabs Flux -->
-                    <a href="https://gemini.google.com/share/50d43f8829bf" target="_blank" class="block app-card p-6 rounded-2xl group">
-                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">Ailabs Flux</h3>
-                        <p class="text-xs text-gray-200 font-medium">Generasi gambar ultra.</p>
+                    <a href="https://gemini.google.com/share/50d43f8829bf" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group">
+                        <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Ailabs Flux</h3>
+                        <p class="text-[9px] md:text-xs text-gray-200 font-medium">Generasi gambar ultra.</p>
                     </a>
 
-                    <!-- 12. Ailabs Ramadhan Version -->
-                    <a href="https://gemini.google.com/share/fa5bd00de5dd" target="_blank" class="block app-card p-6 rounded-2xl group relative">
-                        <div class="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
-                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">Ailabs Ramadhan Version</h3>
-                        <p class="text-xs text-gray-200 font-medium">Edisi spesial berkah.</p>
+                    <a href="https://gemini.google.com/share/fa5bd00de5dd" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative">
+                        <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
+                        <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Ailabs Ramadhan</h3>
+                        <p class="text-[9px] md:text-xs text-gray-200 font-medium">Edisi spesial berkah.</p>
                     </a>
 
-                    <!-- 13. Morp -->
-                    <a href="https://gemini.google.com/share/e0ba482b873c" target="_blank" class="block app-card p-6 rounded-2xl group relative">
-                        <div class="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
-                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">Morp</h3>
-                        <p class="text-xs text-gray-200 font-medium">Transformasi visual halus.</p>
+                    <a href="https://gemini.google.com/share/e0ba482b873c" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative">
+                        <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
+                        <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Morp</h3>
+                        <p class="text-[9px] md:text-xs text-gray-200 font-medium">Transformasi visual halus.</p>
                     </a>
 
-                    <!-- 14. Ailabs Storyboard -->
-                    <a href="https://gemini.google.com/share/7b9e45c20c5d" target="_blank" class="block app-card p-6 rounded-2xl group relative">
-                        <div class="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
-                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">Ailabs Storyboard</h3>
-                        <p class="text-xs text-gray-200 font-medium">Visualisasi alur cerita.</p>
+                    <a href="https://gemini.google.com/share/7b9e45c20c5d" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative">
+                        <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
+                        <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Ailabs Storyboard</h3>
+                        <p class="text-[9px] md:text-xs text-gray-200 font-medium">Visualisasi alur cerita.</p>
                     </a>
 
-                    <!-- New App: DNA -->
-                    <a href="https://gemini.google.com/share/51ad421bbd1f" target="_blank" class="block app-card p-6 rounded-2xl group relative">
-                        <div class="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
-                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">DNA</h3>
-                        <p class="text-xs text-gray-200 font-medium">Analisis struktur data AI.</p>
+                    <a href="https://gemini.google.com/share/51ad421bbd1f" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative">
+                        <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
+                        <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">DNA</h3>
+                        <p class="text-[9px] md:text-xs text-gray-200 font-medium">Analisis struktur data AI.</p>
                     </a>
 
                 </div>
@@ -453,140 +405,119 @@
 
             <!-- TAB CONTENT: APPLICATIONS 2 -->
             <div id="content-apps2" class="hidden">
-                 <div class="mb-6 flex items-center gap-4">
-                     <h2 class="text-3xl font-tech font-bold text-white tracking-[0.2em]">APPLICATIONS <span class="text-neonBlue">2</span></h2>
-                     <div class="h-[2px] flex-1 bg-gradient-to-r from-neonBlue to-transparent"></div>
+                 <div class="mb-4 md:mb-6 flex items-center gap-2 md:gap-4">
+                     <h2 class="text-lg md:text-3xl font-tech font-bold text-white tracking-[0.1em] md:tracking-[0.2em]">APPLICATIONS <span class="text-neonBlue">2</span></h2>
+                     <div class="h-[1px] md:h-[2px] flex-1 bg-gradient-to-r from-neonBlue to-transparent"></div>
                  </div>
-                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-                     
-                     <!-- 1. DNA PRO -->
-                     <a href="https://gemini.google.com/share/00e19cde7ef1" target="_blank" class="block app-card p-6 rounded-2xl group relative">
-                         <div class="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
-                         <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">DNA PRO</h3>
-                         <p class="text-xs text-gray-200 font-medium">Versi pro analisis struktur data AI.</p>
+                 <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 mb-12">
+                     <a href="https://gemini.google.com/share/00e19cde7ef1" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative">
+                         <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
+                         <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">DNA PRO</h3>
+                         <p class="text-[9px] md:text-xs text-gray-200 font-medium">Versi pro analisis struktur data.</p>
                      </a>
-
                  </div>
             </div>
 
             <!-- TAB CONTENT: VIBEAI LABS -->
             <div id="content-vibeai" class="hidden">
-                 <div class="mb-6 flex items-center gap-4">
-                     <h2 class="text-3xl font-tech font-bold text-white tracking-[0.2em]">VIBEAI <span class="text-neonBlue">LABS</span></h2>
-                     <div class="h-[2px] flex-1 bg-gradient-to-r from-neonBlue to-transparent"></div>
+                 <div class="mb-4 md:mb-6 flex items-center gap-2 md:gap-4">
+                     <h2 class="text-lg md:text-3xl font-tech font-bold text-white tracking-[0.1em] md:tracking-[0.2em]">VIBEAI <span class="text-neonBlue">LABS</span></h2>
+                     <div class="h-[1px] md:h-[2px] flex-1 bg-gradient-to-r from-neonBlue to-transparent"></div>
                  </div>
-                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-                     
-                     <!-- 1. Motion -->
-                     <a href="https://opal.google/app/1MwZb47W07qKQ2wT1AaARxYo1_M3TVlRM" target="_blank" class="block app-card p-6 rounded-2xl group relative">
-                         <div class="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
-                         <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">Motion</h3>
-                         <p class="text-xs text-gray-200 font-medium">Platform generasi video motion AI.</p>
+                 <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 mb-12">
+                     <a href="https://opal.google/app/1MwZb47W07qKQ2wT1AaARxYo1_M3TVlRM" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative">
+                         <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
+                         <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Motion</h3>
+                         <p class="text-[9px] md:text-xs text-gray-200 font-medium">Platform generasi video motion.</p>
                      </a>
-
-                     <!-- 2. Control Motion -->
-                     <a href="https://opal.google/app/1AIOHY0nkuOfslC5rpRxpnneQlJnK_c_U" target="_blank" class="block app-card p-6 rounded-2xl group relative">
-                         <div class="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
-                         <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">Control Motion</h3>
-                         <p class="text-xs text-gray-200 font-medium">Kontrol presisi pergerakan AI video.</p>
+                     <a href="https://opal.google/app/1AIOHY0nkuOfslC5rpRxpnneQlJnK_c_U" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative">
+                         <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
+                         <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Control Motion</h3>
+                         <p class="text-[9px] md:text-xs text-gray-200 font-medium">Kontrol presisi pergerakan video.</p>
                      </a>
-
                  </div>
             </div>
 
             <!-- TAB CONTENT: TOOLKIT -->
             <div id="content-toolkit" class="hidden">
-                 <div class="mb-6 flex items-center gap-4">
-                     <h2 class="text-3xl font-tech font-bold text-white tracking-[0.2em]">TOOLS <span class="text-neonBlue">KREATIF</span></h2>
-                     <div class="h-[2px] flex-1 bg-gradient-to-r from-neonBlue to-transparent"></div>
+                 <div class="mb-4 md:mb-6 flex items-center gap-2 md:gap-4">
+                     <h2 class="text-lg md:text-3xl font-tech font-bold text-white tracking-[0.1em] md:tracking-[0.2em]">TOOLS <span class="text-neonBlue">KREATIF</span></h2>
+                     <div class="h-[1px] md:h-[2px] flex-1 bg-gradient-to-r from-neonBlue to-transparent"></div>
                  </div>
-                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-                     <a href="https://audio-modifier.vercel.app/" target="_blank" class="block app-card p-6 rounded-2xl group relative overflow-hidden">
-                         <div class="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
-                         <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">Manipulation Audio</h3>
-                         <p class="text-xs text-gray-200 font-medium">Advanced audio processing.</p>
+                 <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 mb-12">
+                     <a href="https://audio-modifier.vercel.app/" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative overflow-hidden">
+                         <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
+                         <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Manipulasi Audio</h3>
+                         <p class="text-[9px] md:text-xs text-gray-200 font-medium">Advanced audio processing.</p>
                      </a>
-                     <a href="https://ailabs-cc.vercel.app/" target="_blank" class="block app-card p-6 rounded-2xl group relative overflow-hidden">
-                         <div class="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
-                         <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">Ailabs Capcut</h3>
-                         <p class="text-xs text-gray-200 font-medium">Video editing suite.</p>
+                     <a href="https://ailabs-cc.vercel.app/" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative overflow-hidden">
+                         <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
+                         <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Ailabs Capcut</h3>
+                         <p class="text-[9px] md:text-xs text-gray-200 font-medium">Video editing suite.</p>
                      </a>
-                     
-                     <!-- New App: EncodeBase64 -->
-                     <a href="https://gemini.google.com/share/520c6663d2a0" target="_blank" class="block app-card p-6 rounded-2xl group relative overflow-hidden">
-                        <div class="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
-                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">EncodeBase64</h3>
-                        <p class="text-xs text-gray-200 font-medium">Data encryption tool.</p>
+                     <a href="https://gemini.google.com/share/520c6663d2a0" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative overflow-hidden">
+                        <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
+                        <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">EncodeBase64</h3>
+                        <p class="text-[9px] md:text-xs text-gray-200 font-medium">Data encryption tool.</p>
                     </a>
-
-                    <!-- New App: AilabsWMremover -->
-                    <a href="https://gemini.google.com/share/ed18417d50c5" target="_blank" class="block app-card p-6 rounded-2xl group relative overflow-hidden">
-                        <div class="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
-                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">AilabsWMremover</h3>
-                        <p class="text-xs text-gray-200 font-medium">Watermark removal AI.</p>
+                    <a href="https://gemini.google.com/share/ed18417d50c5" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative overflow-hidden">
+                        <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
+                        <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">WM Remover</h3>
+                        <p class="text-[9px] md:text-xs text-gray-200 font-medium">Watermark removal AI.</p>
                     </a>
-
-                    <!-- Music Mastering (Moved from Apps) -->
-                    <a href="https://masteraudio.pro" target="_blank" class="block app-card p-6 rounded-2xl group">
-                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">Music Mastering</h3>
-                        <p class="text-xs text-gray-200 font-medium">Audio polish pro.</p>
+                    <a href="https://masteraudio.pro" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group">
+                        <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Music Mastering</h3>
+                        <p class="text-[9px] md:text-xs text-gray-200 font-medium">Audio polish pro.</p>
                     </a>
-
-                    <!-- Prompt Suno Style (Moved from Apps) -->
-                    <a href="https://gemini.google.com/share/6a3f36032542" target="_blank" class="block app-card p-6 rounded-2xl group">
-                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">Prompt Suno Style</h3>
-                        <p class="text-xs text-gray-200 font-medium">Generator gaya musik.</p>
+                    <a href="https://gemini.google.com/share/6a3f36032542" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group">
+                        <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Suno Style</h3>
+                        <p class="text-[9px] md:text-xs text-gray-200 font-medium">Generator gaya musik.</p>
                     </a>
-
-                    <!-- New App: Upscale Image -->
-                    <a href="https://upscale-image.vercel.app/" target="_blank" class="block app-card p-6 rounded-2xl group relative overflow-hidden">
-                        <div class="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
-                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">Upscale Image</h3>
-                        <p class="text-xs text-gray-200 font-medium">Tingkatkan resolusi gambar.</p>
+                    <a href="https://upscale-image.vercel.app/" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative overflow-hidden">
+                        <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
+                        <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Upscale Image</h3>
+                        <p class="text-[9px] md:text-xs text-gray-200 font-medium">Tingkatkan resolusi gambar.</p>
                     </a>
-
-                    <!-- New App: Ailabs Speed -->
-                    <a href="https://ailabs-speed.vercel.app/" target="_blank" class="block app-card p-6 rounded-2xl group relative overflow-hidden">
-                        <div class="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
-                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-neonBlue transition-colors">Ailabs Speed</h3>
-                        <p class="text-xs text-gray-200 font-medium">Akselerasi dan pengontrol kecepatan.</p>
+                    <a href="https://ailabs-speed.vercel.app/" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative overflow-hidden">
+                        <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
+                        <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Ailabs Speed</h3>
+                        <p class="text-[9px] md:text-xs text-gray-200 font-medium">Akselerasi kecepatan.</p>
                     </a>
-
                  </div>
             </div>
 
             <!-- TAB CONTENT: TUTORIAL -->
             <div id="content-tutorial" class="hidden">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div class="tutorial-card p-6 rounded-2xl flex flex-col justify-between">
-                        <h3 class="text-xl font-bold text-white font-tech mb-4">Desain Cover AI</h3>
-                        <p class="text-sm text-gray-300 mb-6">Panduan pembuatan cover profesional dengan AIlabs Studio Pro.</p>
-                        <a href="https://gemini.google.com/share/b6ce96b95d5a" target="_blank" class="bg-neonOrange/20 border border-neonOrange text-neonOrange py-3 rounded-xl text-center hover:bg-neonOrange hover:text-black transition-all font-bold">BUKA TUTORIAL</a>
+                <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8">
+                    <div class="tutorial-card p-4 md:p-6 rounded-xl md:rounded-2xl flex flex-col justify-between">
+                        <h3 class="text-[14px] md:text-xl font-bold text-white font-tech mb-2 md:mb-4">Desain Cover AI</h3>
+                        <p class="text-[10px] md:text-sm text-gray-300 mb-4 md:mb-6">Panduan pembuatan cover profesional.</p>
+                        <a href="https://gemini.google.com/share/b6ce96b95d5a" target="_blank" class="text-[9px] md:text-base bg-neonOrange/20 border border-neonOrange text-neonOrange py-2 md:py-3 rounded-lg md:rounded-xl text-center hover:bg-neonOrange hover:text-black transition-all font-bold">BUKA TUTORIAL</a>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB CONTENT: PROMPT FRAMEWORK -->
+            <!-- TAB CONTENT: PROMPT FRAMEWORK (Forced Side-by-Side) -->
             <div id="content-framework" class="hidden">
                 <div class="explorer-container">
                     <div class="explorer-sidebar overflow-y-auto" id="file-list"></div>
                     <div class="explorer-main">
                         <div class="txt-header">
-                            <span id="active-filename">Pilih file...</span>
-                            <button onclick="copyCurrentPrompt()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-[10px] font-bold tracking-wide transition-colors">SALIN</button>
+                            <span id="active-filename" class="truncate max-w-[60%]">Pilih file...</span>
+                            <button onclick="copyCurrentPrompt()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 md:px-3 rounded text-[8px] md:text-[10px] font-bold tracking-wide transition-colors">SALIN</button>
                         </div>
-                        <div class="txt-content p-6 text-black" id="txt-display">Pilih prompt dari menu samping.</div>
+                        <div class="txt-content" id="txt-display">Pilih prompt dari menu samping.</div>
                     </div>
                 </div>
             </div>
 
             <!-- TAB CONTENT: CAMERA -->
             <div id="content-camera" class="hidden">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <a href="https://aishotstudio.com/42-camera-movements-ai-prompts/" target="_blank" class="framework-card p-6 rounded-2xl border border-neonBlue/30 block group">
-                        <h3 class="text-xl font-bold text-white font-tech mb-4 group-hover:text-neonBlue">42 Camera Movements</h3>
-                        <p class="text-sm text-gray-300 mb-4">Panduan pergerakan kamera sinematik AI Video.</p>
-                        <button class="w-full py-2 rounded-lg text-xs font-bold border border-neonBlue text-neonBlue group-hover:bg-neonBlue group-hover:text-black transition-all">OPEN GUIDE</button>
+                <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8">
+                    <a href="https://aishotstudio.com/42-camera-movements-ai-prompts/" target="_blank" class="framework-card p-4 md:p-6 rounded-xl md:rounded-2xl border border-neonBlue/30 block group">
+                        <h3 class="text-[13px] md:text-xl font-bold text-white font-tech mb-2 md:mb-4 group-hover:text-neonBlue">42 Camera Movements</h3>
+                        <p class="text-[10px] md:text-sm text-gray-300 mb-3 md:mb-4">Panduan kamera sinematik.</p>
+                        <button class="w-full py-1.5 md:py-2 rounded-lg text-[9px] md:text-xs font-bold border border-neonBlue text-neonBlue group-hover:bg-neonBlue group-hover:text-black transition-all">OPEN GUIDE</button>
                     </a>
                 </div>
             </div>
@@ -699,9 +630,6 @@
             setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
         }
 
-        /* -------------------------------------------------------------
-            BAGIAN BARU: SCRIPT UNTUK MEMUTAR AUDIO SAAT ADA INTERAKSI
-        ------------------------------------------------------------- */
         let hasInteracted = false;
 
         function playAudioOnFirstInteraction() {
@@ -710,27 +638,22 @@
             
             bgAudio.play().then(() => {
                 initVisualizer();
-                // Jika audio context ada dan dalam state suspended, jalankan ulang
                 if(audioCtx && audioCtx.state === 'suspended') {
                     audioCtx.resume();
                 }
             }).catch((err) => {
                 console.log("Autoplay masih terblokir, pengguna butuh interaksi yang lebih jelas.", err);
-                hasInteracted = false; // reset agar dicoba lagi di klik berikutnya
+                hasInteracted = false; 
             });
 
-            // Hapus event listener agar tidak berjalan berulang-ulang
             document.removeEventListener('click', playAudioOnFirstInteraction);
             document.removeEventListener('keydown', playAudioOnFirstInteraction);
             document.removeEventListener('touchstart', playAudioOnFirstInteraction);
         }
 
-        // Pasang pendeteksi interaksi ke seluruh halaman
         document.addEventListener('click', playAudioOnFirstInteraction);
         document.addEventListener('keydown', playAudioOnFirstInteraction);
         document.addEventListener('touchstart', playAudioOnFirstInteraction);
-        /* ------------------------------------------------------------- */
-
 
         document.getElementById('login-form').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -740,8 +663,6 @@
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('portal-page').classList.remove('hidden');
                 initExplorer();
-                // Audio sudah otomatis coba diputar dari trigger interaksi di atas
-                // Tapi kita buat cadangan disini jika belum berputar
                 if(bgAudio.paused) {
                     bgAudio.play().then(() => initVisualizer()).catch(() => {});
                 }
