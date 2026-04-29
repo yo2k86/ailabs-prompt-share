@@ -99,8 +99,13 @@
             padding: 8px 10px;
             font-family: 'Orbitron', sans-serif;
             font-weight: 900;
-            font-size: 0.6rem;
+            font-size: 0.65rem;
             letter-spacing: 1px;
+            /* Efek 3D Default (sebelum aktif) */
+            text-shadow: 
+                0px 1px 0px rgba(255, 255, 255, 0.2),
+                0px 2px 0px rgba(0, 0, 0, 0.8),
+                0px 3px 2px rgba(0, 0, 0, 0.5);
             transition: all 0.3s ease;
             color: rgba(255, 255, 255, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -117,20 +122,180 @@
         @media (min-width: 768px) {
             .tab-btn {
                 padding: 10px 15px;
-                font-size: 0.7rem;
+                font-size: 0.8rem;
                 letter-spacing: 2px;
                 border-width: 2px;
                 min-width: 140px;
             }
         }
 
+        /* Base Active Class */
         .tab-btn.active {
-            color: #00ffd5;
-            border-color: #00ffd5;
-            background: rgba(0, 255, 213, 0.1);
-            box-shadow: 0 0 15px rgba(0, 255, 213, 0.4), inset 0 0 10px rgba(0, 255, 213, 0.2);
             animation: flicker 4s linear infinite;
         }
+
+        /* --- UNIQUE 3D TAB STYLES --- */
+        /* Tab: APPLICATIONS */
+        #tab-apps {
+            color: rgba(0, 255, 213, 0.9);
+            border-color: rgba(0, 255, 213, 0.4);
+        }
+        #tab-apps:hover { 
+            color: #00ffd5; border-color: #00ffd5; background: rgba(0, 255, 213, 0.1); 
+            box-shadow: 0 0 10px rgba(0, 255, 213, 0.3);
+            transform: translateY(-2px);
+        }
+        #tab-apps.active {
+            color: #ffffff; border-color: #00ffd5; background: rgba(0, 255, 213, 0.15);
+            box-shadow: 0 0 15px rgba(0, 255, 213, 0.5), inset 0 0 10px rgba(0, 255, 213, 0.3);
+            /* Efek 3D Neon Blue saat Aktif */
+            text-shadow: 
+                0 1px 0 #00cca0,
+                0 2px 0 #00997a,
+                0 3px 0 #006652,
+                0 4px 5px rgba(0, 255, 213, 0.8),
+                0 0 10px rgba(0, 255, 213, 1);
+            transform: translateY(1px); /* Efek ditekan */
+        }
+
+        /* Tab: APPLICATIONS 2 */
+        #tab-apps2 {
+            color: rgba(167, 139, 250, 0.9); 
+            border-color: rgba(124, 58, 237, 0.4);
+        }
+        #tab-apps2:hover { 
+            color: #c4b5fd; border-color: #a78bfa; background: rgba(124, 58, 237, 0.1); 
+            box-shadow: 0 0 10px rgba(124, 58, 237, 0.3); 
+            transform: translateY(-2px);
+        }
+        #tab-apps2.active {
+            color: #ffffff; border-color: #8b5cf6; background: rgba(124, 58, 237, 0.2);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.6), inset 0 0 10px rgba(139, 92, 246, 0.3);
+            /* Efek 3D Purple saat Aktif */
+            text-shadow: 
+                0 1px 0 #6d28d9,
+                0 2px 0 #5b21b6,
+                0 3px 0 #4c1d95,
+                0 4px 5px rgba(139, 92, 246, 0.8),
+                0 0 10px rgba(139, 92, 246, 1);
+            transform: translateY(1px);
+        }
+
+        /* Tab: VIBEAI LABS */
+        #tab-vibeai {
+            color: rgba(244, 114, 182, 0.9);
+            border-color: rgba(236, 72, 153, 0.4);
+        }
+        #tab-vibeai:hover { 
+            color: #fbcfe8; border-color: #f472b6; background: rgba(236, 72, 153, 0.1); 
+            box-shadow: 0 0 10px rgba(236, 72, 153, 0.3); 
+            transform: translateY(-2px);
+        }
+        #tab-vibeai.active {
+            color: #ffffff; border-color: #ec4899; background: rgba(236, 72, 153, 0.2);
+            box-shadow: 0 0 15px rgba(236, 72, 153, 0.6), inset 0 0 10px rgba(236, 72, 153, 0.3);
+             /* Efek 3D Pink saat Aktif */
+            text-shadow: 
+                0 1px 0 #be185d,
+                0 2px 0 #9d174d,
+                0 3px 0 #831843,
+                0 4px 5px rgba(236, 72, 153, 0.8),
+                0 0 10px rgba(236, 72, 153, 1);
+            transform: translateY(1px);
+        }
+
+        /* Tab: TOOLKIT */
+        #tab-toolkit {
+            color: rgba(250, 204, 21, 0.9);
+            border-color: rgba(234, 179, 8, 0.4);
+        }
+        #tab-toolkit:hover { 
+            color: #fef08a; border-color: #facc15; background: rgba(234, 179, 8, 0.1); 
+            box-shadow: 0 0 10px rgba(234, 179, 8, 0.3); 
+            transform: translateY(-2px);
+        }
+        #tab-toolkit.active {
+            color: #ffffff; border-color: #eab308; background: rgba(234, 179, 8, 0.2);
+            box-shadow: 0 0 15px rgba(234, 179, 8, 0.6), inset 0 0 10px rgba(234, 179, 8, 0.3);
+            /* Efek 3D Yellow saat Aktif */
+            text-shadow: 
+                0 1px 0 #a16207,
+                0 2px 0 #854d0e,
+                0 3px 0 #713f12,
+                0 4px 5px rgba(234, 179, 8, 0.8),
+                0 0 10px rgba(234, 179, 8, 1);
+            transform: translateY(1px);
+        }
+
+        /* Tab: TUTORIALS */
+        #tab-tutorial {
+            color: rgba(255, 153, 0, 0.9);
+            border-color: rgba(255, 153, 0, 0.4);
+        }
+        #tab-tutorial:hover { 
+            color: #ffedd5; border-color: #FF9900; background: rgba(255, 153, 0, 0.1); 
+            box-shadow: 0 0 10px rgba(255, 153, 0, 0.3); 
+            transform: translateY(-2px);
+        }
+        #tab-tutorial.active {
+            color: #ffffff; border-color: #f97316; background: rgba(255, 153, 0, 0.2);
+            box-shadow: 0 0 15px rgba(255, 153, 0, 0.6), inset 0 0 10px rgba(255, 153, 0, 0.3);
+            /* Efek 3D Orange saat Aktif */
+            text-shadow: 
+                0 1px 0 #c2410c,
+                0 2px 0 #9a3412,
+                0 3px 0 #7c2d12,
+                0 4px 5px rgba(255, 153, 0, 0.8),
+                0 0 10px rgba(255, 153, 0, 1);
+            transform: translateY(1px);
+        }
+
+        /* Tab: PROMPT FRAMEWORK */
+        #tab-framework {
+            color: rgba(96, 165, 250, 0.9);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+        #tab-framework:hover { 
+            color: #bfdbfe; border-color: #60a5fa; background: rgba(59, 130, 246, 0.1); 
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); 
+            transform: translateY(-2px);
+        }
+        #tab-framework.active {
+            color: #ffffff; border-color: #3b82f6; background: rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.6), inset 0 0 10px rgba(59, 130, 246, 0.3);
+             /* Efek 3D Blue saat Aktif */
+            text-shadow: 
+                0 1px 0 #1d4ed8,
+                0 2px 0 #1e40af,
+                0 3px 0 #1e3a8a,
+                0 4px 5px rgba(59, 130, 246, 0.8),
+                0 0 10px rgba(59, 130, 246, 1);
+            transform: translateY(1px);
+        }
+
+        /* Tab: 42 CAMERA MOVEMENTS */
+        #tab-camera {
+            color: rgba(52, 211, 153, 0.9); 
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+        #tab-camera:hover { 
+            color: #a7f3d0; border-color: #34d399; background: rgba(16, 185, 129, 0.1); 
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.3); 
+            transform: translateY(-2px);
+        }
+        #tab-camera.active {
+            color: #ffffff; border-color: #10b981; background: rgba(16, 185, 129, 0.2);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.6), inset 0 0 10px rgba(16, 185, 129, 0.3);
+            /* Efek 3D Green saat Aktif */
+            text-shadow: 
+                0 1px 0 #047857,
+                0 2px 0 #065f46,
+                0 3px 0 #064e3b,
+                0 4px 5px rgba(16, 185, 129, 0.8),
+                0 0 10px rgba(16, 185, 129, 1);
+            transform: translateY(1px);
+        }
+
 
         .app-card {
             background: rgba(0, 0, 0, 0.4); 
@@ -221,10 +386,13 @@
     <div id="login-page" class="w-full max-w-md relative z-10 px-2">
         <form id="login-form" class="glass-panel rounded-2xl p-6 md:p-10 relative overflow-hidden">
             <div class="text-center mb-8 md:mb-12">
-                <h1 class="text-4xl md:text-5xl font-tech font-bold text-white mb-3 tracking-wider leading-tight">
-                    <span class="text-neonOrange">AI</span>LABS<br>
-                    <span class="text-2xl md:text-3xl tracking-[0.2em] text-white">WORKSPACE</span>
-                </h1>
+                <div class="flex justify-center items-center gap-3 md:gap-4 mb-3">
+                    <img src="https://i.ibb.co.com/4nFbhTSN/Desain-tanpa-judul-20260428-191052-0000.png" alt="Ailabs Logo" class="w-12 h-12 md:w-16 md:h-16 object-contain drop-shadow-[0_0_15px_rgba(0,255,213,0.5)]">
+                    <h1 class="text-4xl md:text-5xl font-tech font-bold text-white tracking-wider leading-tight text-left">
+                        <span class="text-neonOrange">AI</span>LABS<br>
+                        <span class="text-2xl md:text-3xl tracking-[0.2em] text-white">WORKSPACE</span>
+                    </h1>
+                </div>
                 <div class="h-px w-32 bg-gradient-to-r from-transparent via-neonBlue to-transparent mx-auto mb-6"></div>
                 <span class="inline-block bg-black/40 border border-white/20 text-neonBlue text-xs font-bold tracking-[0.25em] uppercase px-3 py-1 rounded-full">VIP Prime Access</span>
             </div>
@@ -254,13 +422,15 @@
             
             <!-- HEADER (Forced Horizontal Desktop Mode) -->
             <div class="mb-6 md:mb-8 border-b border-white/10 pb-4 md:pb-6 flex flex-row justify-between items-end gap-2 md:gap-6 w-full">
-                <div class="flex-shrink-0">
-                    <h1 class="text-[14px] sm:text-xl md:text-3xl font-bold text-white tracking-tight font-tech mb-0 md:mb-2 leading-tight whitespace-nowrap">
-                        <span class="text-neonOrange block mb-0 md:mb-1">
-                            <a href="https://gemini.google.com/share/c8dbf606a9df" target="_blank" class="hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,153,0,0.8)] transition-all cursor-pointer">⚡</a> 
+                <div class="flex-shrink-0 flex items-center gap-2 md:gap-3">
+                    <!-- LOGO SEBAGAI LINK ADMIN -->
+                    <a href="https://gemini.google.com/share/c8dbf606a9df" target="_blank" class="cursor-pointer transition-all hover:scale-110 hover:drop-shadow-[0_0_15px_rgba(255,153,0,0.8)]" title="Akses Admin">
+                        <img src="https://i.ibb.co.com/4nFbhTSN/Desain-tanpa-judul-20260428-191052-0000.png" alt="Ailabs Logo" class="w-8 h-8 md:w-12 md:h-12 object-contain drop-shadow-[0_0_10px_rgba(0,255,213,0.5)]">
+                    </a>
+                    <h1 class="text-[14px] sm:text-xl md:text-3xl font-bold text-white tracking-tight font-tech mb-0 leading-tight whitespace-nowrap">
+                        <span class="text-neonOrange">
                             AILABS WORKSPACE
                         </span>
-                        <span class="text-neonBlue text-[8px] sm:text-xs md:text-2xl tracking-widest block mt-1">AILABS INFINITY CORE</span>
                     </h1>
                 </div>
                 
@@ -320,7 +490,6 @@
                 <button onclick="switchTab('vibeai')" id="tab-vibeai" class="tab-btn">VIBEAI LABS</button>
                 <button onclick="switchTab('toolkit')" id="tab-toolkit" class="tab-btn">
                     TOOLKIT
-                    <span class="absolute -top-2 -right-1 md:-top-3 md:-right-2 bg-red-600 text-white text-[7px] md:text-[9px] font-bold px-1.5 py-0.5 rounded animate-pulse shadow-[0_0_8px_red]">NEW</span>
                 </button>
                 <button onclick="switchTab('tutorial')" id="tab-tutorial" class="tab-btn">TUTORIALS</button>
                 <button onclick="switchTab('framework')" id="tab-framework" class="tab-btn">PROMPT FRAMEWORK</button>
@@ -377,25 +546,21 @@
                     </a>
 
                     <a href="https://gemini.google.com/share/fa5bd00de5dd" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative">
-                        <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
                         <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Ailabs Ramadhan</h3>
                         <p class="text-[9px] md:text-xs text-gray-200 font-medium">Edisi spesial berkah.</p>
                     </a>
 
                     <a href="https://gemini.google.com/share/e0ba482b873c" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative">
-                        <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
                         <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Morp</h3>
                         <p class="text-[9px] md:text-xs text-gray-200 font-medium">Transformasi visual halus.</p>
                     </a>
 
                     <a href="https://gemini.google.com/share/7b9e45c20c5d" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative">
-                        <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
                         <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Ailabs Storyboard</h3>
                         <p class="text-[9px] md:text-xs text-gray-200 font-medium">Visualisasi alur cerita.</p>
                     </a>
 
                     <a href="https://gemini.google.com/share/51ad421bbd1f" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative">
-                        <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
                         <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">DNA</h3>
                         <p class="text-[9px] md:text-xs text-gray-200 font-medium">Analisis struktur data AI.</p>
                     </a>
@@ -411,7 +576,6 @@
                  </div>
                  <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 mb-12">
                      <a href="https://gemini.google.com/share/00e19cde7ef1" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative">
-                         <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
                          <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">DNA PRO</h3>
                          <p class="text-[9px] md:text-xs text-gray-200 font-medium">Versi pro analisis struktur data.</p>
                      </a>
@@ -426,12 +590,10 @@
                  </div>
                  <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 mb-12">
                      <a href="https://opal.google/app/1MwZb47W07qKQ2wT1AaARxYo1_M3TVlRM" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative">
-                         <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
                          <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Motion</h3>
                          <p class="text-[9px] md:text-xs text-gray-200 font-medium">Platform generasi video motion.</p>
                      </a>
                      <a href="https://opal.google/app/1AIOHY0nkuOfslC5rpRxpnneQlJnK_c_U" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative">
-                         <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
                          <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Control Motion</h3>
                          <p class="text-[9px] md:text-xs text-gray-200 font-medium">Kontrol presisi pergerakan video.</p>
                      </a>
@@ -446,22 +608,18 @@
                  </div>
                  <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 mb-12">
                      <a href="https://audio-modifier.vercel.app/" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative overflow-hidden">
-                         <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
                          <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Manipulasi Audio</h3>
                          <p class="text-[9px] md:text-xs text-gray-200 font-medium">Advanced audio processing.</p>
                      </a>
                      <a href="https://ailabs-cc.vercel.app/" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative overflow-hidden">
-                         <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
                          <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Ailabs Capcut</h3>
                          <p class="text-[9px] md:text-xs text-gray-200 font-medium">Video editing suite.</p>
                      </a>
                      <a href="https://gemini.google.com/share/520c6663d2a0" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative overflow-hidden">
-                        <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
                         <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">EncodeBase64</h3>
                         <p class="text-[9px] md:text-xs text-gray-200 font-medium">Data encryption tool.</p>
                     </a>
                     <a href="https://gemini.google.com/share/ed18417d50c5" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative overflow-hidden">
-                        <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
                         <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">WM Remover</h3>
                         <p class="text-[9px] md:text-xs text-gray-200 font-medium">Watermark removal AI.</p>
                     </a>
@@ -474,12 +632,10 @@
                         <p class="text-[9px] md:text-xs text-gray-200 font-medium">Generator gaya musik.</p>
                     </a>
                     <a href="https://upscale-image.vercel.app/" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative overflow-hidden">
-                        <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
                         <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Upscale Image</h3>
                         <p class="text-[9px] md:text-xs text-gray-200 font-medium">Tingkatkan resolusi gambar.</p>
                     </a>
                     <a href="https://ailabs-speed.vercel.app/" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative overflow-hidden">
-                        <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-red-600 text-white text-[8px] md:text-[10px] font-bold px-1.5 py-0.5 md:px-2 rounded animate-pulse z-20 shadow-[0_0_8px_red]">NEW</div>
                         <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Ailabs Speed</h3>
                         <p class="text-[9px] md:text-xs text-gray-200 font-medium">Akselerasi kecepatan.</p>
                     </a>
