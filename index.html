@@ -853,6 +853,13 @@
                 document.getElementById('portal-page').classList.remove('hidden');
                 initExplorer();
             }
+
+            // [PERBARUAN] Menyembunyikan jejak referer ke web eksternal
+            // Mencegah keamanan Google (Gemini) me-reset URL /share/ menjadi URL home biasa.
+            const allLinks = document.querySelectorAll('a[target="_blank"]');
+            allLinks.forEach(link => {
+                link.setAttribute('rel', 'noopener noreferrer');
+            });
         });
     </script>
 </body>
