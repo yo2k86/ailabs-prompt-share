@@ -530,7 +530,7 @@
                         <p class="text-[9px] md:text-xs text-gray-200 font-medium">Perbaiki foto lama.</p>
                     </a>
 
-                    <a href="https://gemini.google.com/share/ae0c52982934" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group">
+                    <a href="https://gemini.google.com/share/a994fe709148" target="_blank" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group">
                         <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">Auto Caption</h3>
                         <p class="text-[9px] md:text-xs text-gray-200 font-medium">Subtitle otomatis.</p>
                     </a>
@@ -853,13 +853,6 @@
                 document.getElementById('portal-page').classList.remove('hidden');
                 initExplorer();
             }
-
-            // [PERBARUAN] Menyembunyikan jejak referer ke web eksternal
-            // Mencegah keamanan Google (Gemini) me-reset URL /share/ menjadi URL home biasa.
-            const allLinks = document.querySelectorAll('a[target="_blank"]');
-            allLinks.forEach(link => {
-                link.setAttribute('rel', 'noopener noreferrer');
-            });
         });
     </script>
 </body>
