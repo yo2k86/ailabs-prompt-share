@@ -57,30 +57,34 @@
 
     <style>
         body {
-            /* Fallback gradient if foto-profil.png is missing */
+            /* Fallback gradient jika video gagal dimuat */
             background: #050110 radial-gradient(circle at center, #1a0b2e 0%, #050110 100%); 
-            background-image: url('./foto-profil.png'); 
-            background-size: cover;
-            background-position: center center; 
-            background-repeat: no-repeat;
-            background-attachment: fixed;
             overflow-x: hidden;
             text-shadow: 0 2px 8px rgba(0,0,0,1); 
+            color: white;
+            /* Hapus background-image gambar */
         }
 
-        @media (max-width: 768px) {
-            body {
-                background-size: contain; 
-                background-position: top center; 
-                background-attachment: fixed; 
-            }
+        /* --- VIDEO BACKGROUND STYLES --- */
+        #bg-video {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -2; /* Letakkan di paling belakang */
+            transform: translateX(-50%) translateY(-50%);
+            object-fit: cover; /* Pastikan video menutupi seluruh area */
+            opacity: 0.8; /* Sesuaikan opasitas jika video terlalu terang */
         }
 
         .bg-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at 15% 15%, rgba(124, 58, 237, 0.05) 0%, transparent 50%),
                         radial-gradient(circle at 85% 85%, rgba(255, 153, 0, 0.05) 0%, transparent 50%),
-                        rgba(0, 0, 0, 0.4); /* Slightly darkened for better readability without image */
+                        rgba(0, 0, 0, 0.5); /* Sedikit digelapkan agar UI di atas video tetap terbaca jelas */
             z-index: -1;
         }
 
@@ -373,6 +377,16 @@
     </style>
 </head>
 <body class="text-gray-100 min-h-screen flex items-center justify-center p-2 md:p-4 selection:bg-neonOrange selection:text-black">
+
+    <!-- VIDEO BACKGROUND -->
+    <!-- Ganti 'background-video.mp4' dengan nama file videomu (misal: bg.mp4) -->
+    <!-- Atribut playsinline penting untuk mobile (iOS) -->
+    <video id="bg-video" autoplay loop muted playsinline>
+        <source src="background-video.mp4" type="video/mp4">
+        <!-- Tambahkan sumber webm jika ada untuk kompatibilitas browser yang lebih baik -->
+        <!-- <source src="background-video.webm" type="video/webm"> -->
+        Browser kamu tidak mendukung video background.
+    </video>
 
     <!-- AUDIO PLAYER -->
     <audio id="bg-audio" loop crossorigin="anonymous">
