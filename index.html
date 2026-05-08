@@ -84,12 +84,14 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at 15% 15%, rgba(124, 58, 237, 0.05) 0%, transparent 50%),
                         radial-gradient(circle at 85% 85%, rgba(255, 153, 0, 0.05) 0%, transparent 50%),
-                        rgba(0, 0, 0, 0.25);            z-index: -1;
+                        rgba(0, 0, 0, 0.1); /* Jauh lebih transparan */
+            z-index: -1;
         }
 
         .glass-panel {
-            background: rgba(10, 10, 15, 0.25);            backdrop-filter: blur(12px); /* Menambah efek blur agar teks tetap mudah dibaca */
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(10, 10, 15, 0.05); /* Hampir 100% transparan */
+            backdrop-filter: blur(4px); /* Blur dikurangi drastis agar video jelas */
+            -webkit-backdrop-filter: blur(4px);
             border: 1px solid rgba(255, 255, 255, 0.1); 
             border-top: 1px solid rgba(255, 255, 255, 0.2); 
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
@@ -111,7 +113,7 @@
             transition: all 0.3s ease;
             color: rgba(255, 255, 255, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.2); /* Tombol tab lebih transparan */
             border-radius: 4px;
             display: flex;
             align-items: center;
@@ -300,7 +302,8 @@
 
 
         .app-card {
-            background: rgba(0, 0, 0, 0.15);            backdrop-filter: blur(8px); 
+            background: rgba(0, 0, 0, 0.05); /* Kotak aplikasi sangat tipis hitamnya */
+            backdrop-filter: blur(2px); /* Blur tipis agar text tetap terbaca */
             border: 2px solid rgba(0, 255, 213, 0.3); 
             box-shadow: 0 0 15px rgba(0, 255, 213, 0.1);
             transition: all 0.4s ease;
@@ -315,9 +318,10 @@
         }
 
         .tutorial-card, .framework-card {
-            background: rgba(0, 0, 0, 0.15);            border: 1px solid rgba(255, 153, 0, 0.3);
+            background: rgba(0, 0, 0, 0.05); /* Sama seperti app-card */
+            border: 1px solid rgba(255, 153, 0, 0.3);
             transition: all 0.3s ease;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(2px);
         }
         .tutorial-card:hover, .framework-card:hover {
             border-color: #FF9900;
@@ -336,7 +340,8 @@
 
         /* Explorer Style - FORCED SIDE-BY-SIDE DESKTOP LOOK */
         .explorer-container {
-            background: rgba(15, 15, 25, 0.3);            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 15, 25, 0.1); /* Background lebih jernih */
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             overflow: hidden;
             display: flex;
@@ -344,10 +349,10 @@
             height: 60vh;
             min-height: 450px;
             max-height: 600px;
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(4px);
         }
-        .explorer-sidebar { width: 35%; border-right: 1px solid rgba(255, 255, 255, 0.1); background: rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; }
-        .explorer-main { flex: 1; width: 65%; display: flex; flex-direction: column; background: rgba(0, 0, 0, 0.2); /* Menghapus background putih solid */ }
+        .explorer-sidebar { width: 35%; border-right: 1px solid rgba(255, 255, 255, 0.1); background: rgba(0, 0, 0, 0.15); display: flex; flex-direction: column; }
+        .explorer-main { flex: 1; width: 65%; display: flex; flex-direction: column; background: rgba(0, 0, 0, 0.05); }
         .file-item { padding: 10px 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.7); font-size: 0.7rem; }
         @media (min-width: 768px) { .file-item { font-size: 0.8rem; padding: 12px 16px; gap: 12px; } }
         .file-item:hover { background: rgba(0, 255, 213, 0.1); color: #00ffd5; }
@@ -402,12 +407,12 @@
                     </h1>
                 </div>
                 <div class="h-px w-32 bg-gradient-to-r from-transparent via-neonBlue to-transparent mx-auto mb-6"></div>
-                <span class="inline-block bg-black/40 border border-white/20 text-neonBlue text-xs font-bold tracking-[0.25em] uppercase px-3 py-1 rounded-full">VIP Prime Access</span>
+                <span class="inline-block bg-black/20 border border-white/20 text-neonBlue text-xs font-bold tracking-[0.25em] uppercase px-3 py-1 rounded-full">VIP Prime Access</span>
             </div>
             
             <div class="mb-8">
                 <p class="text-xs text-neonBlue uppercase tracking-widest mb-2 ml-1 font-bold">User ID</p>
-                <div class="bg-black/50 border border-white/20 rounded-lg p-3 flex items-center justify-between">
+                <div class="bg-black/20 border border-white/20 rounded-lg p-3 flex items-center justify-between">
                     <span class="font-mono text-white font-bold tracking-wide text-lg">bangpro</span>
                     <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
                 </div>
@@ -416,7 +421,7 @@
             <div class="mb-10 text-center">
                 <label class="block text-xs text-neonOrange uppercase tracking-widest mb-4 font-bold">Security Token</label>
                 <input type="password" id="password" name="password" placeholder="ENTER CODE" required
-                       class="w-full p-3 md:p-4 border border-white/20 bg-black/50 rounded-lg text-center text-lg md:text-xl font-tech tracking-widest text-neonBlue focus:border-neonOrange outline-none">
+                       class="w-full p-3 md:p-4 border border-white/20 bg-black/20 rounded-lg text-center text-lg md:text-xl font-tech tracking-widest text-neonBlue focus:border-neonOrange outline-none">
             </div>
             
             <button type="submit" class="w-full bg-transparent border-2 border-neonBlue text-neonBlue py-3 md:py-4 rounded-lg font-bold text-base md:text-lg tracking-wider hover:bg-neonBlue hover:text-black transition-all">INITIALIZE</button>
@@ -457,7 +462,7 @@
 
                         <!-- Sound Control + Visualizer -->
                         <div class="flex flex-col items-center gap-1 md:gap-2 mr-1 md:mr-2">
-                            <div class="flex items-center gap-1 md:gap-2 bg-black/60 border border-white/10 px-2 py-1 md:px-3 rounded-lg">
+                            <div class="flex items-center gap-1 md:gap-2 bg-black/20 border border-white/10 px-2 py-1 md:px-3 rounded-lg">
                                 <button id="sound-toggle" class="text-neonBlue hover:text-white transition-colors">
                                     <svg id="icon-sound-on" class="w-[12px] h-[12px] md:w-[16px] md:h-[16px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
                                     <svg id="icon-sound-off" class="hidden w-[12px] h-[12px] md:w-[16px] md:h-[16px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
@@ -476,7 +481,7 @@
                         </div>
                         <button id="logout-button" class="text-[8px] md:text-[10px] text-red-400 border border-red-500/40 px-2 py-1 md:px-4 md:py-1.5 rounded font-bold hover:bg-red-500 hover:text-white transition-all">LOGOUT</button>
                     </div>
-                    <div class="bg-black/60 border border-white/10 rounded-lg px-2 py-1 md:px-3 md:py-2 flex items-center gap-2 md:gap-3">
+                    <div class="bg-black/20 border border-white/10 rounded-lg px-2 py-1 md:px-3 md:py-2 flex items-center gap-2 md:gap-3">
                         <span class="relative flex h-1.5 w-1.5 md:h-2 md:w-2">
                           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
                           <span class="relative inline-flex rounded-full h-1.5 w-1.5 md:h-2 md:w-2 bg-green-500"></span>
