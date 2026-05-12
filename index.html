@@ -526,7 +526,7 @@
                              <p class="text-[9px] md:text-xs text-gray-200 font-medium relative z-10">Versi pro analisis struktur data.</p>
                          </div>
                      </a>
-                     <a href="https://gemini.google.com/share/a0e7b97ae677" class="fire-card-wrapper group">
+                     <a href="https://gemini.google.com/share/2f70a3ba09cb" class="fire-card-wrapper group">
                          <div class="fire-card-inner p-3 md:p-6 transition-all duration-300 group-hover:bg-[#1a0b2e]">
                              <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonOrange transition-colors relative z-10">Ailabs Storyboard Pro</h3>
                              <p class="text-[9px] md:text-xs text-gray-200 font-medium relative z-10">Versi pro visualisasi alur cerita.</p>
@@ -767,9 +767,9 @@
         }
 
         function loginSuccess(email, username) {
-            // Menggunakan LocalStorage agar login permanen (tdk hilang saat refresh/tutup tab)
-            localStorage.setItem('ailabs_email', email);
-            localStorage.setItem('ailabs_username', username || email);
+            // Menggunakan SessionStorage agar login sementara (hilang saat refresh/tutup tab)
+            sessionStorage.setItem('ailabs_email', email);
+            sessionStorage.setItem('ailabs_username', username || email);
             
             // Update UI
             document.getElementById('user-email-display').textContent = email;
@@ -801,10 +801,10 @@
         document.addEventListener('click', playAudioOnFirstInteraction);
         document.addEventListener('keydown', playAudioOnFirstInteraction);
 
-        // LOGOUT LOGIC (MENGHAPUS LOCAL STORAGE)
+        // LOGOUT LOGIC (MENGHAPUS SESSION STORAGE)
         document.getElementById('logout-button').addEventListener('click', () => {
-            localStorage.removeItem('ailabs_email');
-            localStorage.removeItem('ailabs_username');
+            sessionStorage.removeItem('ailabs_email');
+            sessionStorage.removeItem('ailabs_username');
             location.reload();
         });
 
@@ -822,9 +822,9 @@
 
         // INIT SAAT HALAMAN DIBUKA
         document.addEventListener('DOMContentLoaded', () => {
-            // Cek Session dari LocalStorage (Auto Login)
-            const savedEmail = localStorage.getItem('ailabs_email');
-            const savedUsername = localStorage.getItem('ailabs_username');
+            // Cek Session dari SessionStorage (Login sementara)
+            const savedEmail = sessionStorage.getItem('ailabs_email');
+            const savedUsername = sessionStorage.getItem('ailabs_username');
             
             if (savedEmail) {
                 document.getElementById('user-email-display').textContent = savedEmail;
