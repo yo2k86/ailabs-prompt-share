@@ -99,7 +99,7 @@
         #tab-apps.active { color: #ffffff; border-left-width: 4px; border-left-color: #00ffd5; background: rgba(0, 255, 213, 0.15); box-shadow: 0 0 15px rgba(0, 255, 213, 0.5), inset 0 0 10px rgba(0, 255, 213, 0.3); text-shadow: 0 1px 0 #00cca0, 0 2px 0 #00997a, 0 3px 0 #006652, 0 4px 5px rgba(0, 255, 213, 0.8), 0 0 10px rgba(0, 255, 213, 1); transform: translateY(1px); }
 
         #tab-apps2 { padding: 2px !important; border: none !important; background: transparent !important; overflow: hidden; position: relative; border-radius: 18px 6px 18px 6px !important; box-shadow: none; }
-        #tab-apps2::before { content: ''; position: absolute; top: 50%; left: 50%; width: 300px; height: 300px; background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 240deg, #ff0000 280deg, #ff8c00 320deg, #ffff00 360deg); animation: spin-fire 3s linear infinite; transform: translate(-50%, -50%); z-index: 0; }
+        #tab-apps2::before { content: ''; position: absolute; top: 50%; left: 50%; width: 250%; height: 250%; background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 240deg, #ff0000 280deg, #ff8c00 320deg, #ffff00 360deg); animation: spin-fire 3s linear infinite; transform: translate(-50%, -50%); z-index: 0; will-change: transform; }
         .fire-tab-inner { position: relative; z-index: 1; background: rgba(10, 5, 20, 0.9); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; border-radius: 16px 4px 16px 4px !important; padding: 8px 10px; color: rgba(255, 69, 0, 0.9); transition: all 0.3s ease; text-align: center; gap: 8px; }
         @media (min-width: 768px) { .fire-tab-inner { padding: 10px 16px; } }
         #tab-apps2:hover .fire-tab-inner { background: rgba(255, 69, 0, 0.1); color: #ff8c00; }
@@ -123,15 +123,16 @@
         .tutorial-card, .framework-card { background: rgba(0, 0, 0, 0.05); border: 1px solid rgba(255, 153, 0, 0.3); transition: all 0.3s ease; backdrop-filter: blur(2px); display: flex; flex-direction: column; }
         .tutorial-card:hover, .framework-card:hover { border-color: #FF9900; box-shadow: 0 0 20px rgba(255, 153, 0, 0.2); transform: translateY(-4px); }
 
-        /* Custom Fire Card Style */
+        /* Custom Fire Card Style - OPTIMIZED FOR MOBILE GPU */
         .fire-card-wrapper { position: relative; overflow: hidden; border-radius: 1rem; padding: 2px; box-shadow: 0 0 15px rgba(255, 69, 0, 0.1); transition: all 0.4s ease; cursor: pointer; display: block; }
         .fire-card-wrapper:hover { transform: translateY(-5px); box-shadow: 0 0 30px rgba(255, 69, 0, 0.5); }
-        .fire-card-wrapper::before { content: ''; position: absolute; top: 50%; left: 50%; width: 200%; height: 200%; background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 240deg, #ff0000 280deg, #ff8c00 320deg, #ffff00 360deg); animation: spin-fire 2.5s linear infinite; transform: translate(-50%, -50%); z-index: 0; }
+        .fire-card-wrapper::before { content: ''; position: absolute; top: 50%; left: 50%; width: 250%; height: 250%; background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 240deg, #ff0000 280deg, #ff8c00 320deg, #ffff00 360deg); animation: spin-fire 2.5s linear infinite; transform: translate(-50%, -50%); z-index: 0; will-change: transform; }
         .fire-card-inner { position: relative; z-index: 1; background: #0a0514; border-radius: calc(1rem - 2px); height: 100%; }
         @keyframes spin-fire { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
         
         .fire-banner-wrapper { position: relative; overflow: hidden; border-radius: 0.75rem; padding: 2px; box-shadow: 0 0 20px rgba(255, 69, 0, 0.3); margin-bottom: 1.5rem; }
-        .fire-banner-wrapper::before { content: ''; position: absolute; top: 50%; left: 50%; width: 3000px; height: 3000px; background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 240deg, #ff0000 280deg, #ff8c00 320deg, #ffff00 360deg); animation: spin-fire 4s linear infinite; transform: translate(-50%, -50%); z-index: 0; }
+        /* DIOPTIMALKAN: Ukuran diturunkan dari 3000px agar HP tidak crash/close sendiri */
+        .fire-banner-wrapper::before { content: ''; position: absolute; top: 50%; left: 50%; width: 250%; height: 250%; min-width: 800px; min-height: 800px; background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 240deg, #ff0000 280deg, #ff8c00 320deg, #ffff00 360deg); animation: spin-fire 4s linear infinite; transform: translate(-50%, -50%); z-index: 0; will-change: transform; }
         .fire-banner-inner { position: relative; z-index: 1; background: #0a0514; border-radius: calc(0.75rem - 2px); padding: 12px 20px; display: flex; align-items: center; width: 100%; }
 
         .v-bar { width: 4px; background: #00ffd5; border-radius: 2px 2px 0 0; box-shadow: 0 0 5px #00ffd5; transition: height 0.08s ease; }
@@ -343,11 +344,12 @@
         function openAdmin() { window.open(_d(_sd.adm), '_blank'); }
 
         // =========================================================================
-        // AUDIO & VISUALIZER SCRIPT
+        // AUDIO & VISUALIZER SCRIPT (DIOPTIMALKAN AGAR TIDAK BOCOR MEMORI DI HP)
         // =========================================================================
         const bgAudio = document.getElementById("bg-audio");
         bgAudio.volume = 0.5;
         let audioCtx, analyser, dataArray, isInit = false;
+        let cachedVBars = []; // Cache DOM elements
 
         function initVisualizer() {
             if(isInit) return;
@@ -357,14 +359,16 @@
                 analyser = audioCtx.createAnalyser();
                 src.connect(analyser); analyser.connect(audioCtx.destination);
                 analyser.fftSize = 64; dataArray = new Uint8Array(analyser.frequencyBinCount);
+                cachedVBars = document.querySelectorAll('.v-bar'); // Simpan elemen sekali saja
                 isInit = true; draw();
             } catch(e) {}
         }
         function draw() {
-            if(!analyser) return;
+            if(!analyser || cachedVBars.length === 0) return;
             requestAnimationFrame(draw);
             analyser.getByteFrequencyData(dataArray);
-            document.querySelectorAll('.v-bar').forEach((bar, i) => {
+            // Gunakan elemen yg di-cache, jangan cari DOM 60x/detik!
+            cachedVBars.forEach((bar, i) => {
                 bar.style.height = `${Math.max(2, (dataArray[i]/255)*12)}px`;
             });
         }
@@ -417,7 +421,7 @@
             document.getElementById('login-page').classList.add('hidden');
             document.getElementById('portal-page').classList.remove('hidden');
             
-            // EXECUTE DOM INJECTION HERE (Keamanan)
+            // EXECUTE DOM INJECTION HERE
             _bDOM();
 
             if(bgAudio.paused) bgAudio.play().then(() => initVisualizer()).catch(() => {});
@@ -453,8 +457,7 @@
             }
         });
 
-        // --- HARDCORE ANTI-INSPECT ELEMENT ---
-        // (Klik kanan dan jalan pintas keyboard tetap dinonaktifkan untuk keamanan dasar)
+        // --- HARDCORE ANTI-INSPECT ELEMENT (TETAP AMAN DI HP) ---
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('keydown', function(e) {
             if(e.key==='F12'||e.keyCode===123) { e.preventDefault(); return false; }
