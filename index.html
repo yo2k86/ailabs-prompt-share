@@ -406,27 +406,89 @@
         // APP VIEWER (IFRAME) SCRIPT
         // =========================================================================
         let currentChildWindow = null;
+        let messageInterval = null;
+
         function openAppInNewTab(url, title) {
-            if(currentChildWindow && !currentChildWindow.closed) currentChildWindow.close();
+            // Bersihkan interval sebelumnya jika ada
+            if (messageInterval) {
+                clearInterval(messageInterval);
+                messageInterval = null;
+            }
+
+            if (currentChildWindow && !currentChildWindow.closed) {
+                currentChildWindow.close();
+            }
+            
+            // Buka tab baru
             currentChildWindow = window.open(url, '_blank');
+            
+            // Hentikan fungsi jika popup diblokir (biasa di mobile)
+            if (!currentChildWindow || currentChildWindow.closed || typeof currentChildWindow.closed == 'undefined') {
+                alert("Mohon izinkan popup (Pop-ups) untuk membuka tab baru.");
+                return;
+            }
+
             let attempts = 0;
-            const interval = setInterval(() => {
-                if(currentChildWindow.closed || attempts > 15) { clearInterval(interval); return; }
-                currentChildWindow.postMessage('BUKA_AILABS', '*'); attempts++;
+            // Gunakan variabel yang baru dideklarasikan
+            messageInterval = setInterval(() => {
+                if(currentChildWindow.closed || attempts > 15) { 
+                    clearInterval(messageInterval); 
+                    messageInterval = null;
+                    return; 
+                }
+                try {
+                    currentChildWindow.postMessage('BUKA_AILABS', '*'); 
+                } catch(e) {
+                    // Abaikan error CORS sementara jika ada
+                }
+                attempts++;
             }, 1000); 
         }
 
         function openApp(url, title) {
             const m = document.getElementById('app-viewer-modal'), i = document.getElementById('app-iframe'), l = document.getElementById('viewer-loader');
             document.getElementById('viewer-title').textContent = title;
-            document.getElementById('btn-open-new-tab').onclick = () => openAppInNewTab(url, title);
-            m.classList.remove('hidden'); m.classList.add('flex'); i.style.opacity = '0'; l.style.display = 'flex'; i.src = url;
-            i.onload = () => { l.style.display = 'none'; i.style.opacity = '1'; try{ i.contentWindow.postMessage('BUKA_AILABS','*'); }catch(e){} };
+            
+            // Setup tombol tab baru
+            document.getElementById('btn-open-new-tab').onclick = () => {
+                closeApp(); // Tutup modal saat membuka tab baru untuk menghemat memori di HP
+                openAppInNewTab(url, title);
+            };
+            
+            // Tampilkan modal
+            m.classList.remove('hidden'); 
+            m.classList.add('flex'); 
+            i.style.opacity = '0'; 
+            l.style.display = 'flex'; 
+            
+            // Set sumber iframe
+            i.src = url;
+            
+            // Handler saat iframe selesai dimuat
+            i.onload = () => { 
+                l.style.display = 'none'; 
+                i.style.opacity = '1'; 
+                try { 
+                    // Pastikan domain target sama atau diizinkan menerima pesan
+                    i.contentWindow.postMessage('BUKA_AILABS', '*'); 
+                } catch(e) {
+                    console.error("Gagal mengirim pesan ke Iframe:", e);
+                } 
+            };
         }
+
         function closeApp() {
-            document.getElementById('app-viewer-modal').classList.add('hidden');
-            document.getElementById('app-viewer-modal').classList.remove('flex');
-            document.getElementById('app-iframe').src = ''; 
+            const m = document.getElementById('app-viewer-modal');
+            const i = document.getElementById('app-iframe');
+            
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+            
+            // Bersihkan src iframe untuk menghentikan proses di background
+            i.src = 'about:blank'; 
+            
+            // Hapus event listener onload lama agar tidak menumpuk
+            i.onload = null;
         }
 
         // =========================================================================
