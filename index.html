@@ -279,17 +279,18 @@
                 {t:"Ailabs Cartoon", d:"Style kartun instan.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9hZjU1MThlYTk3MDY="},
                 {t:"Restore Image", d:"Perbaiki foto lama.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9jOTc5YTM0MTdkMjk="},
                 {t:"Auto Caption", d:"Subtitle otomatis.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9hOTk0ZmU3MDkxNDg="},
-                {t:"Elite Prompt Lab", d:"Optimasi teks AI.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS82NjNiNDJmMDAzZDA="},
+                {t:"Reels Analizer", d:"Optimasi teks AI.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9jZTg2N2M2YThjMTc=", n: true},
                 {t:"Ailabs Flux", d:"Generasi gambar ultra.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9jYjdlMTAxMmY0Zjk="},
                 {t:"Ailabs Ramadhan", d:"Edisi spesial berkah.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9mYTViZDAwZGU1ZGQ="},
                 {t:"Morp", d:"Transformasi visual halus.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9hZGNjMDhlZTlhOGY="},
-                {t:"Ailabs Storyboard", d:"Visualisasi alur cerita.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS84ZGVmMGZmMDg3ODY="},
+                {t:"Template", d:"Template prompt khusus.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS81OGM1OGVhZDM2OTk=", n: true},
                 {t:"DNA", d:"Analisis struktur data AI.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS85NGE0OTMyMDhjOTE="}
             ],
             x: [
                 {t:"DNA PRO", d:"Versi pro analisis struktur data.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9kZmY4NGFlZWE0MjY="},
                 {t:"Ailabs Storyboard Pro", d:"Versi pro visualisasi alur.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS8yZjcwYTNiYTA5Y2I="},
-                {t:"Ailabs Scene Pro", d:"Visual scene generator.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS8wNjE1ODEzMDNiYTQ="}
+                {t:"Ailabs Scene Pro", d:"Visual scene generator.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS8wNjE1ODEzMDNiYTQ="},
+                {t:"Ailabs Storyboard Pro V2", d:"Versi pro storyboard V2.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS8zZGQ5YzdlYzc5NjY=", n: true}
             ],
             k: [
                 {t:"Manipulasi Audio", u:"aHR0cHM6Ly9hdWRpby1tb2RpZmllci52ZXJjZWwuYXBwLw=="},
@@ -319,7 +320,10 @@
             // Render Apps
             document.getElementById('grid-apps').innerHTML = _sd.a.map(i => 
                 `<a href="#" onclick="${createLink(_d(i.u), i.t)}; return false;" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group ${i.b||''}">
-                    <h3 class="text-[13px] md:text-2xl font-bold text-white group-hover:text-neonBlue transition-colors mb-1 md:mb-2">${i.t}</h3>
+                    <div class="flex items-center gap-2 mb-1 md:mb-2 flex-wrap">
+                        <h3 class="text-[13px] md:text-2xl font-bold text-white group-hover:text-neonBlue transition-colors">${i.t}</h3>
+                        ${i.n ? '<span class="bg-neonOrange text-black text-[8px] md:text-[10px] px-2 py-0.5 rounded font-bold tracking-wider animate-pulse shadow-[0_0_8px_rgba(255,153,0,0.8)]">NEW</span>' : ''}
+                    </div>
                     <p class="text-[9px] md:text-sm text-gray-200 leading-relaxed font-medium">${i.d}</p>
                 </a>`
             ).join('');
@@ -328,7 +332,10 @@
             document.getElementById('grid-apps2').innerHTML = _sd.x.map(i => 
                 `<a href="#" onclick="${createLink(_d(i.u), i.t)}; return false;" class="fire-card-wrapper group">
                     <div class="fire-card-inner p-3 md:p-6 transition-all duration-300 group-hover:bg-[#1a0b2e]">
-                        <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonOrange transition-colors relative z-10">${i.t}</h3>
+                        <div class="flex items-center gap-2 mb-1 md:mb-2 flex-wrap relative z-10">
+                            <h3 class="text-[13px] md:text-xl font-bold text-white group-hover:text-neonOrange transition-colors">${i.t}</h3>
+                            ${i.n ? '<span class="bg-neonBlue text-black text-[8px] md:text-[10px] px-2 py-0.5 rounded font-bold tracking-wider animate-pulse shadow-[0_0_8px_rgba(0,255,213,0.8)]">NEW</span>' : ''}
+                        </div>
                         <p class="text-[9px] md:text-xs text-gray-200 font-medium relative z-10">${i.d}</p>
                     </div>
                 </a>`
