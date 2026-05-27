@@ -569,6 +569,7 @@
         });
 
         // --- HARDCORE ANTI-INSPECT ELEMENT ---
+        // (Klik kanan dan jalan pintas keyboard tetap dinonaktifkan untuk keamanan dasar)
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('keydown', function(e) {
             if(e.key==='F12'||e.keyCode===123) { e.preventDefault(); return false; }
@@ -578,17 +579,10 @@
             if(e.ctrlKey && e.shiftKey && (e.key==='C'||e.key==='c'||e.keyCode===67)) { e.preventDefault(); return false; }
         });
 
-        // Jebakan DevTools (Debugger Loop)
-        setInterval(function() {
-            const before = new Date().getTime();
-            debugger; // Akan freeze jika Inspect Element terbuka
-            const after = new Date().getTime();
-            if (after - before > 100) {
-                // Jika DevTools terbuka, hapus seluruh isi layar
-                document.body.innerHTML = "<div style='color:#00ffd5; font-family:monospace; text-align:center; padding-top:20%; font-size:20px;'>AKSES KEAMANAN DIBLOKIR. DEVTOOLS TERDETEKSI.</div>";
-                window.location.reload();
-            }
-        }, 1500);
+        // NOTE: Fitur Debugger Loop (setInterval > 100ms) telah dihapus dari sini.
+        // Fitur tersebut sering memicu 'false-positive' di perangkat seluler karena throttling prosesor 
+        // yang menyebabkan aplikasi me-reload/menutup dengan sendirinya.
+
     </script>
 </body>
 </html>
