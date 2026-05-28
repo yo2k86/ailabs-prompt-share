@@ -306,22 +306,24 @@
         const _d = (s) => atob(s); // Fungsi dekoder
 
         // =========================================================================
-        // JAVASCRIPT FALLBACK: MEMAKSA LINK TERBUKA DI HP APAPUN
+        // JAVASCRIPT FIX: MENCEGAH BLANK WHITE SCREEN DI MOBILE / IN-APP BROWSER
         // =========================================================================
         function handleLinkClick(event, url) {
             event.preventDefault(); // Mencegah browser melakukan blokir standar
             
+            // Deteksi apakah user menggunakan HP
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
             try {
-                // Mencoba membuka di tab baru (Metode utama)
-                let newWin = window.open(url, '_blank');
-                
-                // Jika browser HP (atau In-App Browser seperti IG/TikTok) memblokir tab baru
-                if (!newWin || newWin.closed || typeof newWin.closed === 'undefined' || newWin.outerWidth === 0) {
-                    // Paksa buka di tab yang sama saat ini (Fallback Method)
+                if (isMobile) {
+                    // Jika di HP/Mobile: Paksa buka di tab yang sama (menghindari blank screen)
                     window.location.href = url;
+                } else {
+                    // Jika di PC/Desktop: Buka di tab baru
+                    window.open(url, '_blank', 'noopener,noreferrer');
                 }
             } catch (err) {
-                // Jika ada error keamanan WebView, paksa buka di tab yang sama
+                // Fallback darurat jika error
                 window.location.href = url;
             }
             return false;
