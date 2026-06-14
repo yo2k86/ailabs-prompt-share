@@ -285,7 +285,7 @@
                 {t:"DNA PRO", d:"Versi pro analisis struktur data.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9kZmY4NGFlZWE0MjY="},
                 {t:"Ailabs Storyboard Pro", d:"Versi pro visualisasi alur.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS8yZjcwYTNiYTA5Y2I="},
                 {t:"Ailabs Scene Pro", d:"Visual scene generator.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS8wNjE1ODEzMDNiYTQ="},
-                {t:"Ailabs Storyboard Pro V2", d:"Versi pro storyboard V2.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS8zZGQ5YzdlYzc5NjY=", n: true}
+                {t:"Ailabs Storyboard Pro V2", d:"Versi pro storyboard V2.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9lM2FjODI3OWM4Y2Y=", n: true}
             ],
             k: [
                 {t:"Manipulasi Audio", u:"aHR0cHM6Ly9hdWRpby1tb2RpZmllci52ZXJjZWwuYXBwLw=="},
@@ -473,7 +473,7 @@
         }
 
         // =========================================================================
-        // SECURITY & ANTI-HACKER TRAPS
+        // INITIALIZATION
         // =========================================================================
         let hasInteracted = false;
         const _pi = () => {
@@ -500,19 +500,6 @@
             if (sessionStorage.getItem('ai_secure_token') && sessionStorage.getItem('ailabs_email')) {
                 loginSuccess(sessionStorage.getItem('ailabs_email'), sessionStorage.getItem('ailabs_username'));
             }
-        });
-
-        // Tweak Anti-Inspect agar tidak memblokir tap di layar HP secara tidak sengaja
-        document.addEventListener('contextmenu', e => {
-            if (e.target.closest('a') || e.target.closest('button')) return; // Izinkan tap normal di HP
-            e.preventDefault();
-        });
-        document.addEventListener('keydown', function(e) {
-            if(e.key==='F12'||e.keyCode===123) { e.preventDefault(); return false; }
-            if(e.ctrlKey && e.shiftKey && (e.key==='I'||e.key==='i'||e.keyCode===73)) { e.preventDefault(); return false; }
-            if(e.ctrlKey && e.shiftKey && (e.key==='J'||e.key==='j'||e.keyCode===74)) { e.preventDefault(); return false; }
-            if(e.ctrlKey && (e.key==='U'||e.key==='u'||e.keyCode===85)) { e.preventDefault(); return false; }
-            if(e.ctrlKey && e.shiftKey && (e.key==='C'||e.key==='c'||e.keyCode===67)) { e.preventDefault(); return false; }
         });
 
     </script>
