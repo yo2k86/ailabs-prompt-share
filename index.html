@@ -3,505 +3,889 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ailabs Workspace</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Inter, Orbitron, & Fira Code -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    
+    <title>Ailabs Glass Workspace</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(rgba(10, 10, 15, 0.75), rgba(10, 10, 15, 0.75)), url("https://i.ibb.co.com/FLfrC2X8/logo.jpg") center/cover no-repeat fixed;
+            z-index: -2;
+        }
+
+        .hidden { display: none !important; }
+
+        /* --- LOGIN VIEW --- */
+        #login-view {
+            width: 100%; max-width: 400px; padding: 40px; border-radius: 32px; margin: auto;
+            background: rgba(10, 10, 15, 0.65); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 107, 125, 0.25); box-shadow: 0 25px 60px rgba(0,0,0,.7); text-align: center; z-index: 10;
+        }
+        #login-view img { width: 90px; height: 90px; border-radius: 25px; object-fit: cover; margin-bottom: 20px; border: 2px solid rgba(255, 107, 125, 0.4); box-shadow: 0 10px 25px rgba(255, 107, 125, 0.2); }
+        #login-view h2 { color: #fff; font-size: 26px; font-weight: 700; margin-bottom: 5px; text-shadow: 0 2px 8px rgba(0,0,0,0.9); }
+        #login-view p.subtitle { color: rgba(255, 255, 255, 0.6); font-size: 12px; margin-bottom: 30px; letter-spacing: 1px; }
+        
+        .input-group { position: relative; margin-bottom: 25px; }
+        .input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.5); font-size: 16px; }
+        .input-group input { width: 100%; padding: 15px 15px 15px 45px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; color: #fff; font-size: 14px; outline: none; transition: 0.3s; }
+        .input-group input:focus { border-color: #ff6b7d; background: rgba(0, 0, 0, 0.5); box-shadow: inset 0 0 10px rgba(255, 107, 125, 0.1); }
+        
+        #login-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, #ff6b7d, #ff3333); color: #fff; border: none; border-radius: 16px; font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px rgba(255, 51, 51, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        #login-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(255, 51, 51, 0.5); }
+        #login-error-msg { color: #ff6b7d; font-size: 12px; margin-top: 15px; font-weight: 500; background: rgba(255, 107, 125, 0.1); padding: 10px; border-radius: 10px; }
+
+        /* --- WRAPPER & GLASS PANELS --- */
+        .wrapper { display: flex; align-items: flex-start; justify-content: center; transition: .6s ease; opacity: 0; visibility: hidden; height: 90vh; max-height: 850px; position: absolute; }
+        .wrapper.open { opacity: 1; visibility: visible; animation: fadeIn 0.8s forwards; }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        .sidebar, .panel, .sub-panel {
+            position: relative; background: rgba(10, 10, 15, 0.65); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 107, 125, 0.25); box-shadow: 0 25px 60px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.05); border-radius: 32px;
+        }
+        .sidebar::before, .panel::before, .sub-panel::before {
+            content: ""; position: absolute; width: 220px; height: 120%; left: -120px; top: -20%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.05), transparent); transform: rotate(18deg); pointer-events: none;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar { width: 95px; height: 100%; border-radius: 25px; display: flex; flex-direction: column; align-items: center; padding: 28px 0; z-index: 2; }
+        .window-btns { display: flex; gap: 10px; margin-bottom: 30px; }
+        .window-btns span { width: 12px; height: 12px; border-radius: 50%; }
+        .green { background: #2cf95f; color: #2cf95f; } .red { background: #ff6b7d; color: #ff6b7d; } .yellow { background: #ffd93d; color: #ffd93d; }
+        
+        .logo { width: 62px; height: 62px; display: grid; place-items: center; margin-bottom: 35px; }
+        .logo button { width: 58px; height: 58px; border: none; outline: none; border-radius: 18px; cursor: pointer; background: rgba(255,255,255,.06); color: #fff; transition: .35s; }
+        .logo button:hover { transform: translateY(-4px); background: rgba(255,255,255,.12); box-shadow: 0 0 15px rgba(255,107,125,0.4); }
+        .line { width: 48px; height: 1px; background: rgba(255,255,255,.12); margin: 18px 0; }
+        
+        .mini-menu { list-style: none; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .mini-menu li { width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; color: rgba(255,255,255,.72); font-size: 22px; border-radius: 18px; cursor: pointer; transition: .35s; position: relative; }
+        .mini-menu li:hover { background: rgba(255,255,255,.08); color: #fff; transform: translateY(-3px); }
+        .mini-menu li.active { background: rgba(255,255,255,.10); color: #fff; box-shadow: inset 0 1px rgba(255,255,255,.18), 0 8px 18px rgba(0,0,0,.4); }
+        .mini-menu li.active::before { content: ""; position: absolute; left: -18px; width: 5px; height: 34px; border-radius: 20px; background: #ff6b7d; box-shadow: 0 0 12px rgba(255, 107, 125, 0.9); }
+        
+        .profile { margin-top: auto; margin-bottom: 10px; cursor: pointer; }
+        .profile img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,.18); transition: .35s; }
+        .profile img:hover { border-color: #ff6b7d; transform: scale(1.1); box-shadow: 0 0 15px rgba(255,107,125,0.4); }
+
+        /* --- PANEL 1 (CATEGORIES) --- */
+        .panel { width: 420px; height: 100%; padding: 28px; margin-left: 25px; overflow-y: auto; -ms-overflow-style: none; scrollbar-width: none; }
+        .panel::-webkit-scrollbar, .sub-panel::-webkit-scrollbar { display: none; }
+        .panel h1 { color: #fff; font-size: 32px; line-height: 1.2; margin-bottom: 10px; font-weight: 700; letter-spacing: .5px; text-shadow: 0 2px 8px rgba(0,0,0,0.9); }
+        
+        .account { position: relative; display: flex; align-items: center; gap: 16px; padding: 12px 16px; margin-top: 5px; margin-bottom: 25px; border-radius: 20px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 107, 125, 0.2); transition: .35s; }
+        .account img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255, 129, 129, 0.5); }
+        .account h3 { color: #fff; font-size: 15px; font-weight: 600; text-shadow: 0 2px 5px rgba(0,0,0,0.9); }
+        .account small { color: rgba(255,255,255,.7); font-size: 11px; display: block; }
+        .account .actions { margin-left: auto; display: flex; gap: 8px; }
+        .account .actions i { color: rgba(255, 107, 125, 0.8); font-size: 16px; padding: 8px; border-radius: 50%; background: rgba(255,255,255,0.05); transition: 0.3s; cursor: pointer; }
+        .account .actions i:hover { background: rgba(255, 107, 125, 0.3); color: #fff; transform: scale(1.1); }
+
+        .menu-title { color: rgba(255,255,255,.6); letter-spacing: 2px; font-size: 13px; font-weight: 500; display: block; margin-bottom: 10px; padding: 0 8px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+        .menu { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .menu li { height: 55px; display: flex; justify-content: space-between; align-items: center; padding: 0 18px; border-radius: 18px; color: rgba(255,255,255,.78); cursor: pointer; transition: .35s; position: relative; background: rgba(255,255,255,.03); border: 1px solid transparent; }
+        .menu li>div { display: flex; align-items: center; gap: 15px; }
+        .menu li i { font-size: 18px; }
+        .menu li span { font-size: 15px; font-weight: 500; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+        .menu li:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.1); color: #fff; transform: translateX(4px); }
+        .menu li.current { background: linear-gradient(90deg, rgba(255, 107, 125, 0.25), transparent); color: #fff; border-left: 4px solid #ff6b7d; border-top: 1px solid rgba(255, 107, 125, 0.1); border-bottom: 1px solid rgba(255, 107, 125, 0.1); }
+        .menu-badge { background: rgba(255, 255, 255, 0.1); font-size: 11px; padding: 2px 8px; border-radius: 12px; color: #fff; }
+        .menu li.current .menu-badge { background: #ff6b7d; }
+
+        /* --- STREAMING_CHUNK: Sub-panel styles --- */
+        .sub-panel-wrapper { width: 0; height: 100%; opacity: 0; visibility: hidden; overflow: hidden; transition: width .5s cubic-bezier(.22,1,.36,1), margin-left .5s, opacity .4s; }
+        .sub-panel-wrapper.active { width: 420px; margin-left: 25px; opacity: 1; visibility: visible; }
+        .sub-panel { width: 420px; height: 100%; padding: 28px; overflow-y: auto; }
+        .flex-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .flex-header h2 { color: #fff; font-size: 24px; font-weight: 700; text-shadow: 0 2px 8px rgba(0,0,0,0.9); }
+        
+        .header-actions { display: flex; gap: 8px; }
+        .btn-action { background: rgba(255,107,125,0.15); border: 1px solid rgba(255,107,125,0.3); color: #ff6b7d; width: 34px; height: 34px; border-radius: 12px; cursor: pointer; transition: 0.3s; display: grid; place-items: center; }
+        .btn-action:hover { background: #ff6b7d; color: #fff; transform: scale(1.1); box-shadow: 0 5px 15px rgba(255,107,125,0.4); }
+        .divider { width: 100%; height: 1px; background: rgba(255,255,255,.12); margin-bottom: 22px; margin-top: 8px; }
+
+        .app-list { display: flex; flex-direction: column; gap: 12px; }
+        .app-item { display: flex; align-items: center; gap: 15px; padding: 14px 16px; background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 18px; text-decoration: none; transition: 0.3s; cursor: pointer; position: relative; overflow: hidden; }
+        .app-item:hover { background: rgba(255, 107, 125, 0.15); border-color: rgba(255, 107, 125, 0.3); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .app-item::before { content: ''; position: absolute; left: 0; top: 0; width: 4px; height: 100%; background: #ff6b7d; transform: scaleY(0); transition: 0.3s; border-radius: 4px 0 0 4px; }
+        .app-item:hover::before { transform: scaleY(1); }
+        
+        .app-icon { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, rgba(255,107,125,0.4), rgba(255,51,51,0.1)); border: 1px solid rgba(255, 107, 125, 0.2); display: grid; place-items: center; color: #fff; font-size: 18px; flex-shrink: 0; text-shadow: 0 2px 5px rgba(0,0,0,0.5); overflow: hidden; }
+        .app-item:hover .app-icon { background: linear-gradient(135deg, rgba(255,107,125,0.8), rgba(255,51,51,0.4)); }
+        
+        .app-details { flex-grow: 1; }
+        .app-details h4 { color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 2px; display: flex; align-items: center; gap: 8px; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
+        .app-details p { color: rgba(255, 255, 255, 0.6); font-size: 11px; line-height: 1.4; }
+        
+        /* Admin controls inside app item */
+        .admin-controls { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); display: flex; gap: 6px; opacity: 0; transition: 0.3s; z-index: 10; }
+        .app-item:hover .admin-controls { opacity: 1; }
+        .admin-btn { width: 28px; height: 28px; border-radius: 8px; border: none; display: grid; place-items: center; cursor: pointer; color: #fff; font-size: 12px; transition: 0.3s; }
+        .btn-edit { background: rgba(255,255,255,0.15); }
+        .btn-edit:hover { background: rgba(255,255,255,0.3); }
+        .btn-delete { background: rgba(255, 107, 125, 0.5); }
+        .btn-delete:hover { background: #ff6b7d; }
+
+        .link-icon { color: rgba(255,255,255,0.2); font-size: 14px; transition: 0.3s; }
+        .app-item:hover .link-icon { color: #ff6b7d; transform: translate(2px, -2px); }
+
+        #admin-bulk-btn { margin-left: 8px; }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; z-index: 100; opacity: 0; visibility: hidden; transition: 0.3s; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-box { background: rgba(20, 20, 25, 0.85); border: 1px solid rgba(255, 107, 125, 0.3); border-radius: 24px; padding: 30px; width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transform: translateY(20px); transition: 0.4s; position: relative; }
+        .modal-overlay.active .modal-box { transform: translateY(0); }
+        
+        .modal-icon-top { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #ff6b7d, #ff3333); display: grid; place-items: center; font-size: 24px; color: white; margin: -60px auto 20px auto; box-shadow: 0 10px 20px rgba(255, 107, 125, 0.4); border: 4px solid rgba(20, 20, 25, 1); }
+        .modal-box h3 { color: #fff; margin-bottom: 20px; font-weight: 600; text-align: center; }
+        
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; color: rgba(255,255,255,0.7); font-size: 11px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .form-group input, .form-group select { width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'Poppins'; outline: none; transition: 0.3s; }
+        .form-group input:focus, .form-group select:focus { border-color: #ff6b7d; box-shadow: inset 0 0 10px rgba(255, 107, 125, 0.1); }
+        .form-group select option { background: #1a1a1a; color: white; }
+        
+        .modal-btns { display: flex; gap: 10px; margin-top: 25px; }
+        .btn-cancel { flex: 1; padding: 12px; background: rgba(255,255,255,0.1); border: none; border-radius: 12px; color: #fff; cursor: pointer; transition: 0.3s; font-family: 'Poppins'; }
+        .btn-cancel:hover { background: rgba(255,255,255,0.2); }
+        .btn-save { flex: 1; padding: 12px; background: linear-gradient(135deg, #ff6b7d, #ff3333); border: none; border-radius: 12px; color: #fff; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(255,107,125,0.4); font-family: 'Poppins'; }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255,107,125,0.6); }
+
+        #bulk-textarea { width: 100%; height: 150px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; padding: 12px; font-family: monospace; font-size: 11px; outline: none; resize: vertical; margin-bottom: 10px; }
+        #bulk-textarea:focus { border-color: #ffd93d; box-shadow: inset 0 0 10px rgba(255, 217, 61, 0.1); }
+        #bulk-status { font-size: 12px; text-align: center; margin-top: 10px; min-height: 18px; }
+        .text-success { color: #2cf95f; }
+        .text-error { color: #ff6b7d; }
+        .btn-warning { background: linear-gradient(135deg, #ffd93d, #ffa000); color: #000; box-shadow: 0 5px 15px rgba(255, 217, 61, 0.3); }
+        .btn-warning:hover { box-shadow: 0 10px 25px rgba(255, 217, 61, 0.5); }
+
+        /* Responsive */
+        @media(max-width:980px){
+            .wrapper { gap: 20px; }
+            .panel, .sub-panel-wrapper.active, .sub-panel { width: 340px; }
+            .panel, .sub-panel-wrapper.active { margin-left: 15px; }
+        }
+        @media(max-width:760px){
+            .wrapper { flex-direction: column; height: 100vh; padding: 15px; position: relative; gap: 15px; }
+            .sidebar { width: 100%; height: auto; padding: 15px 0; border-radius: 20px; flex-direction: row; justify-content: space-around; }
+            .sidebar .window-btns, .sidebar .line { display: none; }
+            .sidebar .logo { margin-bottom: 0; }
+            .mini-menu { flex-direction: row; justify-content: center; width: auto; gap: 20px; }
+            .mini-menu li.active::before { width: 34px; height: 5px; left: 50%; top: -10px; transform: translateX(-50%); }
+            .panel { width: 100%; height: 100%; margin-left: 0; flex-grow: 1; }
+            .sub-panel-wrapper { position: absolute; top: 95px; left: 15px; right: 15px; bottom: 15px; height: calc(100% - 110px); z-index: 10; }
+            .sub-panel-wrapper.active { width: calc(100% - 30px); margin-left: 0; }
+            .sub-panel { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PORTAL LOGIN -->
+    <div id="login-view">
+        <img src="https://i.ibb.co.com/FLfrC2X8/logo.jpg" alt="Ailabs Logo" onerror="this.src='https://placehold.co/100x100/ff6b7d/white?text=A'">
+        <h2>Ailabs Portal</h2>
+        <p class="subtitle">System Secure Login Required</p>
+        
+        <div class="input-group">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="login-email" placeholder="email@gmail.com" onkeypress="if(event.key === 'Enter') processLogin()">
+        </div>
+        
+        <button id="login-btn" onclick="processLogin()">
+            <i class="fa-solid fa-fingerprint"></i> Authenticate
+        </button>
+        
+        <p id="login-error-msg" class="hidden"></p>
+    </div>
+
+    <!-- MAIN WORKSPACE -->
+    <div class="wrapper" id="main-app">
+
+        <!-- COLLAPSED SIDEBAR -->
+        <aside class="sidebar">
+            <div class="window-btns">
+                <span class="green"></span>
+                <span class="red"></span>
+                <span class="yellow"></span>
+            </div>
+
+            <div class="logo">
+                <button id="toggle" title="Toggle Panel" onclick="handleLogoClick()">
+                    <img src="https://i.ibb.co.com/FLfrC2X8/logo.jpg" alt="Ailabs Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px;" onerror="this.src='https://placehold.co/100x100/ff6b7d/white?text=A'">
+                </button>
+            </div>
+
+            <div class="line"></div>
+
+            <ul class="mini-menu">
+                <!-- Kategori akan dirender secara otomatis dari database via JS -->
+            </ul>
+
+            <div class="profile" onclick="handleLogoClick()" title="Klik 3x untuk Admin Mode">
+                <img src="https://i.ibb.co.com/FLfrC2X8/logo.jpg" alt="Profile" id="sidebar-profile-img" onerror="this.src='https://placehold.co/100x100/333/white?text=U'">
+            </div>
+        </aside>
+
+        <!-- PANEL KATEGORI -->
+        <section class="panel">
+            <h1>Ailabs Workspace</h1>
+            
+            <div class="account">
+                <img src="https://i.ibb.co.com/FLfrC2X8/logo.jpg" alt="Account Avatar" id="panel-profile-img" onerror="this.src='https://placehold.co/100x100/333/white?text=U'">
+                <div>
+                    <h3 id="user-name-display">Loading...</h3>
+                    <small id="user-email-display">...</small>
+                </div>
+                <div class="actions">
+                    <i id="sync-btn" class="fa-solid fa-rotate" title="Sync Data Cloud" onclick="forceSync()"></i>
+                    <i class="fa-solid fa-right-from-bracket" title="Logout" onclick="handleLogout()"></i>
+                </div>
+            </div>
+
+            <span class="menu-title">KATEGORI</span>
+
+            <ul class="menu" id="category-menu">
+                <!-- Kategori akan dirender secara otomatis dari database via JS -->
+            </ul>
+        </section>
+
+        <!-- SUB-PANEL WADAH DAFTAR APLIKASI -->
+        <div class="sub-panel-wrapper" id="sub-panel-wrapper">
+            <section class="panel sub-panel">
+                <div class="flex-header">
+                    <h2 id="sub-panel-title">Applications</h2>
+                    <div class="header-actions">
+                        <button id="admin-bulk-btn" class="btn-action hidden" onclick="openBulkModal()" title="Bulk Import Data" style="color: #ffd93d; background: rgba(255, 217, 61, 0.15); border-color: rgba(255, 217, 61, 0.3);"><i class="fa-solid fa-file-import"></i></button>
+                        <button id="admin-add-btn" class="btn-action hidden" onclick="openAddModal()" title="Tambah Aplikasi"><i class="fa-solid fa-plus"></i></button>
+                        <button class="btn-action" onclick="closeSubPanel()" title="Tutup Panel"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+                <div class="divider" style="margin-top: 0;"></div>
+                
+                <div id="app-list" class="app-list">
+                    <!-- Aplikasi dirender di sini lewat JS -->
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- MODAL PASSWORD ADMIN -->
+    <div id="password-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-icon-top"><i class="fa-solid fa-user-shield"></i></div>
+            <h3>Admin Protocol</h3>
+            
+            <div class="form-group">
+                <input type="password" id="admin-password" placeholder="Enter System Code..." onkeypress="if(event.key === 'Enter') verifyPassword()" style="text-align: center; letter-spacing: 2px;">
+            </div>
+            
+            <p id="password-error" class="hidden" style="color: #ff6b7d; font-size: 12px; text-align: center; margin-top:-5px;">Akses Ditolak!</p>
+            
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="closePasswordModal()">Batal</button>
+                <button class="btn-save" onclick="verifyPassword()">Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TAMBAH/EDIT APLIKASI -->
+    <div id="add-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-icon-top"><i class="fa-solid fa-layer-group"></i></div>
+            <h3 id="modal-title">Add Interface</h3>
+            
+            <form id="add-app-form" onsubmit="handleAddApp(event)">
+                <input type="hidden" id="edit-app-id">
+                
+                <div class="form-group">
+                    <label>Application Name</label>
+                    <input type="text" id="app-name" required placeholder="E.g., Youtube">
+                </div>
+                <div class="form-group">
+                    <label>URL / Link Target</label>
+                    <input type="url" id="app-url" required placeholder="https://...">
+                </div>
+                
+                <!-- UBAH BAGIAN INI: Dari <select> menjadi <input list="..."> -->
+                <div class="form-group">
+                    <label>Category</label>
+                    <input type="text" id="app-category" list="category-list" required placeholder="Pilih atau ketik kategori baru...">
+                    <datalist id="category-list">
+                        <!-- Pilihan kategori dirender otomatis via JS -->
+                    </datalist>
+                </div>
+                <!-- AKHIR BAGIAN YANG DIUBAH -->
+
+                <div class="form-group">
+                    <label>Logo URL (Optional, Auto FontAwesome if empty)</label>
+                    <input type="url" id="app-logo" placeholder="https://image-url...">
+                </div>
+                
+                <div class="modal-btns">
+                    <button type="button" class="btn-cancel" onclick="closeAddModal()">Cancel</button>
+                    <button type="submit" class="btn-save" id="btn-save-app">Save App</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL BULK IMPORT -->
+    <div id="bulk-modal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 500px;">
+            <div class="modal-icon-top" style="background: linear-gradient(135deg, #ffd93d, #ffa000); box-shadow: 0 10px 20px rgba(255, 217, 61, 0.4);"><i class="fa-solid fa-database"></i></div>
+            <h3>Bulk Import JSON</h3>
+            
+            <p style="color: rgba(255,255,255,0.7); font-size: 11px; text-align: center; margin-bottom: 15px;">
+                Paste array JSON di bawah ini. Duplikat (berdasarkan URL) akan diabaikan.
+            </p>
+
+            <textarea id="bulk-textarea" placeholder='[
+  {
+    "name": "App Baru",
+    "url": "https://...",
+    "category": "apps",
+    "logo": ""
+  }
+]'></textarea>
+            
+            <div id="bulk-status"></div>
+
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="closeBulkModal()">Tutup</button>
+                <button class="btn-save btn-warning" id="btn-process-bulk" onclick="processBulkImport()">Proses Import</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        tech: ['Orbitron', 'sans-serif'],
-                        mono: ['Fira Code', 'monospace'],
-                    },
-                    colors: {
-                        neonBlue: '#00ffd5',
-                        neonOrange: '#FF9900',
-                        deepDark: '#050110',
-                        accentPurple: '#7c3aed'
-                    },
-                    animation: {
-                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'glow-pulse': 'glowPulse 2s infinite',
-                        'float': 'float 6s ease-in-out infinite',
-                        'neon-flicker': 'flicker 3s linear infinite',
-                    },
-                    keyframes: {
-                        glowPulse: {
-                            '0%, 100%': { boxShadow: '0 0 5px #00ffd5', filter: 'brightness(1)' },
-                            '50%': { boxShadow: '0 0 20px #00ffd5', filter: 'brightness(1.2)' },
-                        },
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
-                        },
-                        flicker: {
-                             '0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100%': {
-                                opacity: 0.99,
-                                filter: 'drop-shadow(0 0 1px rgba(0,255,213,1))'
-                            },
-                            '20%, 21.999%, 63%, 63.999%, 65%, 69.999%': {
-                                opacity: 0.4,
-                                filter: 'none'
+        // Endpoint Google Script
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwgYCCYXKE1RPLdUCeq3Lv7rqGaOPkl19P9LmsiXDFuAWNpgtlHI2-NWoJ85v10QuDVOw/exec";
+        
+        // PENTING BROW: Ganti link di bawah ini dengan URL DEPLOY YANG BARU dari Google Script!
+        const APPS_DB_URL = "https://script.google.com/macros/s/AKfycbzRxycito28jUjQeCHIMEEfHtOFa6LGBtReLv01WX2-mFbrq1MfO0QWXYCoF0l1dYBgsA/exec"; 
+        
+        let isAdmin = false;
+        let clickCount = 0;
+        let clickTimer;
+        let currentCategory = 'apps';
+        
+        // KONFIGURASI KATEGORI DASAR (Otomatis Handle Kategori Baru)
+        const categoryConfig = {
+            'apps': { title: 'Applications', icon: 'fa-layer-group' },
+            'xpro': { title: 'X-Pro Edition', icon: 'fa-fire' },
+            'toolkit': { title: 'Toolkit', icon: 'fa-wrench' },
+            'guides': { title: 'Guides & Tutorials', icon: 'fa-book-open' }
+        };
+
+        // TAMBAHKAN BARIS INI: Atur urutan kategori sesuka Anda di sini
+        const CATEGORY_ORDER = ['apps', 'xpro', 'toolkit', 'guides'];
+
+        function getCategoryInfo(catKey) {
+            if(categoryConfig[catKey]) return categoryConfig[catKey];
+            // Jika ada kategori baru dari spreadsheet, rapikan teks dan beri ikon default folder
+            let title = catKey.split(/[-_ ]/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            return { title: title, icon: 'fa-folder-open' };
+        }
+        
+        // DAFTAR 27 APLIKASI PERMANEN
+        const DEFAULT_APPS = [
+            { id: "app_1", name: "AIlabs Voice Over V2", url: "https://gemini.google.com/share/8d40127f7175", category: "apps", logo: "" },
+            { id: "app_2", name: "Ailabs UMKM", url: "https://gemini.google.com/share/49a52a6c4734", category: "apps", logo: "" },
+            { id: "app_3", name: "Ailabs Affiliate", url: "https://gemini.google.com/share/3cee1998a001", category: "apps", logo: "" },
+            { id: "app_4", name: "Ailabs Cartoon", url: "https://gemini.google.com/share/af5518ea9706", category: "apps", logo: "" },
+            { id: "app_5", name: "Restore Image", url: "https://gemini.google.com/share/c979a3417d29", category: "apps", logo: "" },
+            { id: "app_6", name: "Auto Caption", url: "https://gemini.google.com/share/a994fe709148", category: "apps", logo: "" },
+            { id: "app_7", name: "Reels Analizer", url: "https://gemini.google.com/share/ce867c6a8c17", category: "apps", logo: "" },
+            { id: "app_8", name: "Ailabs Flux", url: "https://gemini.google.com/share/cb7e1012f4f9", category: "apps", logo: "" },
+            { id: "app_9", name: "Ailabs Ramadhan", url: "https://gemini.google.com/share/fa5bd00de5dd", category: "apps", logo: "" },
+            { id: "app_10", name: "Morp", url: "https://gemini.google.com/share/adcc08ee9a8f", category: "apps", logo: "" },
+            { id: "app_11", name: "Template", url: "https://gemini.google.com/share/58c58ead3699", category: "apps", logo: "" },
+            { id: "app_12", name: "DNA", url: "https://gemini.google.com/share/94a493208c91", category: "apps", logo: "" },
+            { id: "app_13", name: "DNA PRO", url: "https://gemini.google.com/share/dff84aeea426", category: "xpro", logo: "" },
+            { id: "app_14", name: "Ailabs Storyboard Pro", url: "https://gemini.google.com/share/2f70a3ba09cb", category: "xpro", logo: "" },
+            { id: "app_15", name: "Ailabs Scene Pro", url: "https://gemini.google.com/share/061581303ba4", category: "xpro", logo: "" },
+            { id: "app_16", name: "Ailabs Storyboard Pro V2", url: "https://gemini.google.com/share/e3ac8279c8cf", category: "xpro", logo: "" },
+            { id: "app_17", name: "Manipulasi Audio", url: "https://audio-modifier.vercel.app/", category: "toolkit", logo: "" },
+            { id: "app_18", name: "Ailabs Capcut", url: "https://ailabs-cc.vercel.app/", category: "toolkit", logo: "" },
+            { id: "app_19", name: "EncodeBase64", url: "https://gemini.google.com/share/520c6663d2a0", category: "toolkit", logo: "" },
+            { id: "app_20", name: "WM Remover", url: "https://gemini.google.com/share/01704ae5fbbf", category: "toolkit", logo: "" },
+            { id: "app_21", name: "Music Mastering", url: "https://masteraudio.pro", category: "toolkit", logo: "" },
+            { id: "app_22", name: "Suno Style", url: "https://gemini.google.com/share/6a3f36032542", "category": "toolkit", logo: "" },
+            { id: "app_23", name: "Upscale Image", url: "https://upscale-image.vercel.app/", category: "toolkit", logo: "" },
+            { id: "app_24", name: "Ailabs Speed", url: "https://ailabs-speed.vercel.app/", category: "toolkit", logo: "" },
+            { id: "app_25", name: "Media Forge", "url": "https://gemini.google.com/share/a8f284a49e0d", "category": "toolkit", logo: "" },
+            { id: "app_26", name: "Desain Cover AI", "url": "https://gemini.google.com/share/b6ce96b95d5a", "category": "guides", logo: "" },
+            { id: "app_27", name: "42 Camera Movements", "url": "https://aishotstudio.com/42-camera-movements-ai-prompts/", "category": "guides", logo: "" }
+        ];
+
+        let allApps = [...DEFAULT_APPS];
+
+        // Inisialisasi Auth
+        function initAuth() {
+            const savedUser = localStorage.getItem('ailabsSession');
+            if (savedUser) {
+                const user = JSON.parse(savedUser);
+                showMainApp(user);
+            } else {
+                document.getElementById('login-view').classList.remove('hidden');
+            }
+        }
+
+        async function processLogin() {
+            const emailInput = document.getElementById('login-email').value.trim();
+            const btn = document.getElementById('login-btn');
+            const errorMsg = document.getElementById('login-error-msg');
+
+            if (!emailInput) {
+                errorMsg.textContent = "Harap masukkan Gmail terlebih dahulu!";
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
+            errorMsg.classList.add('hidden');
+
+            try {
+                const response = await fetch(`${GAS_URL}?email=${encodeURIComponent(emailInput)}`);
+                const responseText = await response.text();
+                const data = JSON.parse(responseText);
+
+                if (data.success) {
+                    const userData = { email: data.email, username: data.username };
+                    localStorage.setItem('ailabsSession', JSON.stringify(userData));
+                    showMainApp(userData);
+                } else {
+                    errorMsg.textContent = data.message || "Akses ditolak oleh database.";
+                    errorMsg.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorMsg.textContent = "Gagal terhubung ke database. Cek deploy Google Script (Anyone).";
+                errorMsg.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-fingerprint"></i> Authenticate';
+            }
+        }
+
+        function showMainApp(user) {
+            document.getElementById('login-view').classList.add('hidden');
+            const mainApp = document.getElementById('main-app');
+            mainApp.classList.remove('hidden');
+            setTimeout(() => mainApp.classList.add('open'), 100);
+            
+            document.getElementById('user-name-display').textContent = user.username || "Ailabs User";
+            document.getElementById('user-email-display').textContent = user.email;
+            
+            loadApps();
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('ailabsSession');
+            location.reload();
+        }
+
+        async function loadApps() {
+            // 1. Ambil Cache Lokal (Menggunakan kunci baru v5 agar mengabaikan cache rusak lama)
+            const savedApps = localStorage.getItem('ailabs_v5_apps');
+            if (savedApps) {
+                allApps = JSON.parse(savedApps);
+            }
+            
+            updateCounts();
+            if(document.getElementById('sub-panel-wrapper').classList.contains('active')) renderApps(currentCategory);
+
+            // 2. Tarik Data dari Cloud & Gabungkan Otomatis
+            if (APPS_DB_URL !== "") {
+                const syncBtn = document.getElementById('sync-btn');
+                if(syncBtn) syncBtn.classList.add('fa-spin');
+                
+                try {
+                    const response = await fetch(APPS_DB_URL + "?action=getApps");
+                    const textData = await response.text();
+                    
+                    if (!textData.trim().startsWith('<')) {
+                        const data = JSON.parse(textData);
+                        if (data.success) {
+                            let cloudApps = data.apps || [];
+                            let needCloudUpdate = false;
+
+                            // LOGIKA PINTAR: Cek apakah ke-27 aplikasi ini sudah ada di Spreadsheet
+                            DEFAULT_APPS.forEach(defApp => {
+                                // Cari berdasarkan URL, abaikan format huruf besar/kecil
+                                const exists = cloudApps.some(ca => (ca.url || ca.u || "").toLowerCase() === defApp.url.toLowerCase());
+                                if (!exists) {
+                                    cloudApps.push(defApp); // Masukkan ke dalam daftar
+                                    needCloudUpdate = true; // Tandai bahwa Spreadsheet harus diupdate!
+                                }
+                            });
+
+                            allApps = cloudApps;
+                            localStorage.setItem('ailabs_v5_apps', JSON.stringify(allApps));
+                            updateCounts();
+                            if(document.getElementById('sub-panel-wrapper').classList.contains('active')) renderApps(currentCategory);
+
+                            // Jika ternyata di Spreadsheet datanya kurang dari 27, script otomatis simpan sisanya!
+                            if (needCloudUpdate) {
+                                console.log("Mensinkronkan 27 aplikasi utama ke Spreadsheet...");
+                                saveApps();
                             }
                         }
                     }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        body {
-            background: #050110 radial-gradient(circle at center, #1a0b2e 0%, #050110 100%); 
-            overflow-x: hidden;
-            text-shadow: 0 2px 8px rgba(0,0,0,1); 
-            color: white;
-        }
-
-        #bg-video {
-            position: fixed; top: 50%; left: 50%; min-width: 100%; min-height: 100%; width: auto; height: auto;
-            z-index: -2; transform: translateX(-50%) translateY(-50%); object-fit: cover; opacity: 0.8; 
-        }
-
-        /* MATIKAN VIDEO DI MOBILE UNTUK MENCEGAH CRASH */
-        @media (max-width: 768px) {
-            #bg-video { display: none !important; }
-            body { background: linear-gradient(135deg, #050110 0%, #1a0b2e 50%, #050110 100%); }
-        }
-
-        .bg-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 15% 15%, rgba(124, 58, 237, 0.05) 0%, transparent 50%),
-                        radial-gradient(circle at 85% 85%, rgba(255, 153, 0, 0.05) 0%, transparent 50%), rgba(0, 0, 0, 0.1); 
-            z-index: -1;
-        }
-
-        /* OPTIMASI GLASSMORPHISM: BLUR DIMATIKAN DI MOBILE (Hanya Desktop) */
-        .glass-panel {
-            background: rgba(15, 10, 25, 0.85); /* Solid color untuk fallback HP */
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-top: 1px solid rgba(255, 255, 255, 0.2); 
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-        }
-        @media (min-width: 768px) {
-            .glass-panel {
-                background: rgba(10, 10, 15, 0.15); 
-                backdrop-filter: blur(8px); 
-                -webkit-backdrop-filter: blur(8px);
+                } catch (err) { console.warn("Info Cloud:", err.message); }
+                finally { if(syncBtn) syncBtn.classList.remove('fa-spin'); }
             }
         }
 
-        /* Tabs Styles */
-        .tab-btn {
-            position: relative; padding: 10px 14px; font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: 0.65rem;
-            letter-spacing: 1px; text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.2), 0px 2px 0px rgba(0, 0, 0, 0.8), 0px 3px 2px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); color: rgba(255, 255, 255, 0.6); background: rgba(0, 0, 0, 0.4); 
-            border-top: 1px solid rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.1); border-right: 1px solid rgba(255, 255, 255, 0.05);
-            border-left: 3px solid transparent; border-radius: 16px 4px 16px 4px; display: flex; align-items: center; justify-content: center;
-            text-align: center; flex: 1; min-width: 140px; max-width: 250px; gap: 8px; box-shadow: 2px 4px 10px rgba(0,0,0,0.4);
-        }
-        @media (min-width: 768px) { .tab-btn { padding: 12px 18px; font-size: 0.75rem; letter-spacing: 2px; min-width: 180px; } }
-        @media (min-width: 768px) { .tab-btn.active { animation: flicker 4s linear infinite; } }
-
-        /* Specific Tabs */
-        #tab-apps { border-left-color: rgba(0, 255, 213, 0.4); color: rgba(0, 255, 213, 0.9); }
-        #tab-apps:hover { color: #00ffd5; border-left-color: #00ffd5; background: rgba(0, 255, 213, 0.1); box-shadow: 0 0 10px rgba(0, 255, 213, 0.3); transform: translateY(-2px); }
-        #tab-apps.active { color: #ffffff; border-left-width: 4px; border-left-color: #00ffd5; background: rgba(0, 255, 213, 0.15); box-shadow: 0 0 15px rgba(0, 255, 213, 0.5), inset 0 0 10px rgba(0, 255, 213, 0.3); text-shadow: 0 1px 0 #00cca0, 0 2px 0 #00997a, 0 3px 0 #006652, 0 4px 5px rgba(0, 255, 213, 0.8), 0 0 10px rgba(0, 255, 213, 1); transform: translateY(1px); }
-
-        #tab-apps2 { padding: 2px !important; border: none !important; background: transparent !important; overflow: hidden; position: relative; border-radius: 18px 6px 18px 6px !important; box-shadow: none; }
-        #tab-apps2::before { content: ''; position: absolute; top: 50%; left: 50%; width: 250%; height: 250%; background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 240deg, #ff0000 280deg, #ff8c00 320deg, #ffff00 360deg); animation: spin-fire 3s linear infinite; transform: translate(-50%, -50%); z-index: 0; will-change: transform; }
-        .fire-tab-inner { position: relative; z-index: 1; background: rgba(10, 5, 20, 0.9); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; border-radius: 16px 4px 16px 4px !important; padding: 8px 10px; color: rgba(255, 69, 0, 0.9); transition: all 0.3s ease; text-align: center; gap: 8px; }
-        @media (min-width: 768px) { .fire-tab-inner { padding: 10px 16px; } }
-        #tab-apps2:hover .fire-tab-inner { background: rgba(255, 69, 0, 0.1); color: #ff8c00; }
-        #tab-apps2.active .fire-tab-inner { background: rgba(255, 69, 0, 0.2); color: #ffffff; box-shadow: inset 0 0 10px rgba(255, 69, 0, 0.3); text-shadow: 0 1px 0 #cc3700, 0 2px 0 #992900, 0 3px 0 #661c00, 0 4px 5px rgba(255, 69, 0, 0.8), 0 0 10px rgba(255, 69, 0, 1); }
-
-        #tab-toolkit { border-left-color: rgba(234, 179, 8, 0.4); color: rgba(250, 204, 21, 0.9); }
-        #tab-toolkit:hover { color: #fef08a; border-left-color: #facc15; background: rgba(234, 179, 8, 0.1); box-shadow: 0 0 10px rgba(234, 179, 8, 0.3); transform: translateY(-2px); }
-        #tab-toolkit.active { color: #ffffff; border-left-width: 4px; border-left-color: #eab308; background: rgba(234, 179, 8, 0.2); box-shadow: 0 0 15px rgba(234, 179, 8, 0.6), inset 0 0 10px rgba(234, 179, 8, 0.3); text-shadow: 0 1px 0 #a16207, 0 2px 0 #854d0e, 0 3px 0 #713f12, 0 4px 5px rgba(234, 179, 8, 0.8), 0 0 10px rgba(234, 179, 8, 1); transform: translateY(1px); }
-
-        #tab-tutorial { border-left-color: rgba(255, 153, 0, 0.4); color: rgba(255, 153, 0, 0.9); }
-        #tab-tutorial:hover { color: #ffedd5; border-left-color: #FF9900; background: rgba(255, 153, 0, 0.1); box-shadow: 0 0 10px rgba(255, 153, 0, 0.3); transform: translateY(-2px); }
-        #tab-tutorial.active { color: #ffffff; border-left-width: 4px; border-left-color: #f97316; background: rgba(255, 153, 0, 0.2); box-shadow: 0 0 15px rgba(255, 153, 0, 0.6), inset 0 0 10px rgba(255, 153, 0, 0.3); text-shadow: 0 1px 0 #c2410c, 0 2px 0 #9a3412, 0 3px 0 #7c2d12, 0 4px 5px rgba(255, 153, 0, 0.8), 0 0 10px rgba(255, 153, 0, 1); transform: translateY(1px); }
-
-        #tab-camera { border-left-color: rgba(16, 185, 129, 0.4); color: rgba(52, 211, 153, 0.9); }
-        #tab-camera:hover { color: #a7f3d0; border-left-color: #34d399; background: rgba(16, 185, 129, 0.1); box-shadow: 0 0 10px rgba(16, 185, 129, 0.3); transform: translateY(-2px); }
-        #tab-camera.active { color: #ffffff; border-left-width: 4px; border-left-color: #10b981; background: rgba(16, 185, 129, 0.2); box-shadow: 0 0 15px rgba(16, 185, 129, 0.6), inset 0 0 10px rgba(16, 185, 129, 0.3); text-shadow: 0 1px 0 #047857, 0 2px 0 #065f46, 0 3px 0 #064e3b, 0 4px 5px rgba(16, 185, 129, 0.8), 0 0 10px rgba(16, 185, 129, 1); transform: translateY(1px); }
-
-        /* Card Styles */
-        .app-card { background: rgba(0, 0, 0, 0.4); border: 2px solid rgba(0, 255, 213, 0.3); box-shadow: 0 0 15px rgba(0, 255, 213, 0.1); transition: all 0.4s ease; position: relative; overflow: hidden; cursor: pointer; display: block; z-index: 10; pointer-events: auto; }
-        .app-card:hover { transform: translateY(-5px); background: rgba(0, 255, 213, 0.1); border-color: #00ffd5; box-shadow: 0 0 30px rgba(0, 255, 213, 0.4), inset 0 0 10px rgba(0, 255, 213, 0.1); }
-        
-        .tutorial-card, .framework-card { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 153, 0, 0.3); transition: all 0.3s ease; display: flex; flex-direction: column; z-index: 10; pointer-events: auto; }
-        .tutorial-card:hover, .framework-card:hover { border-color: #FF9900; box-shadow: 0 0 20px rgba(255, 153, 0, 0.2); transform: translateY(-4px); }
-
-        /* Custom Fire Card Style - OPTIMIZED FOR MOBILE GPU */
-        .fire-card-wrapper { position: relative; overflow: hidden; border-radius: 1rem; padding: 2px; box-shadow: 0 0 15px rgba(255, 69, 0, 0.1); transition: all 0.4s ease; cursor: pointer; display: block; z-index: 10; pointer-events: auto; }
-        .fire-card-wrapper:hover { transform: translateY(-5px); box-shadow: 0 0 30px rgba(255, 69, 0, 0.5); }
-        .fire-card-wrapper::before { content: ''; position: absolute; top: 50%; left: 50%; width: 250%; height: 250%; background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 240deg, #ff0000 280deg, #ff8c00 320deg, #ffff00 360deg); animation: spin-fire 2.5s linear infinite; transform: translate(-50%, -50%); z-index: 0; will-change: transform; }
-        .fire-card-inner { position: relative; z-index: 1; background: #0a0514; border-radius: calc(1rem - 2px); height: 100%; }
-        @keyframes spin-fire { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
-        
-        .fire-banner-wrapper { position: relative; overflow: hidden; border-radius: 0.75rem; padding: 2px; box-shadow: 0 0 20px rgba(255, 69, 0, 0.3); margin-bottom: 1.5rem; }
-        .fire-banner-wrapper::before { content: ''; position: absolute; top: 50%; left: 50%; width: 250%; height: 250%; min-width: 800px; min-height: 800px; background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, transparent 240deg, #ff0000 280deg, #ff8c00 320deg, #ffff00 360deg); animation: spin-fire 4s linear infinite; transform: translate(-50%, -50%); z-index: 0; will-change: transform; }
-        .fire-banner-inner { position: relative; z-index: 1; background: #0a0514; border-radius: calc(0.75rem - 2px); padding: 12px 20px; display: flex; align-items: center; width: 100%; }
-
-        .v-bar { width: 4px; background: #00ffd5; border-radius: 2px 2px 0 0; box-shadow: 0 0 5px #00ffd5; transition: height 0.08s ease; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 255, 213, 0.5); }
-    </style>
-</head>
-<body class="text-gray-100 min-h-screen flex items-center justify-center p-2 md:p-4 selection:bg-neonOrange selection:text-black">
-
-    <video id="bg-video" autoplay loop muted playsinline>
-        <source src="background-video.mp4" type="video/mp4">
-    </video>
-    <audio id="bg-audio" loop crossorigin="anonymous"><source src="background-music.mp3" type="audio/mpeg"></audio>
-    <div class="bg-overlay"></div>
-
-    <!-- 1. LOGIN PAGE -->
-    <div id="login-page" class="w-full max-w-md relative z-10 px-2">
-        <div class="glass-panel rounded-2xl p-6 md:p-10 relative overflow-hidden shadow-[0_0_30px_rgba(0,255,213,0.1)] border-t border-t-neonBlue/30">
-            <div class="text-center mb-8 md:mb-12">
-                <div class="flex justify-center items-center gap-3 md:gap-4 mb-3">
-                    <img src="https://i.ibb.co.com/4nFbhTSN/Desain-tanpa-judul-20260428-191052-0000.png" alt="Ailabs Logo" class="w-12 h-12 md:w-16 md:h-16 object-contain drop-shadow-[0_0_15px_rgba(0,255,213,0.5)]">
-                    <h1 class="text-4xl md:text-5xl font-tech font-bold text-white tracking-wider leading-tight text-left">
-                        <span class="text-neonOrange">AI</span>LABS<br><span class="text-2xl md:text-3xl tracking-[0.2em] text-white">WORKSPACE</span>
-                    </h1>
-                </div>
-                <div class="h-px w-32 bg-gradient-to-r from-transparent via-neonBlue to-transparent mx-auto mb-6"></div>
-                <span class="inline-block bg-black/20 border border-white/20 text-neonBlue text-xs font-bold tracking-[0.25em] uppercase px-3 py-1 rounded-full">Secure Auth System</span>
-            </div>
+        async function forceSync() {
+            // Hapus cache agar ditarik ulang secara bersih
+            localStorage.removeItem('ailabs_v5_apps');
+            const syncBtn = document.getElementById('sync-btn');
+            if(syncBtn) syncBtn.style.color = "#2cf95f"; 
             
-            <div class="mb-6 text-center">
-                <p class="text-[10px] md:text-xs text-gray-300 mb-6 font-mono">Autentikasi diwajibkan. Verifikasi status akun melalui database Spreadsheet.</p>
-                <button id="btn-show-login" onclick="toggleLoginForm()" class="w-full flex items-center justify-center gap-3 bg-white text-black py-3.5 md:py-4 rounded-lg font-bold text-sm md:text-base tracking-wider hover:bg-gray-200 hover:scale-[1.02] transition-all shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-                    <svg class="w-5 h-5 md:w-6 md:h-6" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                    VERIFIKASI EMAIL
-                </button>
-                <div id="email-input-section" class="hidden mt-4 transition-all">
-                    <input type="email" id="login-email-input" placeholder="Ketik email terdaftar Anda..." class="w-full p-3 md:p-4 border border-white/20 bg-black/40 rounded-lg text-center text-sm md:text-base font-tech text-neonBlue focus:border-neonOrange outline-none mb-3">
-                    <button onclick="submitEmailLogin()" id="btn-submit-login" class="w-full bg-transparent border-2 border-neonBlue text-neonBlue py-3 rounded-lg font-bold text-sm tracking-widest hover:bg-neonBlue hover:text-black transition-all shadow-[0_0_10px_rgba(0,255,213,0.2)]">CHECK DATABASE</button>
-                </div>
-            </div>
-            <p id="error-message" class="text-red-400 text-center mt-6 text-[10px] md:text-xs font-mono min-h-[20px] transition-all"></p>
-        </div>
-    </div>
+            await loadApps();
+            
+            setTimeout(() => { if(syncBtn) syncBtn.style.color = ""; }, 1000); 
+        }
 
-    <!-- 2. PORTAL DASHBOARD -->
-    <div id="portal-page" class="w-full max-w-7xl md:p-4 hidden relative z-10">
-        <div class="glass-panel rounded-2xl md:rounded-3xl p-4 md:p-10">
-            <!-- HEADER -->
-            <div class="mb-6 md:mb-8 border-b border-white/10 pb-4 md:pb-6 flex flex-row justify-between items-end gap-2 md:gap-6 w-full">
-                <div class="flex-shrink-0 flex items-center gap-2 md:gap-3">
-                    <a href="#" onclick="openAdmin(event)" class="cursor-pointer transition-all hover:scale-110" title="Akses Admin">
-                        <img src="https://i.ibb.co.com/4nFbhTSN/Desain-tanpa-judul-20260428-191052-0000.png" alt="Ailabs Logo" class="w-8 h-8 md:w-12 md:h-12 object-contain drop-shadow-[0_0_10px_rgba(0,255,213,0.5)]">
-                    </a>
-                    <h1 class="text-[14px] sm:text-xl md:text-3xl font-bold text-white tracking-tight font-tech mb-0 leading-tight whitespace-nowrap">
-                        <span class="text-neonOrange">AILABS WORKSPACE</span>
-                    </h1>
-                </div>
+        async function saveApps() {
+            updateCounts();
+            renderApps(currentCategory);
+            localStorage.setItem('ailabs_v5_apps', JSON.stringify(allApps));
+
+            if (APPS_DB_URL !== "") {
+                const addBtn = document.getElementById('btn-save-app');
+                if(addBtn) addBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
                 
-                <div class="flex flex-col items-end gap-2 md:gap-3 w-auto">
-                    <div class="flex items-center justify-end gap-2 md:gap-4 flex-wrap">
-                        <div class="flex items-center mr-1 md:mr-2">
-                            <span class="text-[7px] md:text-[10px] text-neonBlue font-bold mr-1 md:mr-2 animate-pulse hidden md:block">Follow dong</span>
-                            <a href="https://www.facebook.com/share/1DxuKkDdFm/" onclick="smartOpen(event, this.href)" class="text-blue-500 hover:text-white hover:scale-110 transition-all duration-300"><svg class="w-[14px] h-[14px] md:w-[22px] md:h-[22px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg></a>
+                try {
+                    await fetch(APPS_DB_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'saveApps', data: allApps }),
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                    });
+                } catch (err) { console.error("Cloud Save Err:", err); }
+                finally { if(addBtn) addBtn.innerHTML = 'Save App'; }
+            }
+        }
+
+        function updateCounts() {
+            // Render ulang seluruh UI Kategori agar kategori baru otomatis muncul
+            renderCategoriesUI(); 
+        }
+
+        function renderCategoriesUI() {
+            // 1. Tarik semua kategori dan urutkan
+            let uniqueCats = []; 
+            
+            // Masukkan kategori utama sesuai urutan yang Anda atur di CATEGORY_ORDER
+            CATEGORY_ORDER.forEach(cat => uniqueCats.push(cat));
+
+            // Deteksi kategori baru dari database dan taruh di bawahnya
+            allApps.forEach(a => {
+                if(a.category && a.category.trim() !== '') {
+                    const catName = a.category.toLowerCase().trim();
+                    if(!uniqueCats.includes(catName)) {
+                        uniqueCats.push(catName);
+                    }
+                }
+            });
+
+            const miniMenu = document.querySelector('.mini-menu');
+            const categoryMenu = document.getElementById('category-menu');
+            
+            // UBAH BAGIAN INI: Targetkan ke datalist 'category-list'
+            const appCategoryList = document.getElementById('category-list');
+
+            if(!miniMenu || !categoryMenu || !appCategoryList) return;
+
+            miniMenu.innerHTML = '';
+            categoryMenu.innerHTML = '';
+            appCategoryList.innerHTML = '';
+
+            uniqueCats.forEach(cat => {
+                const info = getCategoryInfo(cat);
+                const count = allApps.filter(a => (a.category || 'apps').toLowerCase().trim() === cat).length;
+                const isActive = (cat === currentCategory);
+
+                // Buat icon sidebar
+                miniMenu.innerHTML += `<li class="${isActive ? 'active' : ''}" onclick="changeCategory('${cat}', '${info.title}')" title="${info.title}"><i class="fa-solid ${info.icon}"></i></li>`;
+
+                // Buat menu panel utama
+                categoryMenu.innerHTML += `
+                    <li class="${isActive ? 'current' : ''}" onclick="changeCategory('${cat}', '${info.title}')">
+                        <div><i class="fa-solid ${info.icon}"></i><span>${info.title}</span></div>
+                        <span class="menu-badge">${count}</span>
+                    </li>
+                `;
+
+                // Buat pilihan dropdown di form Admin
+                appCategoryList.innerHTML += `<option value="${cat}">${info.title}</option>`;
+            });
+
+            // Kembalikan link eksternal manual (AI-Labs By Pro) di paling bawah
+            categoryMenu.innerHTML += `
+                <li onclick="smartOpen(event, 'https://ai-labs-by-pro.vercel.app/')">
+                    <div><i class="fa-solid fa-globe"></i><span>AI-Labs By Pro</span></div>
+                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 14px; opacity: 0.5;"></i>
+                </li>
+            `;
+        }
+
+        function getAppIcon(title) {
+            const t = String(title || "").toLowerCase();
+            if (t.includes('audio') || t.includes('voice') || t.includes('music')) return 'fa-music';
+            if (t.includes('image') || t.includes('flux') || t.includes('morp') || t.includes('cartoon') || t.includes('cover')) return 'fa-image';
+            if (t.includes('video') || t.includes('scene') || t.includes('storyboard') || t.includes('reels') || t.includes('capcut')) return 'fa-film';
+            if (t.includes('umkm') || t.includes('affiliate')) return 'fa-chart-line';
+            if (t.includes('dna')) return 'fa-dna';
+            if (t.includes('speed')) return 'fa-gauge-high';
+            if (t.includes('template')) return 'fa-table-list';
+            return 'fa-rocket';
+        }
+
+        function renderApps(categoryKey) {
+            const container = document.getElementById('app-list');
+            container.innerHTML = '';
+            
+            const filteredApps = allApps.filter(a => {
+                let cat = (a.category || 'apps').toLowerCase().trim();
+                return cat === categoryKey;
+            });
+
+            if (filteredApps.length === 0) {
+                container.innerHTML = '<p style="color:white;text-align:center;font-size:12px;opacity:0.6;margin-top:20px;">Belum ada aplikasi.</p>';
+                return;
+            }
+
+            let html = '';
+            filteredApps.forEach(app => {
+                // Gunakan app.name, atau fallback ke app.t (format data lama), atau teks default
+                const appName = app.name || app.t || "Unknown App";
+                // Gunakan app.url, atau fallback ke app.u (format data lama)
+                const appUrl = app.url || app.u || "#";
+
+                const iconContent = app.logo 
+                    ? `<img src="${app.logo}" style="width:100%;height:100%;object-fit:cover;" onerror="this.outerHTML='<i class=\\'fa-solid ${getAppIcon(appName)}\\'></i>'">` 
+                    : `<i class="fa-solid ${getAppIcon(appName)}"></i>`;
+                
+                let adminControls = '';
+                if(isAdmin) {
+                    adminControls = `
+                        <div class="admin-controls">
+                            <button class="admin-btn btn-edit" onclick="event.preventDefault(); event.stopPropagation(); openEditModal('${app.id}')" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                            <button class="admin-btn btn-delete" onclick="event.preventDefault(); event.stopPropagation(); deleteApp('${app.id}')" title="Hapus"><i class="fa-solid fa-trash"></i></button>
                         </div>
-                        <div class="flex flex-col items-center gap-1 md:gap-2 mr-1 md:mr-2">
-                            <div class="flex items-center gap-1 md:gap-2 bg-black/20 border border-white/10 px-2 py-1 md:px-3 rounded-lg">
-                                <button id="sound-toggle" class="text-neonBlue hover:text-white transition-colors">
-                                    <svg id="icon-sound-on" class="w-[12px] h-[12px] md:w-[16px] md:h-[16px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-                                    <svg id="icon-sound-off" class="hidden w-[12px] h-[12px] md:w-[16px] md:h-[16px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
-                                </button>
-                                <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.5" class="w-10 md:w-16 h-1 md:h-auto accent-neonBlue">
-                            </div>
-                            <div id="visualizer" class="flex items-end justify-center gap-[1px] md:gap-[2px] h-2 md:h-3 w-full opacity-60">
-                                <div class="v-bar w-[2px] h-[2px]"></div><div class="v-bar w-[2px] h-[2px]"></div><div class="v-bar w-[2px] h-[2px]"></div><div class="v-bar w-[2px] h-[2px]"></div><div class="v-bar w-[2px] h-[2px]"></div><div class="v-bar w-[2px] h-[2px]"></div><div class="v-bar w-[2px] h-[2px]"></div><div class="v-bar w-[2px] h-[2px]"></div>
-                            </div>
+                    `;
+                }
+
+                html += `
+                    <a href="${appUrl}" onclick="smartOpen(event, this.href)" class="app-item">
+                        <div class="app-icon">${iconContent}</div>
+                        <div class="app-details">
+                            <h4>${appName}</h4>
+                            <p>${appUrl.replace(/^https?:\/\//, '').substring(0, 30)}...</p>
                         </div>
-                        <div class="text-right flex flex-col justify-center">
-                            <span class="text-[7px] md:text-[8px] text-gray-400 uppercase tracking-widest block font-bold">VERIFIED USER</span>
-                            <span id="user-name-display" class="text-neonOrange font-tech text-[10px] md:text-[12px] font-bold tracking-wider uppercase mb-1">USERNAME</span>
-                            <span id="user-email-display" class="text-neonBlue font-mono text-[8px] md:text-[10px] font-bold tracking-wider">user@gmail.com</span>
-                        </div>
-                        <button id="logout-button" class="text-[8px] md:text-[10px] text-red-400 border border-red-500/40 px-2 py-1 md:px-4 md:py-1.5 rounded font-bold hover:bg-red-500 hover:text-white transition-all ml-1">LOGOUT</button>
-                    </div>
-                </div>
-            </div>
+                        ${adminControls}
+                        <i class="fa-solid fa-arrow-up-right-from-square link-icon" ${isAdmin ? 'style="display:none"' : ''}></i>
+                    </a>
+                `;
+            });
+            container.innerHTML = html;
+        }
 
-            <!-- TABS -->
-            <div class="flex flex-wrap gap-2 md:gap-4 mb-6 md:mb-10 border-b border-white/5 pb-4">
-                <button onclick="switchTab('apps')" id="tab-apps" class="tab-btn active"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5z"></path></svg><span>APPLICATIONS</span></button>
-                <button onclick="switchTab('apps2')" id="tab-apps2" class="tab-btn"><div class="fire-tab-inner"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg><span>AILABS X-PRO</span></div></button>
-                <button onclick="switchTab('toolkit')" id="tab-toolkit" class="tab-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065"></path></svg><span>TOOLKIT</span></button>
-                <button onclick="switchTab('tutorial')" id="tab-tutorial" class="tab-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477-4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg><span>TUTORIALS</span></button>
-                <button onclick="switchTab('camera')" id="tab-camera" class="tab-btn"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg><span>42 CAMERA</span></button>
-            </div>
-
-            <!-- EMPTY CONTAINERS FOR DYNAMIC DOM INJECTION -->
-            <div id="content-apps"><div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 mb-12" id="grid-apps"></div></div>
-            <div id="content-apps2" class="hidden">
-                 <div class="fire-banner-wrapper"><div class="fire-banner-inner gap-2 md:gap-4"><h2 class="text-sm md:text-3xl font-tech font-bold text-white tracking-[0.1em] md:tracking-[0.2em] mb-0">AILABS X-PRO: <span class="text-neonOrange text-shadow-[0_0_15px_#ff9900]">SPECIAL EDITION</span></h2><div class="h-[1px] md:h-[2px] flex-1 bg-gradient-to-r from-neonOrange to-transparent"></div></div></div>
-                 <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 mb-12" id="grid-apps2"></div>
-            </div>
-            <div id="content-toolkit" class="hidden">
-                 <div class="mb-4 md:mb-6 flex items-center gap-2 md:gap-4"><h2 class="text-lg md:text-3xl font-tech font-bold text-white tracking-[0.1em] md:tracking-[0.2em]">TOOLS <span class="text-neonBlue">KREATIF</span></h2><div class="h-[1px] md:h-[2px] flex-1 bg-gradient-to-r from-neonBlue to-transparent"></div></div>
-                 <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 mb-12" id="grid-toolkit"></div>
-            </div>
-            <div id="content-tutorial" class="hidden"><div class="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8" id="grid-tutorial"></div></div>
-            <div id="content-camera" class="hidden"><div class="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8" id="grid-camera"></div></div>
-
-        </div>
-    </div>
-
-    <!-- SCRIPT UTAMA & KEAMANAN -->
-    <script>
-        // =========================================================================
-        // SECRET DATA BASE64 ENCODED (OBFUSCATION) - TIDAK ADA LINK MENTAH DI HTML
-        // =========================================================================
-        const _sd = {
-            a: [
-                {t:"AIlabs Voice Over V2", d:"Advanced Audio Synthesis.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS84ZDQwMTI3ZjcxNzU=", b:"border-l-2 md:border-l-4 border-l-neonBlue/50"},
-                {t:"Ailabs UMKM", d:"Solusi cerdas bisnis.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS80OWE1MmE2YzQ3MzQ="},
-                {t:"Ailabs Affiliate", d:"Program mitra eksklusif.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS8zY2VlMTk5OGEwMDE="},
-                {t:"Ailabs Cartoon", d:"Style kartun instan.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9hZjU1MThlYTk3MDY="},
-                {t:"Restore Image", d:"Perbaiki foto lama.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9jOTc5YTM0MTdkMjk="},
-                {t:"Auto Caption", d:"Subtitle otomatis.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9hOTk0ZmU3MDkxNDg="},
-                {t:"Reels Analizer", d:"Optimasi teks AI.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9jZTg2N2M2YThjMTc=", n: true},
-                {t:"Ailabs Flux", d:"Generasi gambar ultra.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9jYjdlMTAxMmY0Zjk="},
-                {t:"Ailabs Ramadhan", d:"Edisi spesial berkah.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9mYTViZDAwZGU1ZGQ="},
-                {t:"Morp", d:"Transformasi visual halus.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9hZGNjMDhlZTlhOGY="},
-                {t:"Template", d:"Template prompt khusus.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS81OGM1OGVhZDM2OTk=", n: true},
-                {t:"DNA", d:"Analisis struktur data AI.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS85NGE0OTMyMDhjOTE="}
-            ],
-            x: [
-                {t:"DNA PRO", d:"Versi pro analisis struktur data.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9kZmY4NGFlZWE0MjY="},
-                {t:"Ailabs Storyboard Pro", d:"Versi pro visualisasi alur.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS8yZjcwYTNiYTA5Y2I="},
-                {t:"Ailabs Scene Pro", d:"Visual scene generator.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS8wNjE1ODEzMDNiYTQ="},
-                {t:"Ailabs Storyboard Pro V2", d:"Versi pro storyboard V2.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9lM2FjODI3OWM4Y2Y=", n: true}
-            ],
-            k: [
-                {t:"Manipulasi Audio", u:"aHR0cHM6Ly9hdWRpby1tb2RpZmllci52ZXJjZWwuYXBwLw=="},
-                {t:"Ailabs Capcut", u:"aHR0cHM6Ly9haWxhYnMtY2MudmVyY2VsLmFwcC8="},
-                {t:"EncodeBase64", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS81MjBjNjY2M2QyYTA="},
-                {t:"WM Remover", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS8wMTcwNGFlNWZiYmY="},
-                {t:"Music Mastering", u:"aHR0cHM6Ly9tYXN0ZXJhdWRpby5wcm8="},
-                {t:"Suno Style", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS82YTNmMzYwMzI1NDI="},
-                {t:"Upscale Image", u:"aHR0cHM6Ly91cHNjYWxlLWltYWdlLnZlcmNlbC5hcHAv"},
-                {t:"Ailabs Speed", u:"aHR0cHM6Ly9haWxhYnMtc3BlZWQudmVyY2VsLmFwcC8="},
-                {t:"Media Forge", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9hOGYyODRhNDllMGQ="}
-            ],
-            t: [{t:"Desain Cover AI", d:"Panduan pembuatan cover profesional.", u:"aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9iNmNlOTZiOTVkNWE="}],
-            c: [{t:"42 Camera Movements", u:"aHR0cHM6Ly9haXNob3RzdHVkaW8uY29tLzQyLWNhbWVyYS1tb3ZlbWVudHMtYWktcHJvbXB0cy8="}],
-            adm: "aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS9zaGFyZS9jOGRiZjYwNmE5ZGY="
+        window.changeCategory = function(categoryKey, title) {
+            currentCategory = categoryKey;
+            renderCategoriesUI(); // Update UI status aktif
+            
+            document.getElementById('sub-panel-title').innerText = title || getCategoryInfo(categoryKey).title;
+            renderApps(categoryKey);
+            document.getElementById('sub-panel-wrapper').classList.add('active');
         };
 
-        const _d = (s) => atob(s); // Fungsi dekoder
+        window.closeSubPanel = function() {
+            document.getElementById('sub-panel-wrapper').classList.remove('active');
+            renderCategoriesUI(); // Reset UI status aktif
+        };
 
-        // =========================================================================
-        // JAVASCRIPT SMART LINK OPENER (ANTI SECURITY LOOP GOOGLE)
-        // =========================================================================
-        function smartOpen(e, url) {
+        function handleLogoClick() {
+            clickCount++;
+            clearTimeout(clickTimer);
+            if (clickCount >= 3) {
+                document.getElementById('password-modal').classList.add('active');
+                document.getElementById('admin-password').value = '';
+                document.getElementById('password-error').classList.add('hidden');
+                document.getElementById('admin-password').focus();
+                clickCount = 0;
+            } else {
+                clickTimer = setTimeout(() => clickCount = 0, 1000);
+            }
+        }
+
+        function closePasswordModal() { document.getElementById('password-modal').classList.remove('active'); }
+
+        function verifyPassword() {
+            const pwd = document.getElementById('admin-password').value;
+            if (pwd === '@Kr333wol') {
+                isAdmin = true;
+                closePasswordModal();
+                document.getElementById('admin-add-btn').classList.remove('hidden');
+                document.getElementById('admin-bulk-btn').classList.remove('hidden');
+                if(document.getElementById('sub-panel-wrapper').classList.contains('active')) renderApps(currentCategory);
+            } else {
+                document.getElementById('password-error').classList.remove('hidden');
+            }
+        }
+
+        function openAddModal() {
+            document.getElementById('add-modal').classList.add('active');
+            document.getElementById('add-app-form').reset();
+            document.getElementById('edit-app-id').value = '';
+            document.getElementById('modal-title').textContent = 'Add Interface';
+            document.getElementById('app-category').value = currentCategory;
+            document.getElementById('app-name').focus();
+        }
+
+        window.openEditModal = function(id) {
+            const app = allApps.find(a => a.id === id);
+            if(app) {
+                document.getElementById('add-modal').classList.add('active');
+                document.getElementById('edit-app-id').value = app.id;
+                document.getElementById('app-name').value = app.name;
+                document.getElementById('app-url').value = app.url;
+                document.getElementById('app-category').value = app.category || 'apps';
+                document.getElementById('app-logo').value = app.logo || '';
+                document.getElementById('modal-title').textContent = 'Edit Interface';
+            }
+        };
+
+        function closeAddModal() { document.getElementById('add-modal').classList.remove('active'); }
+
+        window.handleAddApp = function(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-app-id').value;
+            const name = document.getElementById('app-name').value;
+            const url = document.getElementById('app-url').value;
+            const category = document.getElementById('app-category').value;
+            const logo = document.getElementById('app-logo').value;
+
+            if (id) {
+                const index = allApps.findIndex(a => a.id === id);
+                if(index !== -1) allApps[index] = { ...allApps[index], name, url, logo, category };
+            } else {
+                allApps.push({ id: 'app_' + Date.now(), name, url, logo, category });
+            }
+            saveApps();
+            closeAddModal();
+        };
+
+        window.deleteApp = function(id) {
+            if(confirm("Hapus aplikasi ini?")) {
+                allApps = allApps.filter(app => app.id !== id);
+                saveApps();
+            }
+        };
+
+        window.openBulkModal = function() {
+            document.getElementById('bulk-modal').classList.add('active');
+            document.getElementById('bulk-textarea').value = '';
+            document.getElementById('bulk-status').textContent = '';
+            document.getElementById('bulk-status').className = '';
+        };
+
+        window.closeBulkModal = function() {
+            document.getElementById('bulk-modal').classList.remove('active');
+        };
+
+        window.processBulkImport = function() {
+            const textarea = document.getElementById('bulk-textarea');
+            const statusText = document.getElementById('bulk-status');
+            const rawData = textarea.value.trim();
+
+            if (!rawData) {
+                statusText.textContent = "Data kosong!";
+                statusText.className = "text-error";
+                return;
+            }
+
+            let newData = [];
+            try {
+                newData = JSON.parse(rawData);
+                if (!Array.isArray(newData)) {
+                    throw new Error("Data harus berupa array JSON: [...]");
+                }
+            } catch (err) {
+                statusText.textContent = "Format JSON tidak valid: " + err.message;
+                statusText.className = "text-error";
+                return;
+            }
+
+            let addedCount = 0;
+            let skipCount = 0;
+
+            newData.forEach(app => {
+                if (!app.name || !app.url) return; // Skip invalid entries
+
+                // Pengecekan Duplikat berdasarkan URL
+                const isDuplicate = allApps.some(existingApp => 
+                    existingApp.url.toLowerCase() === app.url.toLowerCase()
+                );
+
+                if (!isDuplicate) {
+                    allApps.push({
+                        id: app.id || ('app_' + Date.now() + Math.floor(Math.random() * 1000)),
+                        name: app.name,
+                        url: app.url,
+                        category: app.category || 'apps',
+                        logo: app.logo || ''
+                    });
+                    addedCount++;
+                } else {
+                    skipCount++;
+                }
+            });
+
+            if (addedCount > 0) {
+                saveApps(); // This will save to localStorage and trigger cloud sync
+                statusText.textContent = `Berhasil menambah ${addedCount} aplikasi. (${skipCount} duplikat dilewati). Menunggu sinkronisasi...`;
+                statusText.className = "text-success";
+                setTimeout(closeBulkModal, 3000);
+            } else {
+                statusText.textContent = `Tidak ada aplikasi baru ditambahkan. (${skipCount} duplikat ditemukan).`;
+                statusText.className = "text-warning";
+                statusText.style.color = "#ffd93d";
+            }
+        };
+
+        // Smart Open Link Handler
+        window.smartOpen = function(e, url) {
             if(e) e.preventDefault();
-            
-            // Deteksi In-App Browser (WebView) seperti WhatsApp, FB, IG, TikTok, atau PWA Standalone
             const ua = navigator.userAgent || navigator.vendor || window.opera;
             const isWebView = /(Instagram|FBAN|FBAV|WhatsApp|Line|TikTok|wv)/i.test(ua);
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-
             try {
-                if (isWebView || isStandalone) {
-                    // Jika di WebView, Tab Baru akan memicu loop keamanan Google karena cookie ditolak.
-                    // Oleh karena itu, di sini kita PAKSA navigasi top-level agar tidak blank/loop.
-                    window.top.location.href = url;
-                } else {
-                    // Jika di Browser Biasa (Chrome, Safari PC/HP), aman buka Tab Baru
+                if (isWebView || isStandalone) window.location.href = url;
+                else {
                     let newWin = window.open(url, '_blank', 'noopener,noreferrer');
-                    if (!newWin || newWin.closed || typeof newWin.closed === 'undefined') {
-                        // Fallback jika popup blocker aktif
-                        window.top.location.href = url;
-                    }
+                    if (!newWin || newWin.closed) window.location.href = url;
                 }
-            } catch (err) {
-                // Fallback darurat
-                window.top.location.href = url;
-            }
-        }
-
-        // Fungsi Render Dinamis (DOM Injection)
-        function _bDOM() {
-            // Render Apps
-            document.getElementById('grid-apps').innerHTML = _sd.a.map(i => 
-                `<a href="${_d(i.u)}" onclick="smartOpen(event, this.href)" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group ${i.b||''}">
-                    <div class="flex items-center gap-2 mb-1 md:mb-2 flex-wrap">
-                        <h3 class="text-[13px] md:text-2xl font-bold text-white group-hover:text-neonBlue transition-colors">${i.t}</h3>
-                        ${i.n ? '<span class="bg-neonOrange text-black text-[8px] md:text-[10px] px-2 py-0.5 rounded font-bold tracking-wider animate-pulse shadow-[0_0_8px_rgba(255,153,0,0.8)]">NEW</span>' : ''}
-                    </div>
-                    <p class="text-[9px] md:text-sm text-gray-200 leading-relaxed font-medium">${i.d}</p>
-                </a>`
-            ).join('');
-
-            // Render X-Pro
-            document.getElementById('grid-apps2').innerHTML = _sd.x.map(i => 
-                `<a href="${_d(i.u)}" onclick="smartOpen(event, this.href)" class="fire-card-wrapper group">
-                    <div class="fire-card-inner p-3 md:p-6 transition-all duration-300 group-hover:bg-[#1a0b2e]">
-                        <div class="flex items-center gap-2 mb-1 md:mb-2 flex-wrap relative z-10">
-                            <h3 class="text-[13px] md:text-xl font-bold text-white group-hover:text-neonOrange transition-colors">${i.t}</h3>
-                            ${i.n ? '<span class="bg-neonBlue text-black text-[8px] md:text-[10px] px-2 py-0.5 rounded font-bold tracking-wider animate-pulse shadow-[0_0_8px_rgba(0,255,213,0.8)]">NEW</span>' : ''}
-                        </div>
-                        <p class="text-[9px] md:text-xs text-gray-200 font-medium relative z-10">${i.d}</p>
-                    </div>
-                </a>`
-            ).join('');
-
-            // Render Toolkit
-            document.getElementById('grid-toolkit').innerHTML = _sd.k.map(i => 
-                `<a href="${_d(i.u)}" onclick="smartOpen(event, this.href)" class="block app-card p-3 md:p-6 rounded-xl md:rounded-2xl group relative overflow-hidden">
-                    <h3 class="text-[13px] md:text-xl font-bold text-white mb-1 md:mb-2 group-hover:text-neonBlue transition-colors">${i.t}</h3>
-                </a>`
-            ).join('');
-
-            // Render Tutorial
-            document.getElementById('grid-tutorial').innerHTML = _sd.t.map(i => 
-                `<div class="tutorial-card p-4 md:p-6 rounded-xl md:rounded-2xl flex flex-col justify-between">
-                    <h3 class="text-[14px] md:text-xl font-bold text-white font-tech mb-2 md:mb-4">${i.t}</h3>
-                    <p class="text-[10px] md:text-sm text-gray-300 mb-4 md:mb-6">${i.d}</p>
-                    <a href="${_d(i.u)}" onclick="smartOpen(event, this.href)" class="text-[9px] md:text-base bg-neonOrange/20 border border-neonOrange text-neonOrange py-2 md:py-3 rounded-lg md:rounded-xl text-center hover:bg-neonOrange hover:text-black transition-all font-bold">BUKA TUTORIAL</a>
-                </div>`
-            ).join('');
-
-            // Render Camera
-            document.getElementById('grid-camera').innerHTML = _sd.c.map(i => 
-                `<a href="${_d(i.u)}" onclick="smartOpen(event, this.href)" class="framework-card p-4 md:p-6 rounded-xl md:rounded-2xl border border-neonBlue/30 block group">
-                    <h3 class="text-[13px] md:text-xl font-bold text-white font-tech mb-2 md:mb-4 group-hover:text-neonBlue">${i.t}</h3>
-                    <button class="w-full py-1.5 md:py-2 rounded-lg text-[9px] md:text-xs font-bold border border-neonBlue text-neonBlue group-hover:bg-neonBlue group-hover:text-black transition-all">OPEN GUIDE</button>
-                </a>`
-            ).join('');
-        }
-
-        function openAdmin(e) {
-            smartOpen(e, _d(_sd.adm)); 
-        }
-
-        // =========================================================================
-        // AUDIO & VISUALIZER SCRIPT
-        // =========================================================================
-        const bgAudio = document.getElementById("bg-audio");
-        bgAudio.volume = 0.5;
-        let audioCtx, analyser, dataArray, isInit = false;
-        let cachedVBars = []; 
-
-        function initVisualizer() {
-            if(isInit) return;
-            try {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const src = audioCtx.createMediaElementSource(bgAudio);
-                analyser = audioCtx.createAnalyser();
-                src.connect(analyser); analyser.connect(audioCtx.destination);
-                analyser.fftSize = 64; dataArray = new Uint8Array(analyser.frequencyBinCount);
-                cachedVBars = document.querySelectorAll('.v-bar'); 
-                isInit = true; draw();
-            } catch(e) {}
-        }
-        function draw() {
-            if(!analyser || cachedVBars.length === 0) return;
-            requestAnimationFrame(draw);
-            analyser.getByteFrequencyData(dataArray);
-            if (!document.hidden) {
-                cachedVBars.forEach((bar, i) => { bar.style.height = `${Math.max(2, (dataArray[i]/255)*12)}px`; });
-            }
-        }
-
-        function switchTab(tab) {
-            ['content-apps', 'content-apps2', 'content-toolkit', 'content-tutorial', 'content-camera'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
-            ['tab-apps', 'tab-apps2', 'tab-toolkit', 'tab-tutorial', 'tab-camera'].forEach(id => document.getElementById(id)?.classList.remove('active'));
-            document.getElementById(`content-${tab}`)?.classList.remove('hidden');
-            document.getElementById(`tab-${tab}`)?.classList.add('active');
-        }
-
-        // =========================================================================
-        // LOGIN & SPREADSHEET SCRIPT
-        // =========================================================================
-        function toggleLoginForm() {
-            const form = document.getElementById('email-input-section');
-            form.classList.toggle('hidden');
-            if(!form.classList.contains('hidden')) document.getElementById('login-email-input').focus();
-        }
-
-        async function submitEmailLogin() {
-            const email = document.getElementById('login-email-input').value.trim();
-            if(!email) { document.getElementById('error-message').textContent = 'Email kosong!'; return; }
-            
-            const errorMsg = document.getElementById('error-message');
-            const submitBtn = document.getElementById('btn-submit-login');
-            errorMsg.innerHTML = '<span class="text-neonBlue animate-pulse">Menghubungkan Database...</span>';
-            submitBtn.disabled = true; submitBtn.style.opacity = '0.5';
-            
-            const API_URL = "https://script.google.com/macros/s/AKfycbz1FR3bB6-GpVvertVerKUK7WnpTJoEt_mZ0Y7L8YAdkcI7R7q69vPhwr8tnz585DTUVQ/exec";
-            try {
-                const response = await fetch(`${API_URL}?email=${encodeURIComponent(email)}`);
-                const data = await response.json();
-                submitBtn.disabled = false; submitBtn.style.opacity = '1';
-                if(data.success) loginSuccess(data.email, data.username);
-                else errorMsg.textContent = 'Akses Ditolak: ' + data.message;
-            } catch(e) {
-                submitBtn.disabled = false; submitBtn.style.opacity = '1';
-                errorMsg.textContent = 'Gagal terhubung ke Database.';
-            }
-        }
-
-        function loginSuccess(email, username) {
-            sessionStorage.setItem('ai_secure_token', btoa(email));
-            sessionStorage.setItem('ailabs_email', email);
-            sessionStorage.setItem('ailabs_username', username || email);
-            
-            document.getElementById('user-email-display').textContent = email;
-            document.getElementById('user-name-display').textContent = username || email;
-            document.getElementById('login-page').classList.add('hidden');
-            document.getElementById('portal-page').classList.remove('hidden');
-            
-            _bDOM();
-
-            if(bgAudio.paused) bgAudio.play().then(() => initVisualizer()).catch(() => {});
-        }
-
-        // =========================================================================
-        // INITIALIZATION
-        // =========================================================================
-        let hasInteracted = false;
-        const _pi = () => {
-            if (hasInteracted) return; hasInteracted = true;
-            bgAudio.play().then(() => { initVisualizer(); if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); }).catch(()=>{ hasInteracted = false; });
-            document.removeEventListener('click', _pi); document.removeEventListener('keydown', _pi);
+            } catch (err) { window.location.href = url; }
         };
-        document.addEventListener('click', _pi); document.addEventListener('keydown', _pi);
 
-        document.getElementById('logout-button').addEventListener('click', () => {
-            sessionStorage.clear(); location.reload();
-        });
-
-        document.getElementById('sound-toggle').addEventListener('click', () => {
-            bgAudio.muted = !bgAudio.muted;
-            document.getElementById('icon-sound-on').classList.toggle('hidden', bgAudio.muted);
-            document.getElementById('icon-sound-off').classList.toggle('hidden', !bgAudio.muted);
-            if(!bgAudio.muted && audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-            if (!bgAudio.muted && bgAudio.paused) bgAudio.play().then(() => initVisualizer()).catch(() => {});
-        });
-        document.getElementById('volume-slider').addEventListener('input', (e) => bgAudio.volume = e.target.value );
-
-        document.addEventListener('DOMContentLoaded', () => {
-            if (sessionStorage.getItem('ai_secure_token') && sessionStorage.getItem('ailabs_email')) {
-                loginSuccess(sessionStorage.getItem('ailabs_email'), sessionStorage.getItem('ailabs_username'));
-            }
-        });
-
+        // Init
+        window.addEventListener('DOMContentLoaded', () => { initAuth(); });
     </script>
 </body>
 </html>
