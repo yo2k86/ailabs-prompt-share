@@ -460,7 +460,7 @@
 
         // Inisialisasi Auth
         function initAuth() {
-            const savedUser = localStorage.getItem('ailabsSession');
+            const savedUser = sessionStorage.getItem('ailabsSession');
             if (savedUser) {
                 const user = JSON.parse(savedUser);
                 showMainApp(user);
@@ -491,7 +491,7 @@
 
                 if (data.success) {
                     const userData = { email: data.email, username: data.username };
-                    localStorage.setItem('ailabsSession', JSON.stringify(userData));
+                    sessionStorage.setItem('ailabsSession', JSON.stringify(userData));
                     showMainApp(userData);
                 } else {
                     errorMsg.textContent = data.message || "Akses ditolak oleh database.";
@@ -519,7 +519,7 @@
         }
 
         function handleLogout() {
-            localStorage.removeItem('ailabsSession');
+            sessionStorage.removeItem('ailabsSession');
             location.reload();
         }
 
