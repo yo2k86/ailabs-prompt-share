@@ -290,6 +290,7 @@
 
     <!-- POLES HP: background gelap penuh + layout HP tidak sesak -->
     <style>
+        html { background: #05070d !important; }
         @media (max-width: 760px) {
             html, body { background: #05070d !important; }
             .wrapper { padding: 8px !important; gap: 8px !important; }
@@ -310,6 +311,22 @@
             .sub-panel-wrapper { left: 8px !important; right: 8px !important; top: 80px !important; bottom: 8px !important; width: calc(100% - 16px) !important; }
             .sub-panel { padding: 16px !important; }
             .app-item { padding: 12px !important; }
+        }
+    </style>
+
+    <!-- FULL HP: logo login selebar kartu + workspace selebar layar (HP saja) -->
+    <style>
+        @media (max-width: 760px) {
+            /* Login: kartu selebar layar, logo menembus padding jadi selebar kartu penuh */
+            #login-view { width: 100% !important; max-width: none !important; height: 100dvh !important; max-height: none !important; padding: 0 22px 28px !important; border-radius: 0 !important; display: flex !important; flex-direction: column !important; justify-content: center !important; }
+            #login-view img { width: calc(100% + 44px) !important; max-width: none !important; max-height: none !important; margin-left: -22px !important; margin-right: -22px !important; border-radius: 0 !important; border: none !important; }
+            /* Workspace: tanpa celah di tepi layar, kolom panel selebar layar penuh */
+            .wrapper { padding: 0 !important; gap: 0 !important; }
+            .sidebar { border-radius: 0 !important; }
+            .panel { border-radius: 0 !important; height: calc(100% - 64px) !important; }
+            .sub-panel-wrapper { left: 0 !important; right: 0 !important; top: 64px !important; bottom: 0 !important; width: 100% !important; }
+            .sub-panel { border-radius: 0 !important; }
+            .remotion-brand-panel img { border-radius: 12px !important; }
         }
     </style>
 </head>
