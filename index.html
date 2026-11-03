@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#05070d">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
@@ -215,6 +215,52 @@
             .modal-icon-top { width: 50px; height: 50px; margin: -50px auto 15px auto; font-size: 20px; }
         }
     </style>
+
+    <!-- REMOTION THEME (override only, no function/URL changed) -->
+    <style>
+        /* Remotion tokens: dark navy glossy + sky-blue accent, system font */
+        * { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important; }
+        body { color: #e8eefc !important; background: radial-gradient(1200px 500px at 50% -10%, #16233f 0%, #05070d 55%, #000 100%) !important; }
+        #login-view, .sidebar, .panel, .sub-panel, .modal-box {
+            background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.02) 28%), linear-gradient(180deg, #161d2e, #070a12) !important;
+            border: 1px solid #2a364f !important; border-radius: 18px !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 18px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.6) !important;
+        }
+        .sidebar { border-radius: 18px !important; }
+        /* Sky-blue accent replaces the old pink/red accent */
+        #login-btn, .btn-save { background: linear-gradient(180deg, #38bdf8, #0369a1) !important; border-color: #0284c7 !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 0 20px rgba(56,189,248,.3) !important; }
+        #login-btn:hover, .btn-save:hover { box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 0 24px rgba(56,189,248,.45) !important; }
+        .input-group input:focus, .form-group input:focus, .form-group select:focus { border-color: #38bdf8 !important; box-shadow: inset 0 0 10px rgba(56,189,248,.1) !important; }
+        #login-error-msg, .text-error { color: #38bdf8 !important; background: rgba(56,189,248,.1) !important; }
+        .mini-menu li.active::before, .menu li.current { border-left-color: #38bdf8 !important; }
+        .menu li.current { background: linear-gradient(90deg, rgba(56,189,248,.25), transparent) !important; border-top-color: rgba(56,189,248,.1) !important; border-bottom-color: rgba(56,189,248,.1) !important; }
+        .menu li.current .menu-badge { background: #38bdf8 !important; }
+        .logo button:hover, .profile img:hover { box-shadow: 0 0 15px rgba(56,189,248,.4) !important; }
+        .profile img:hover { border-color: #38bdf8 !important; }
+        .account { border-color: rgba(56,189,248,.2) !important; }
+        .account img { border-color: rgba(56,189,248,.5) !important; }
+        .account .actions i { color: rgba(56,189,248,.8) !important; }
+        .account .actions i:hover { background: rgba(56,189,248,.3) !important; }
+        .app-item:hover { background: rgba(56,189,248,.15) !important; border-color: rgba(56,189,248,.3) !important; }
+        .app-item::before { background: #38bdf8 !important; }
+        .app-icon { background: linear-gradient(135deg, rgba(56,189,248,.4), rgba(3,105,161,.1)) !important; border-color: rgba(56,189,248,.2) !important; }
+        .app-item:hover .app-icon { background: linear-gradient(135deg, rgba(56,189,248,.8), rgba(3,105,161,.4)) !important; }
+        .app-item:hover .link-icon { color: #38bdf8 !important; }
+        .btn-action { background: rgba(56,189,248,.15) !important; border-color: rgba(56,189,248,.3) !important; color: #38bdf8 !important; }
+        .btn-action:hover { background: #38bdf8 !important; color: #fff !important; box-shadow: 0 5px 15px rgba(56,189,248,.4) !important; }
+        .btn-delete { background: rgba(56,189,248,.5) !important; }
+        .btn-delete:hover { background: #38bdf8 !important; }
+        .modal-icon-top { background: linear-gradient(180deg, #38bdf8, #0369a1) !important; box-shadow: 0 10px 20px rgba(56,189,248,.4) !important; }
+        .modal-box { border-color: rgba(56,189,248,.3) !important; }
+        /* Ailabs by pro brand block (Remotion .brand style) */
+        .remotion-brand { margin-top: 18px; text-align: center; }
+        .remotion-brand img { width: 220px !important; height: 58px !important; object-fit: cover !important; object-position: center !important; border: none !important; border-radius: 10px !important; box-shadow: none !important; margin-bottom: 8px !important; filter: drop-shadow(0 0 24px rgba(56,189,248,.35)); }
+        .remotion-brand-text { font-weight: 900; letter-spacing: .5px; font-size: 22px; color: #e8eefc; text-shadow: 0 2px 18px rgba(56,189,248,.45); }
+        .remotion-brand-text span { color: #38bdf8; }
+        .remotion-brand-panel { margin-top: 20px; padding-top: 16px; border-top: 1px solid #1e2a44; }
+        .remotion-brand-panel img { width: 200px !important; height: 52px !important; }
+    </style>
+
 </head>
 <body>
 
@@ -223,6 +269,7 @@
         <img src="https://i.ibb.co.com/FLfrC2X8/logo.jpg" alt="Ailabs Logo" onerror="this.src='https://placehold.co/100x100/ff6b7d/white?text=A'">
         <h2>Ailabs Portal</h2>
         <p class="subtitle">System Secure Login Required</p>
+        <div class="remotion-brand"><img src="ailabs-by-pro.jpg" alt="Ailabs by pro"><div class="remotion-brand-text">ailabs <span>BY PRO</span></div></div>
         
         <div class="input-group">
             <i class="fa-solid fa-envelope"></i>
@@ -285,6 +332,8 @@
             <ul class="menu" id="category-menu">
                 <!-- Kategori akan dirender secara otomatis dari database via JS -->
             </ul>
+
+            <div class="remotion-brand remotion-brand-panel"><img src="ailabs-by-pro.jpg" alt="Ailabs by pro"><div class="remotion-brand-text">ailabs <span>BY PRO</span></div></div>
         </section>
 
         <!-- SUB-PANEL WADAH DAFTAR APLIKASI -->
