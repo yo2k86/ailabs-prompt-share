@@ -219,7 +219,8 @@
     <!-- REMOTION THEME (override only, no function/URL changed) -->
     <style>
         /* Remotion tokens: dark navy glossy + sky-blue accent, system font */
-        * { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important; }
+        body, input, button, select, textarea { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+        .fa, .fa-solid, .fa-regular, .fa-brands, .fas, .far, .fab, i[class*="fa-"] { font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important; }
         body { color: #e8eefc !important; background: radial-gradient(1200px 500px at 50% -10%, #16233f 0%, #05070d 55%, #000 100%) !important; }
         #login-view, .sidebar, .panel, .sub-panel, .modal-box {
             background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.02) 28%), linear-gradient(180deg, #161d2e, #070a12) !important;
@@ -268,6 +269,23 @@
         .logo button img { object-fit: contain !important; background: #05070d !important; }
         .profile img, .account img { object-fit: contain !important; background: #05070d !important; }
         .remotion-brand img { width: 200px !important; height: auto !important; max-height: 140px !important; object-fit: contain !important; background: #05070d !important; border-radius: 12px !important; margin-bottom: 0 !important; }
+    </style>
+
+    <!-- FIX DALAM WORKSPACE: ikon FA, logo kecil, footer, sub-panel -->
+    <style>
+        /* Logo sidebar: lebih lebar supaya teks terbaca, bukan kotak gelap kecil */
+        .logo { width: 84px !important; }
+        .logo button { width: 84px !important; height: 54px !important; }
+        .logo button img { width: 100% !important; height: 100% !important; object-fit: contain !important; background: #05070d !important; }
+        /* Avatar sidebar & akun: banner utuh bentuk kotak membulat, bukan lingkaran yang memotong kiri-kanan */
+        .profile img { width: 64px !important; height: 42px !important; border-radius: 12px !important; object-fit: contain !important; background: #05070d !important; }
+        .account img { width: 64px !important; height: 42px !important; border-radius: 12px !important; object-fit: contain !important; background: #05070d !important; }
+        /* Footer banner: terpusat, selebar panel, tanpa glow meluber */
+        .remotion-brand-panel { text-align: center !important; }
+        .remotion-brand-panel img { width: 100% !important; max-width: 340px !important; height: auto !important; display: block !important; margin: 0 auto !important; filter: none !important; padding: 6px !important; box-sizing: border-box !important; background: #05070d !important; }
+        /* Sub-panel: hilangkan margin kiri ganda supaya sisi kanan tidak terpotong */
+        .sub-panel { margin-left: 0 !important; }
+        .sidebar { overflow: hidden !important; }
     </style>
 </head>
 <body>
