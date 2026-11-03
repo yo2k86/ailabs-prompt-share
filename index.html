@@ -342,6 +342,15 @@
     <style>
         #login-view.hidden { display: none !important; }
     </style>
+
+    <!-- LOGIN AWAL FULL LAGI: kartu selayar + logo banner full, dengan hidden tetap menang setelah login -->
+    <style>
+        @media (max-width: 760px) {
+            #login-view { width: 100% !important; max-width: none !important; height: 100dvh !important; max-height: none !important; padding: 0 22px 28px !important; border-radius: 0 !important; display: flex !important; flex-direction: column !important; justify-content: center !important; }
+            #login-view img { width: calc(100% + 44px) !important; max-width: none !important; max-height: none !important; margin-left: -22px !important; margin-right: -22px !important; border-radius: 0 !important; border: none !important; }
+        }
+        #login-view.hidden { display: none !important; }
+    </style>
 </head>
 <body>
 
