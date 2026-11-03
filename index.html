@@ -21,7 +21,7 @@
             overflow: hidden;
             position: fixed;
             inset: 0;
-            background: linear-gradient(rgba(10, 10, 15, 0.75), rgba(10, 10, 15, 0.75)), url("https://i.ibb.co.com/FLfrC2X8/logo.jpg") center/cover no-repeat fixed;
+            background: #05070d;
             z-index: -2;
         }
 
@@ -261,15 +261,22 @@
         .remotion-brand-panel img { width: 200px !important; height: 52px !important; }
     </style>
 
+
+    <!-- LOGO FIX: no ImgBB, no crop, no duplicate text -->
+    <style>
+        #login-view img { width: 220px !important; height: auto !important; max-height: 150px !important; object-fit: contain !important; background: #05070d !important; border-radius: 12px !important; border: 1px solid #2a364f !important; }
+        .logo button img { object-fit: contain !important; background: #05070d !important; }
+        .profile img, .account img { object-fit: contain !important; background: #05070d !important; }
+        .remotion-brand img { width: 200px !important; height: auto !important; max-height: 140px !important; object-fit: contain !important; background: #05070d !important; border-radius: 12px !important; margin-bottom: 0 !important; }
+    </style>
 </head>
 <body>
 
     <!-- PORTAL LOGIN -->
     <div id="login-view">
-        <img src="https://i.ibb.co.com/FLfrC2X8/logo.jpg" alt="Ailabs Logo" onerror="this.src='https://placehold.co/100x100/ff6b7d/white?text=A'">
+        <img src="ailabs-by-pro-banner.jpg" alt="Ailabs Logo" onerror="this.src='https://placehold.co/100x100/38bdf8/white?text=A'">
         <h2>Ailabs Portal</h2>
         <p class="subtitle">System Secure Login Required</p>
-        <div class="remotion-brand"><img src="ailabs-by-pro.jpg" alt="Ailabs by pro"><div class="remotion-brand-text">ailabs <span>BY PRO</span></div></div>
         
         <div class="input-group">
             <i class="fa-solid fa-envelope"></i>
@@ -296,7 +303,7 @@
 
             <div class="logo">
                 <button id="toggle" title="Toggle Panel" onclick="handleLogoClick()">
-                    <img src="https://i.ibb.co.com/FLfrC2X8/logo.jpg" alt="Ailabs Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px;" onerror="this.src='https://placehold.co/100x100/ff6b7d/white?text=A'">
+                    <img src="ailabs-by-pro-banner.jpg" alt="Ailabs Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px;" onerror="this.src='https://placehold.co/100x100/38bdf8/white?text=A'">
                 </button>
             </div>
 
@@ -307,7 +314,7 @@
             </ul>
 
             <div class="profile" onclick="handleLogoClick()" title="Klik 3x untuk Admin Mode">
-                <img src="https://i.ibb.co.com/FLfrC2X8/logo.jpg" alt="Profile" id="sidebar-profile-img" onerror="this.src='https://placehold.co/100x100/333/white?text=U'">
+                <img src="ailabs-by-pro-banner.jpg" alt="Profile" id="sidebar-profile-img" onerror="this.src='https://placehold.co/100x100/333/white?text=U'">
             </div>
         </aside>
 
@@ -316,7 +323,7 @@
             <h1>Ailabs Workspace</h1>
             
             <div class="account">
-                <img src="https://i.ibb.co.com/FLfrC2X8/logo.jpg" alt="Account Avatar" id="panel-profile-img" onerror="this.src='https://placehold.co/100x100/333/white?text=U'">
+                <img src="ailabs-by-pro-banner.jpg" alt="Account Avatar" id="panel-profile-img" onerror="this.src='https://placehold.co/100x100/333/white?text=U'">
                 <div>
                     <h3 id="user-name-display">Loading...</h3>
                     <small id="user-email-display">...</small>
@@ -333,7 +340,7 @@
                 <!-- Kategori akan dirender secara otomatis dari database via JS -->
             </ul>
 
-            <div class="remotion-brand remotion-brand-panel"><img src="ailabs-by-pro.jpg" alt="Ailabs by pro"><div class="remotion-brand-text">ailabs <span>BY PRO</span></div></div>
+            <div class="remotion-brand remotion-brand-panel"><img src="ailabs-by-pro-banner.jpg" alt="Ailabs by pro"></div>
         </section>
 
         <!-- SUB-PANEL WADAH DAFTAR APLIKASI -->
