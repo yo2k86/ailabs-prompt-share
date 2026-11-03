@@ -368,6 +368,17 @@
         }
         #login-view.hidden { display: none !important; }
     </style>
+
+    <!-- LOGO AKUN FULL LEBAR HP: bukan thumbnail kecil, banner utuh selebar panel -->
+    <style>
+        @media (max-width: 760px) {
+            .account { padding: 0 !important; gap: 0 !important; border: none !important; background: transparent !important; }
+            .account img { width: 100% !important; max-width: none !important; height: auto !important; max-height: none !important; border-radius: 12px !important; object-fit: contain !important; margin-bottom: 12px !important; }
+            .account > div { width: 100% !important; text-align: center !important; }
+            .account .actions { margin: 12px auto 0 !important; }
+        }
+        #login-view.hidden { display: none !important; }
+    </style>
 </head>
 <body>
 
