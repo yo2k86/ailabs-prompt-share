@@ -329,6 +329,14 @@
             .remotion-brand-panel img { border-radius: 12px !important; }
         }
     </style>
+
+    <!-- PERBAIKAN LOGIN HP: kartu login kembali ke ukuran produksi (batalkan full-height/flex login; workspace tetap full) -->
+    <style>
+        @media (max-width: 760px) {
+            #login-view { width: 94% !important; max-width: 400px !important; height: auto !important; max-height: 90dvh !important; padding: 28px 22px !important; border-radius: 20px !important; display: block !important; flex-direction: initial !important; justify-content: initial !important; }
+            #login-view img { width: 100% !important; max-width: 260px !important; max-height: 170px !important; margin-left: 0 !important; margin-right: 0 !important; border-radius: 12px !important; border: 1px solid #2a364f !important; }
+        }
+    </style>
 </head>
 <body>
 
