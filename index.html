@@ -141,6 +141,14 @@
 
         .link-icon { color: rgba(255,255,255,0.2); font-size: 14px; transition: 0.3s; }
         .app-item:hover .link-icon { color: #ff6b7d; transform: translate(2px, -2px); }
+        .tutorial-btn { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #fff; font-size: 10px; font-weight: 600; line-height: 1.2; cursor: pointer; flex-shrink: 0; transition: 0.3s; font-family: 'Poppins'; }
+        .tutorial-btn:hover { background: rgba(255,107,125,0.25); border-color: rgba(255,107,125,0.5); }
+        .tutorial-back-btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; font-family: 'Poppins'; margin-bottom: 10px; }
+        .tutorial-back-btn:hover { background: rgba(56,189,248,0.25); border-color: rgba(56,189,248,0.5); }
+        .tutorial-btn i { font-size: 14px; }
+        .tutorial-divider { width: 1px; align-self: stretch; margin: 6px 2px; background: rgba(255,255,255,0.18); flex-shrink: 0; }
+        .tutorial-player { width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 12px; background: #000; }
+
 
         #admin-bulk-btn { margin-left: 8px; }
 
@@ -524,6 +532,10 @@
                     <label>Logo URL (Optional, Auto FontAwesome if empty)</label>
                     <input type="url" id="app-logo" placeholder="https://image-url...">
                 </div>
+                <div class="form-group">
+                    <label>Tutorial URL (YouTube / Google Drive, Optional)</label>
+                    <input type="url" id="app-tutorial" placeholder="https://youtube.com/watch?v=... atau https://drive.google.com/file/d/...">
+                </div>
                 
                 <div class="modal-btns">
                     <button type="button" class="btn-cancel" onclick="closeAddModal()">Cancel</button>
@@ -548,7 +560,8 @@
     "name": "App Baru",
     "url": "https://...",
     "category": "apps",
-    "logo": ""
+    "logo": "",
+    "tutorial": "https://..."
   }
 ]'></textarea>
             
@@ -557,6 +570,20 @@
             <div class="modal-btns">
                 <button class="btn-cancel" onclick="closeBulkModal()">Tutup</button>
                 <button class="btn-save btn-warning" id="btn-process-bulk" onclick="processBulkImport()">Proses Import</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TUTORIAL -->
+    <div id="tutorial-modal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 640px;">
+            <div style="text-align: left;"><button class="tutorial-back-btn" onclick="closeTutorialModal()"><i class="fa-solid fa-arrow-left"></i> Kembali</button></div>
+            <div class="modal-icon-top" style="background: linear-gradient(135deg, #38bdf8, #0369a1); box-shadow: 0 10px 20px rgba(56,189,248,0.4);"><i class="fa-solid fa-circle-play"></i></div>
+            <h3 id="tutorial-title">Tutorial</h3>
+            <div id="tutorial-player-wrap" style="margin-top: 15px;"></div>
+            <p id="tutorial-fallback" class="hidden" style="color: rgba(255,255,255,0.7); font-size: 12px; text-align: center; margin-top: 15px;">Video tidak bisa diputar di dalam aplikasi. <a id="tutorial-open-link" href="#" target="_blank" rel="noopener" style="color: #38bdf8;">Buka tutorial di tab baru</a></p>
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="closeTutorialModal()">Tutup</button>
             </div>
         </div>
     </div>
@@ -593,33 +620,33 @@
         
         // DAFTAR 27 APLIKASI PERMANEN
         const DEFAULT_APPS = [
-            { id: "app_1", name: "AIlabs Voice Over V2", url: "https://gemini.google.com/share/8d40127f7175", category: "apps", logo: "" },
-            { id: "app_2", name: "Ailabs UMKM", url: "https://gemini.google.com/share/49a52a6c4734", category: "apps", logo: "" },
-            { id: "app_3", name: "Ailabs Affiliate", url: "https://gemini.google.com/share/3cee1998a001", category: "apps", logo: "" },
-            { id: "app_4", name: "Ailabs Cartoon", url: "https://gemini.google.com/share/af5518ea9706", category: "apps", logo: "" },
-            { id: "app_5", name: "Restore Image", url: "https://gemini.google.com/share/c979a3417d29", category: "apps", logo: "" },
-            { id: "app_6", name: "Auto Caption", url: "https://gemini.google.com/share/a994fe709148", category: "apps", logo: "" },
-            { id: "app_7", name: "Reels Analizer", url: "https://gemini.google.com/share/ce867c6a8c17", category: "apps", logo: "" },
-            { id: "app_8", name: "Ailabs Flux", url: "https://gemini.google.com/share/cb7e1012f4f9", category: "apps", logo: "" },
-            { id: "app_9", name: "Ailabs Ramadhan", url: "https://gemini.google.com/share/fa5bd00de5dd", category: "apps", logo: "" },
-            { id: "app_10", name: "Morp", url: "https://gemini.google.com/share/adcc08ee9a8f", category: "apps", logo: "" },
-            { id: "app_11", name: "Template", url: "https://gemini.google.com/share/58c58ead3699", category: "apps", logo: "" },
-            { id: "app_12", name: "DNA", url: "https://gemini.google.com/share/94a493208c91", category: "apps", logo: "" },
-            { id: "app_13", name: "DNA PRO", url: "https://gemini.google.com/share/dff84aeea426", category: "xpro", logo: "" },
-            { id: "app_14", name: "Ailabs Storyboard Pro", url: "https://gemini.google.com/share/2f70a3ba09cb", category: "xpro", logo: "" },
-            { id: "app_15", name: "Ailabs Scene Pro", url: "https://gemini.google.com/share/061581303ba4", category: "xpro", logo: "" },
-            { id: "app_16", name: "Ailabs Storyboard Pro V2", url: "https://gemini.google.com/share/e3ac8279c8cf", category: "xpro", logo: "" },
-            { id: "app_17", name: "Manipulasi Audio", url: "https://audio-modifier.vercel.app/", category: "toolkit", logo: "" },
-            { id: "app_18", name: "Ailabs Capcut", url: "https://ailabs-cc.vercel.app/", category: "toolkit", logo: "" },
-            { id: "app_19", name: "EncodeBase64", url: "https://gemini.google.com/share/520c6663d2a0", category: "toolkit", logo: "" },
-            { id: "app_20", name: "WM Remover", url: "https://gemini.google.com/share/01704ae5fbbf", category: "toolkit", logo: "" },
-            { id: "app_21", name: "Music Mastering", url: "https://masteraudio.pro", category: "toolkit", logo: "" },
-            { id: "app_22", name: "Suno Style", url: "https://gemini.google.com/share/6a3f36032542", "category": "toolkit", logo: "" },
-            { id: "app_23", name: "Upscale Image", url: "https://upscale-image.vercel.app/", category: "toolkit", logo: "" },
-            { id: "app_24", name: "Ailabs Speed", url: "https://ailabs-speed.vercel.app/", category: "toolkit", logo: "" },
-            { id: "app_25", name: "Media Forge", "url": "https://gemini.google.com/share/a8f284a49e0d", "category": "toolkit", logo: "" },
-            { id: "app_26", name: "Desain Cover AI", "url": "https://gemini.google.com/share/b6ce96b95d5a", "category": "guides", logo: "" },
-            { id: "app_27", name: "42 Camera Movements", "url": "https://aishotstudio.com/42-camera-movements-ai-prompts/", "category": "guides", logo: "" }
+            { id: "app_1", name: "AIlabs Voice Over V2", url: "https://gemini.google.com/share/8d40127f7175", category: "apps", logo: "", tutorial: "" },
+            { id: "app_2", name: "Ailabs UMKM", url: "https://gemini.google.com/share/49a52a6c4734", category: "apps", logo: "", tutorial: "" },
+            { id: "app_3", name: "Ailabs Affiliate", url: "https://gemini.google.com/share/3cee1998a001", category: "apps", logo: "", tutorial: "" },
+            { id: "app_4", name: "Ailabs Cartoon", url: "https://gemini.google.com/share/af5518ea9706", category: "apps", logo: "", tutorial: "" },
+            { id: "app_5", name: "Restore Image", url: "https://gemini.google.com/share/c979a3417d29", category: "apps", logo: "", tutorial: "" },
+            { id: "app_6", name: "Auto Caption", url: "https://gemini.google.com/share/a994fe709148", category: "apps", logo: "", tutorial: "" },
+            { id: "app_7", name: "Reels Analizer", url: "https://gemini.google.com/share/ce867c6a8c17", category: "apps", logo: "", tutorial: "" },
+            { id: "app_8", name: "Ailabs Flux", url: "https://gemini.google.com/share/cb7e1012f4f9", category: "apps", logo: "", tutorial: "" },
+            { id: "app_9", name: "Ailabs Ramadhan", url: "https://gemini.google.com/share/fa5bd00de5dd", category: "apps", logo: "", tutorial: "" },
+            { id: "app_10", name: "Morp", url: "https://gemini.google.com/share/adcc08ee9a8f", category: "apps", logo: "", tutorial: "" },
+            { id: "app_11", name: "Template", url: "https://gemini.google.com/share/58c58ead3699", category: "apps", logo: "", tutorial: "" },
+            { id: "app_12", name: "DNA", url: "https://gemini.google.com/share/94a493208c91", category: "apps", logo: "", tutorial: "" },
+            { id: "app_13", name: "DNA PRO", url: "https://gemini.google.com/share/dff84aeea426", category: "xpro", logo: "", tutorial: "" },
+            { id: "app_14", name: "Ailabs Storyboard Pro", url: "https://gemini.google.com/share/2f70a3ba09cb", category: "xpro", logo: "", tutorial: "" },
+            { id: "app_15", name: "Ailabs Scene Pro", url: "https://gemini.google.com/share/061581303ba4", category: "xpro", logo: "", tutorial: "" },
+            { id: "app_16", name: "Ailabs Storyboard Pro V2", url: "https://gemini.google.com/share/e3ac8279c8cf", category: "xpro", logo: "", tutorial: "" },
+            { id: "app_17", name: "Manipulasi Audio", url: "https://audio-modifier.vercel.app/", category: "toolkit", logo: "", tutorial: "" },
+            { id: "app_18", name: "Ailabs Capcut", url: "https://ailabs-cc.vercel.app/", category: "toolkit", logo: "", tutorial: "" },
+            { id: "app_19", name: "EncodeBase64", url: "https://gemini.google.com/share/520c6663d2a0", category: "toolkit", logo: "", tutorial: "" },
+            { id: "app_20", name: "WM Remover", url: "https://gemini.google.com/share/01704ae5fbbf", category: "toolkit", logo: "", tutorial: "" },
+            { id: "app_21", name: "Music Mastering", url: "https://masteraudio.pro", category: "toolkit", logo: "", tutorial: "" },
+            { id: "app_22", name: "Suno Style", url: "https://gemini.google.com/share/6a3f36032542", "category": "toolkit", logo: "", tutorial: "" },
+            { id: "app_23", name: "Upscale Image", url: "https://upscale-image.vercel.app/", category: "toolkit", logo: "", tutorial: "" },
+            { id: "app_24", name: "Ailabs Speed", url: "https://ailabs-speed.vercel.app/", category: "toolkit", logo: "", tutorial: "" },
+            { id: "app_25", name: "Media Forge", "url": "https://gemini.google.com/share/a8f284a49e0d", "category": "toolkit", logo: "", tutorial: "" },
+            { id: "app_26", name: "Desain Cover AI", "url": "https://gemini.google.com/share/b6ce96b95d5a", "category": "guides", logo: "", tutorial: "" },
+            { id: "app_27", name: "42 Camera Movements", "url": "https://aishotstudio.com/42-camera-movements-ai-prompts/", "category": "guides", logo: "", tutorial: "" }
         ];
 
         let allApps = [...DEFAULT_APPS];
@@ -882,6 +909,10 @@
                     `;
                 }
 
+                const tutorialBtn = (app.tutorial || "").trim()
+                    ? `<span class="tutorial-divider"></span><button class="tutorial-btn" onclick="event.preventDefault(); event.stopPropagation(); openTutorialModal('${app.id}')" title="Lihat Tutorial"><i class="fa-solid fa-circle-play"></i><span>Tutorial</span></button>`
+                    : '';
+
                 html += `
                     <a href="${appUrl}" onclick="smartOpen(event, this.href)" class="app-item">
                         <div class="app-icon">${iconContent}</div>
@@ -890,6 +921,7 @@
                             <p>${appUrl.replace(/^https?:\/\//, '').substring(0, 30)}...</p>
                         </div>
                         ${adminControls}
+                        ${tutorialBtn}
                         <i class="fa-solid fa-arrow-up-right-from-square link-icon" ${isAdmin ? 'style="display:none"' : ''}></i>
                     </a>
                 `;
@@ -958,6 +990,7 @@
                 document.getElementById('app-url').value = app.url;
                 document.getElementById('app-category').value = app.category || 'apps';
                 document.getElementById('app-logo').value = app.logo || '';
+                document.getElementById('app-tutorial').value = app.tutorial || '';
                 document.getElementById('modal-title').textContent = 'Edit Interface';
             }
         };
@@ -971,12 +1004,13 @@
             const url = document.getElementById('app-url').value;
             const category = document.getElementById('app-category').value;
             const logo = document.getElementById('app-logo').value;
+            const tutorial = document.getElementById('app-tutorial').value;
 
             if (id) {
                 const index = allApps.findIndex(a => a.id === id);
-                if(index !== -1) allApps[index] = { ...allApps[index], name, url, logo, category };
+                if(index !== -1) allApps[index] = { ...allApps[index], name, url, logo, category, tutorial };
             } else {
-                allApps.push({ id: 'app_' + Date.now(), name, url, logo, category });
+                allApps.push({ id: 'app_' + Date.now(), name, url, logo, category, tutorial });
             }
             saveApps();
             closeAddModal();
@@ -1040,7 +1074,8 @@
                         name: app.name,
                         url: app.url,
                         category: app.category || 'apps',
-                        logo: app.logo || ''
+                        logo: app.logo || '',
+                        tutorial: app.tutorial || ''
                     });
                     addedCount++;
                 } else {
@@ -1058,6 +1093,42 @@
                 statusText.className = "text-warning";
                 statusText.style.color = "#ffd93d";
             }
+        };
+
+        // Tutorial: ubah link YouTube / Drive menjadi URL embed untuk diputar di dalam aplikasi
+        function getTutorialEmbedUrl(rawUrl) {
+            const url = (rawUrl || "").trim();
+            if (!url) return null;
+            let m = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|live\/|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
+            if (m) return { type: 'embed', src: 'https://www.youtube-nocookie.com/embed/' + m[1] };
+            m = url.match(/drive\.google\.com\/file\/d\/([^\/?#]+)/);
+            if (m) return { type: 'embed', src: 'https://drive.google.com/file/d/' + m[1] + '/preview' };
+            m = url.match(/drive\.google\.com\/open\?id=([^&#]+)/);
+            if (m) return { type: 'embed', src: 'https://drive.google.com/file/d/' + m[1] + '/preview' };
+            return { type: 'link', src: url };
+        }
+
+        window.openTutorialModal = function(id) {
+            const app = allApps.find(a => a.id === id);
+            if (!app || !app.tutorial) return;
+            const embed = getTutorialEmbedUrl(app.tutorial);
+            document.getElementById('tutorial-title').textContent = 'Tutorial: ' + (app.name || 'Aplikasi');
+            const wrap = document.getElementById('tutorial-player-wrap');
+            const fallback = document.getElementById('tutorial-fallback');
+            if (embed && embed.type === 'embed') {
+                wrap.innerHTML = '<iframe class="tutorial-player" src="' + embed.src + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
+                fallback.classList.add('hidden');
+            } else {
+                wrap.innerHTML = '';
+                document.getElementById('tutorial-open-link').href = embed ? embed.src : app.tutorial;
+                fallback.classList.remove('hidden');
+            }
+            document.getElementById('tutorial-modal').classList.add('active');
+        };
+
+        window.closeTutorialModal = function() {
+            document.getElementById('tutorial-modal').classList.remove('active');
+            document.getElementById('tutorial-player-wrap').innerHTML = '';
         };
 
         // Smart Open Link Handler
