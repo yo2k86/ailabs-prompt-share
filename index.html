@@ -146,6 +146,7 @@
         .tutorial-back-btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; font-family: 'Poppins'; margin-bottom: 10px; }
         .tutorial-back-btn:hover { background: rgba(56,189,248,0.25); border-color: rgba(56,189,248,0.5); }
         .tutorial-btn i { font-size: 13px; }
+        .tutorial-divider { width: 1px; align-self: stretch; margin: 6px 2px; background: rgba(255,255,255,0.18); flex-shrink: 0; }
         .tutorial-player { width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 12px; background: #000; }
         @media (max-width: 480px) { .tutorial-btn span { display: none; } .tutorial-btn { padding: 7px 9px; } }
 
@@ -909,7 +910,7 @@
                 }
 
                 const tutorialBtn = (app.tutorial || "").trim()
-                    ? `<button class="tutorial-btn" onclick="event.preventDefault(); event.stopPropagation(); openTutorialModal('${app.id}')" title="Lihat Tutorial"><i class="fa-solid fa-circle-play"></i><span>Tutorial</span></button>`
+                    ? `<span class="tutorial-divider"></span><button class="tutorial-btn" onclick="event.preventDefault(); event.stopPropagation(); openTutorialModal('${app.id}')" title="Lihat Tutorial"><i class="fa-solid fa-circle-play"></i><span>Tutorial</span></button>`
                     : '';
 
                 html += `
