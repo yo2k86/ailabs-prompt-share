@@ -886,7 +886,7 @@
                     : '';
 
                 html += `
-                    <a href="${appUrl}" onclick="smartOpen(event, this.href)" class="app-item">
+                    <a href="${appUrl}" target="_blank" rel="noopener noreferrer" onclick="smartOpen(event, this.href)" class="app-item">
                         <div class="app-icon">${iconContent}</div>
                         <div class="app-details">
                             <h4>${appName}</h4>
@@ -1105,17 +1105,20 @@
 
         // Smart Open Link Handler
         window.smartOpen = function(e, url) {
-            if(e) e.preventDefault();
             const ua = navigator.userAgent || navigator.vendor || window.opera;
             const isWebView = /(Instagram|FBAN|FBAV|WhatsApp|Line|TikTok|wv)/i.test(ua);
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-            try {
-                if (isWebView || isStandalone) window.location.href = url;
-                else {
-                    let newWin = window.open(url, '_blank', 'noopener,noreferrer');
-                    if (!newWin || newWin.closed) window.location.href = url;
-                }
-            } catch (err) { window.location.href = url; }
+            // Hanya di WebView / aplikasi terpasang (tab baru tidak jalan): pindah di tab yang sama.
+            if (isWebView || isStandalone) {
+                if(e) e.preventDefault();
+                window.location.href = url;
+                return;
+            }
+            // Browser biasa: kalau klik ada di dalam sebuah link, biarkan link itu (target=_blank) yang membuka tab baru.
+            // Kalau bukan link (misal item menu), buka tab baru di sini — tanpa fallback pindah tab,
+            // karena window.open dengan noopener selalu mengembalikan null (bukan berarti diblokir).
+            if (e && e.target && e.target.closest && e.target.closest('a')) return;
+            window.open(url, '_blank', 'noopener');
         };
 
         // Init
